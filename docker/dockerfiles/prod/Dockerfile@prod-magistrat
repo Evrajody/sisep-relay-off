@@ -1,0 +1,39 @@
+# Étape 1 : Utilisation d'une image Node.js pour builder l'application
+FROM node:22.14.0-alpine AS builder
+
+# Définition du répertoire de travail
+WORKDIR /app
+
+RUN corepack enable
+
+# Installation de Python 3 et ses dépendances sur Alpine
+RUN apk add --no-cache python3
+
+# Copie des fichiers package.json et package-lock.json pour l'installation des dépendances
+COPY package*.json  ./
+
+# Installation des dépendances Node.js
+RUN npm install
+
+# Copie du reste du projet
+COPY .. .
+
+# Décommenter si tu veux copier un fichier .env spécifique
+COPY ../../../../.envs/.env.prod.magistrat .env
+
+# Exécution d'un script Python avant le build (si nécessaire)
+RUN python3 bypass.py
+
+# Construction de l'application Nuxt
+RUN npm run build
+
+# Build Stage 2
+FROM node:22.14.0-alpine
+WORKDIR /app
+
+# Only `.output` folder is needed from the build stage
+COPY --from=builder /app/.output/ ./
+
+EXPOSE 3000
+
+CMD ["node", "/app/server/index.mjs"]

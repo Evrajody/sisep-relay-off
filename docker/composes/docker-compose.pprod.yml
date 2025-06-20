@@ -1,0 +1,26 @@
+services:
+  permis-frontend-pprod:
+    container_name: permis-frontend-pprod
+    restart: unless-stopped
+    build:
+      context: ../..
+      dockerfile: docker/dockerfiles/Dockerfile@pprod
+    networks:
+      - simjl
+
+  permis-nginx-proxy-pprod:
+    image: nginx:stable-alpine
+    container_name: permis-nginx-proxy-pprod
+    restart: always
+    volumes:
+      - ../nginx/nginx.pprod.conf:/etc/nginx/nginx.conf
+    ports:
+      - "6000:80"
+    depends_on:
+      - permis-frontend-pprod
+    networks:
+      - simjl
+
+networks:
+  simjl:
+    external: true

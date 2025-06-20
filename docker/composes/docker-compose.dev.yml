@@ -1,0 +1,26 @@
+services:
+  permis-frontend-dev:
+    restart: unless-stopped
+    container_name: permis-frontend-dev
+    build:
+      context: ../..
+      dockerfile: docker/dockerfiles/Dockerfile@dev
+    networks:
+      - simjl
+
+  permis-nginx-proxy-dev:
+    image: nginx:stable-alpine
+    container_name: permis-nginx-proxy-dev
+    restart: always
+    volumes:
+      - ../nginx/nginx.dev.conf:/etc/nginx/nginx.conf
+    ports:
+      - "35100:80"
+    depends_on:
+      - permis-frontend-dev
+    networks:
+      - simjl
+
+networks:
+  simjl:
+    external: true

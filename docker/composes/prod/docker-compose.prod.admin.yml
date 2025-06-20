@@ -1,0 +1,26 @@
+services:
+  permis-frontend-prod-admin:
+    container_name: permis-frontend-prod-admin
+    restart: unless-stopped
+    build:
+      context: ../../../
+      dockerfile: docker/dockerfiles/prod/Dockerfile@prod-admin
+    networks:
+      - simjl
+
+  permis-nginx-proxy-prod-admin:
+    image: nginx:stable-alpine
+    container_name: permis-nginx-proxy-prod-admin
+    restart: always
+    volumes:
+      - ../../nginx/prod/nginx.prod-admin.conf:/etc/nginx/nginx.conf
+    ports:
+      - "5003:80"
+    depends_on:
+      - permis-frontend-prod-admin
+    networks:
+      - simjl
+
+networks:
+  simjl:
+    external: true

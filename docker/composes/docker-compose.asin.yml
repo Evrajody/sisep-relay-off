@@ -1,0 +1,26 @@
+services:
+  permis-frontend-asin:
+    restart: unless-stopped
+    container_name: permis-frontend-asin
+    build:
+      context: ../..
+      dockerfile: docker/dockerfiles/Dockerfile@asin
+    networks:
+      - simjl
+
+  permis-nginx-proxy-asin:
+    image: nginx:stable-alpine
+    container_name: permis-nginx-proxy-asin
+    restart: always
+    volumes:
+      - ../nginx/nginx.asin.conf:/etc/nginx/nginx.conf
+    ports:
+      - "35800:80"
+    depends_on:
+      - permis-frontend-asin
+    networks:
+      - simjl
+
+networks:
+  simjl:
+    external: true
