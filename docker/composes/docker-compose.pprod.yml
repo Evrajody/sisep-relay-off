@@ -1,26 +1,26 @@
 services:
-  permis-frontend-pprod:
-    container_name: permis-frontend-pprod
+  siseb-frontend-pprod:
+    container_name: siseb-frontend-pprod
     restart: unless-stopped
     build:
       context: ../..
       dockerfile: docker/dockerfiles/Dockerfile@pprod
     networks:
-      - simjl
+      - siseb
 
-  permis-nginx-proxy-pprod:
+  siseb-nginx-proxy-pprod:
     image: nginx:stable-alpine
-    container_name: permis-nginx-proxy-pprod
+    container_name: siseb-nginx-proxy-pprod
     restart: always
     volumes:
       - ../nginx/nginx.pprod.conf:/etc/nginx/nginx.conf
     ports:
-      - "6000:80"
+      - "9500:80"
     depends_on:
-      - permis-frontend-pprod
+      - siseb-frontend-pprod
     networks:
-      - simjl
+      - siseb
 
 networks:
-  simjl:
+  siseb:
     external: true

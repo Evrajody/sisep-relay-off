@@ -1,0 +1,26 @@
+services:
+  siseb-frontend-prod:
+    container_name: siseb-frontend-prod
+    restart: unless-stopped
+    build:
+      context: ../..
+      dockerfile: docker/dockerfiles/Dockerfile@prod
+    networks:
+      - siseb
+
+  siseb-nginx-proxy-prod:
+    image: nginx:stable-alpine
+    container_name: siseb-nginx-proxy-prod
+    restart: always
+    volumes:
+      - ../nginx/nginx.prod.conf:/etc/nginx/nginx.conf
+    ports:
+      - "5000:80"
+    depends_on:
+      - siseb-frontend-prod
+    networks:
+      - siseb
+
+networks:
+  siseb:
+    external: true
