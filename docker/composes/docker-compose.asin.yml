@@ -5,6 +5,7 @@ services:
     build:
       context: ../..
       dockerfile: docker/dockerfiles/Dockerfile@asin
+      tags: ['siseb-frontend-asin']
     networks:
       - siseb
 

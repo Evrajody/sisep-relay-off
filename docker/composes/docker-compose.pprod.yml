@@ -1,10 +1,12 @@
 services:
   siseb-frontend-pprod:
     container_name: siseb-frontend-pprod
+
     restart: unless-stopped
     build:
       context: ../..
       dockerfile: docker/dockerfiles/Dockerfile@pprod
+      tags: ['siseb-frontend-pprod']
     networks:
       - siseb
 

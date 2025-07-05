@@ -162,38 +162,22 @@ const statsImg = reactive([
 ])
 
 const questions = reactive([{
-  label: 'Comment reinitialiser mon mot de passe justice ?',
+  label: 'Comment importer mes documents existants ?',
   icon: 'i-heroicons-information-circle',
   content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
 }, {
-  label: 'Comment contacter le support ?',
+  label: 'Comment s’inscrire sur la plateforme Piinova ?',
   icon: 'i-heroicons-arrow-down-tray',
   content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
 }, {
-  label: 'Comment acceder à la plateforme de gestion de la détention',
+  label: 'Comment acceder interpreter les données sur la plateforme ?',
   icon: 'i-heroicons-arrow-down-tray',
   content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
 }, {
-  label: 'Comment éditer mon profile sur la plateforme mandat ?',
+  label: 'Puis librement utiliser ces données ?',
   icon: 'i-heroicons-eye-dropper',
   content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
-}, {
-  label: 'Puis modifier un mandat après emission ?',
-  icon: 'i-heroicons-rectangle-group',
-  content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
-}, {
-  label: 'Comment changer ma photo de profile ?',
-  icon: 'i-heroicons-square-3-stack-3d',
-  content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
-}, {
-  label: 'Comment inscrire son EBNL ?',
-  icon: 'i-heroicons-square-3-stack-3d',
-  content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
-}, {
-  label: 'Mon mail n\'est pas accessible',
-  icon: 'i-heroicons-wrench-screwdriver',
-  content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
-}])
+}, ])
 
 const animation = {duration: 50000, easing: (t) => t}
 
