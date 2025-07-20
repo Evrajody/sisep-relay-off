@@ -212,8 +212,7 @@ const [container, slider] = useKeenSlider({
     <!-- SECTION BANNER PRINCIPAL-->
     <header class="h-[600px] relative bg-gray-100 ">
 
-      <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
-           src="~/assets/images/cadre_world.jpg">
+      <img alt="" class="absolute inset-0 w-full h-full object-center object-cover" src="~/assets/images/cadre_world.jpg">
 
       <div class="bg-black/80 absolute opacity-60 inset-0"></div>
 
@@ -267,7 +266,7 @@ const [container, slider] = useKeenSlider({
 
               <input
                   class="w-full  mx-auto qcss  focus:outline-none focus:appearance-auto motion-duration-500 motion-delay-200 bg-white rounded-sm shadow-lg py-5 max-w-4xl px-5 z-30"
-                  placeholder="Trouvzr des données , des indicateurs par catégories" type="search">
+                  placeholder="Trouver des données , des indicateurs par catégories" type="search">
 
               <button
                   class="bg-red-600  text-white rounded-sm shadow-md px-5 py-2.5">
@@ -396,7 +395,7 @@ const [container, slider] = useKeenSlider({
                       ref="counter"
                       :autoinit="true"
                       :duration="5"
-                      :endAmount="item.value"
+                      :endAmount="Number.parseInt(item.value)"
                       :startAmount="0"
                       class="font-bold"
                   />
@@ -585,8 +584,6 @@ const [container, slider] = useKeenSlider({
 
           <h3 class="text-3xl text-center font-bold text-permis-base"> DECOUVRER LES DERNIERS PROJETS </h3>
 
-
-
         </div>
 
       </div>
@@ -648,11 +645,6 @@ const [container, slider] = useKeenSlider({
 
 
     </section>
-
-
-
-
-
 
 
   </main>

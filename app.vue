@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div >
     <NuxtRouteAnnouncer />
     <NuxtLayout>
       <NuxtPage />
@@ -7,4 +7,5 @@
   </div>
 </template>
 <script setup lang="ts">
+
 </script>
