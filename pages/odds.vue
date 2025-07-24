@@ -114,6 +114,7 @@
 
         <Footer></Footer>
     </main>
+
 </template>
 
 <script lang="ts" setup>

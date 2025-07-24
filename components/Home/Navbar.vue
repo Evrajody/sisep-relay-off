@@ -1,50 +1,57 @@
 <template>
-    <div class="">
-        <ul class="flex gap-6 items-center">
-            <li v-for="item in navMenuElements">
-                <a class="text-lg font-bold text-white uppercase" :href="item.href">
-                    <span>{{ item.label }}</span>
-                </a>
-            </li>
-        </ul>
-    </div>
+  <div class="">
+    <ul class="flex gap-6 items-center">
+      <li v-for="item in navMenuElements">
+        <a :href="item.href" class="text-lg font-bold text-white uppercase">
+          <span>{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script lang="ts" setup>
 const navMenuElements = reactive([
-    {
-        label: "Accueil",
-        href: "#",
-    },
+  {
+    label: "Accueil",
+    href: "#",
+  },
 
-    {
-        label: "A propos",
-        href: "#",
-    },
+  {
+    label: "ODDs",
+    href: "/odds",
+  },
 
-    {
-        label: "Données",
-        href: "#",
-    },
+  {
+    label: "A propos",
+    href: "#",
+  },
 
-    {
-        label: "ODDs",
-        href: "/odds",
-    },
+  {
+    label: "Données",
+    href: "#",
+  },
 
-    {
-        label: "Conventions",
-        href: "#",
-    },
 
-    {
-        label: "Projet",
-        href: "#",
-    },
+  {
+    label: "Conventions",
+    href: "#",
+  },
 
-    {
-        label: "Faqs",
-        href: "#",
-    },
+  {
+    label: "Projet",
+    href: "#",
+  },
+
+  {
+    label: "Faqs",
+    href: "#",
+  },
+
+  {
+    label: "Espace",
+    href: "/dashboard",
+  },
+
 ]);
 </script>
