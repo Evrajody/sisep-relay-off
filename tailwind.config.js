@@ -45,6 +45,7 @@ export default {
                 midnight: "#121063",
                 tahiti: "#3ab7bf",
                 bermuda: "#78dcca",
+                "main-green": "#008751",
 
                 niagara: {
                     50: "#f1fcf9",
@@ -87,6 +88,16 @@ export default {
                     900: "#1c453b",
                     950: "#0a2520",
                 },
+            },
+
+
+            borderRadius: {
+                '5xl': '4rem',
+                '11xl': '10rem',
+            },
+
+            fontSize: {
+                'custom':['0.70rem', { lineHeight: '1rem' }],
             },
 
             fontFamily: {

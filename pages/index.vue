@@ -1,44 +1,9 @@
 <script lang="ts" setup>
 
 import Vue3autocounter from "vue3-autocounter";
+import Footer from "~/components/Home/Footer.vue";
+import Navbar from "~/components/Home/Navbar.vue";
 
-const navMenuElements = reactive([
-  {
-    label: "Accueil",
-    href: "#",
-  },
-
-  {
-    label: "A propos",
-    href: "#",
-  },
-
-  {
-    label: "Données",
-    href: "#",
-  },
-
-  {
-    label: "ODDs",
-    href: "#",
-  },
-
-  {
-    label: "Conventions",
-    href: "#",
-  },
-
-  {
-    label: "Projet",
-    href: "#",
-  },
-
-  {
-    label: "Faqs",
-    href: "#",
-  },
-
-])
 
 
 const cadresSearchElements = reactive([
@@ -179,7 +144,7 @@ const questions = reactive([{
   content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
 }, ])
 
-const animation = {duration: 50000, easing: (t) => t}
+const animation = {duration: 50000, easing: (t: any) => t}
 
 const [container, slider] = useKeenSlider({
   loop: true,
@@ -230,18 +195,8 @@ const [container, slider] = useKeenSlider({
 
           </div>
 
-          <div class="">
-
-            <ul class="flex gap-6 items-center">
-              <li v-for="item in navMenuElements">
-                <a class="text-lg font-bold text-white uppercase" href="">
-                  <span>{{ item.label }}</span>
-                </a>
-              </li>
-
-            </ul>
-
-          </div>
+          <!-- Navbar -->
+          <Navbar />
 
         </div>
 
@@ -646,6 +601,8 @@ const [container, slider] = useKeenSlider({
 
     </section>
 
+    <!--    SECTION FOOTER -->
+    <Footer />
 
   </main>
 
