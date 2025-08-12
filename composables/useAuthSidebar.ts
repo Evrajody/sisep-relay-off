@@ -45,7 +45,7 @@ export const useAuthSidebar = () => {
                 {
                     id: "listes-project",
                     label: "Projets",
-                    to: "#",
+                    to: {name: 'project-module'},
                     tooltip: {text: "Liste des projets"},
                 },
 

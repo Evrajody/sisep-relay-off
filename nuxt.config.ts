@@ -4,6 +4,12 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
 
+  // routeRules: {
+  //   '/': {
+  //     redirect: 'admin/login',
+  //   },
+  // },
+
   tailwindcss: {
     exposeConfig: true,
     viewer: true,

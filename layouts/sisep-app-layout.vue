@@ -131,13 +131,13 @@ const changModuleForm = computed(() => ({
                 :ui="{
                   base: 'gap-3 py-2',
                   inactive: 'text-white dark:text-gray-400 hover:text-slate-800 dark:hover:text-white hover:before:bg-white dark:hover:before:bg-gray-800/50',
-
                   active: 'text-slate-900 dark:text-white before:bg-gray-100 dark:before:bg-gray-800',
                   label: 'text-base truncate relative'
                 }"
             />
             <template #footer>
               <UserMenu/>
+
             </template>
           </UDashboardSidebar>
         </UDashboardPanel>
