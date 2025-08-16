@@ -1,5 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    runtimeConfig: {
+    apiSecret: '0198b20d-4a7c-7412-9f05-97e88bb6b3cb',
+    public: {
+      sisebApiBaseUrl: process.env.SISEB_API_BASE_URL,
+    }
+  },
+  css: ['~/assets/css/main-siseb.css'],
   debug: true,
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
@@ -10,11 +17,11 @@ export default defineNuxtConfig({
   //   },
   // },
 
-  tailwindcss: {
-    exposeConfig: true,
-    viewer: true,
-    cssPath: "~/assets/css/main.css",
-  },
+  // tailwindcss: {
+  //   exposeConfig: true,
+  //   viewer: true,
+  //   cssPath: "~/assets/css/main.css",
+  // },
 
   postcss: {
     plugins: {
@@ -49,7 +56,6 @@ export default defineNuxtConfig({
 
 
   modules: [
-    '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxt/image',
     '@nuxt/scripts',
