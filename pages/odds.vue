@@ -50,7 +50,7 @@
                     <div class="relative my-10 ">
                         <select
                             class="appearance-none border w-[22vw] border-gray-300 rounded px-4 py-2 pr-8 text-green-600 font-semibold focus:outline-none">
-                            <option>Catégories</option>
+                            <option disabled selected >Catégories</option>
                             <!-- Ajoute ici les autres options -->
                         </select>
                         <div
@@ -80,7 +80,7 @@
 
                 <div class="min-h-screen flex items-center justify-center">
                     <div
-                        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 place-content-center mx-auto my-5">
+                        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 place-content-center mx-auto my-16">
                         <div v-for="odd in odds" :key="odd.index"
                             class="bg-white flex flex-col justify-between items-center rounded-tr-5xl shadow-lg overflow-hidden h-[40dvh] max-w-sm w-[18vw] border-b-8 border-green-600">
                             <!-- Contenu principal -->
