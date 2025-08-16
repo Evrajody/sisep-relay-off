@@ -4,7 +4,6 @@ import Vue3autocounter from "vue3-autocounter";
 import Footer from "~/components/Home/Footer.vue";
 import Navbar from "~/components/Home/Navbar.vue";
 
-
 const cadresSearchElements = reactive([
 
   {
