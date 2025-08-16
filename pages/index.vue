@@ -4,8 +4,6 @@ import Vue3autocounter from "vue3-autocounter";
 import Footer from "~/components/Home/Footer.vue";
 import Navbar from "~/components/Home/Navbar.vue";
 
-
-
 const cadresSearchElements = reactive([
 
   {
@@ -306,7 +304,7 @@ const [container, slider] = useKeenSlider({
           </div>
 
           <div class="right w-1/2">
-            <img alt="" class="w-full" src="~/assets/images/bill_director.jpg">
+            <img class="" src="~/assets/images/double_ministre.jpeg">
           </div>
 
         </div>

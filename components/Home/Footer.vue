@@ -1,5 +1,5 @@
 <template>
-    <section class="min-h-[20dvh] text-white bg-main-green">
+    <section class="min-h-[20dvh] text-white bg-gradient-to-t from-[#083D30] to-[#0D6535] relative">
         <div class="container mx-auto px-14 pt-8">
             <div class="flex flex-row items-start justify-between gap-3">
                 <div class="flex flex-col space-y-3 w-full">

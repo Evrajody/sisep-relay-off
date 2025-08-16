@@ -1,7 +1,14 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  debug: true,
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
+
+  // routeRules: {
+  //   '/': {
+  //     redirect: 'admin/login',
+  //   },
+  // },
 
   tailwindcss: {
     exposeConfig: true,
@@ -22,12 +29,8 @@ export default defineNuxtConfig({
   },
 
   auth: {
-
     globalAppMiddleware: false,
-
     isEnabled: false,
-
-
   },
 
   colorMode: {
@@ -41,6 +44,8 @@ export default defineNuxtConfig({
     storage: "localStorage",
     storageKey: "nuxt-color-mode",
   },
+
+  extends: ["@nuxt/ui-pro"],
 
 
   modules: [
