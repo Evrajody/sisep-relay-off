@@ -63,23 +63,7 @@ export const useAuthSidebar = () => {
             id: "types-projet",
             label: "Type de projets",
             icon: "i-heroicons-megaphone",
-            children: [
-
-                {
-                    id: "lists-type-project",
-                    tooltip: {text: "Liste des types de projets"},
-                    label: "Liste des types de projets",
-                    to: "#",
-                },
-
-                {
-                    id: "new-types-project",
-                    tooltip: {text: "Creer un nouveau type de projet"},
-                    label: "Nouveau type de projet",
-                    to: "#"
-                },
-
-            ],
+            to: { name: "project-module-types-projects" },
         },
 
         {

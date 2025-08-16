@@ -8,7 +8,7 @@ import { defineConfig } from "@vueform/vueform";
 // import MaskPlugin from "@vueform/plugin-mask";
 // import FormStep_snow from "~/components/templates/FormStep_snow.vue";
 
-// const runtimeConfig = useRuntimeConfig();
+const runtimeConfig = useRuntimeConfig();
 // const { data, token } = useAuth();
 
 // LOCAL CUSTOMISATIONS
@@ -33,7 +33,7 @@ export default defineConfig({
 
   axios: {
     withCredentials: false,
-    baseURL: '',
+    baseURL: runtimeConfig.public.sisebApiBaseUrl,
   },
 
   views: {
@@ -51,7 +51,7 @@ export default defineConfig({
   endpoints: {
     uploadTempFile: {
       method: "POST",
-      url: "/api/utils/auth/uploadFilesPhotos",
+      url: "/upload-files",
     },
 
     removeTempFile: {
