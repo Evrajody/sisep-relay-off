@@ -17,11 +17,11 @@ export default defineNuxtConfig({
   //   },
   // },
 
-  // tailwindcss: {
-  //   exposeConfig: true,
-  //   viewer: true,
-  //   cssPath: "~/assets/css/main.css",
-  // },
+  tailwindcss: {
+    exposeConfig: true,
+    viewer: true,
+    cssPath: "~/assets/css/main-siseb.css",
+  },
 
   postcss: {
     plugins: {

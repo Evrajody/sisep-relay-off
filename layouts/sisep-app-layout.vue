@@ -79,7 +79,7 @@ const changModuleForm = computed(() => ({
 
   <client-only>
 
-    <div class="">
+    <div class="font-Manrope">
 
       <UDashboardLayout
           :ui="{ wrapper: 'min-h-screen bg-gray-100 dark:bg-gray-900' }"
