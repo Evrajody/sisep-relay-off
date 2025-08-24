@@ -110,14 +110,14 @@
 
         </section>
 
-        <Footer></Footer>
+        <FooterSiseb></FooterSiseb>
     </main>
 
 </template>
 
 <script lang="ts" setup>
 
-import Footer from '~/components/Home/Footer.vue';
+import FooterSiseb from '~/components/Home/FooterSiseb.vue';
 import Navbar from '~/components/Home/Navbar.vue';
 
 

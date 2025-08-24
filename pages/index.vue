@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 
 import Vue3autocounter from "vue3-autocounter";
-import Footer from "~/components/Home/Footer.vue";
+import FooterSiseb from "~/components/Home/FooterSiseb.vue";
 import Navbar from "~/components/Home/Navbar.vue";
 import ProjectCard from "~/components/Home/ProjectCard.vue";
 
@@ -553,7 +553,7 @@ const [container, slider] = useKeenSlider({
     </section>
 
     <!--    SECTION FOOTER -->
-    <Footer/>
+    <FooterSiseb/>
 
   </main>
 

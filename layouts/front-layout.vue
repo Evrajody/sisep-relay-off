@@ -6,6 +6,6 @@
 
 <script lang="ts" >
 
-    import Footer from '~/components/Home/Footer.vue';
+    import FooterSiseb from '~/components/Home/FooterSiseb.vue';
 
 </script>
