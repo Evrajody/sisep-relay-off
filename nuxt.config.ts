@@ -1,10 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  ssr: false,
+  ssr: true,
     runtimeConfig: {
     apiSecret: '0198b20d-4a7c-7412-9f05-97e88bb6b3cb',
     public: {
-      sisebApiBaseUrl: process.env.SISEB_API_BASE_URL,
+      sisebApiBaseUrl: process.env.NUXT_PUBLIC_SISEB_API_BASE_URL,
     }
   },
   css: ['~/assets/css/main-siseb.css'],
