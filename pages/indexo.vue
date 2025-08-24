@@ -34,7 +34,6 @@ const {$sisepApi} = useNuxtApp()
 
   </header>
 
-
 </template>
 
 <style scoped>

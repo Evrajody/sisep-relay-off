@@ -18,7 +18,7 @@ const changModuleForm = computed(() => ({
 
   showRequired: ["label"],
 
-  endpoint: "/agrement",
+  endpoint: "",
 
   schema: {
 

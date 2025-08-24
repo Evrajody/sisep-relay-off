@@ -199,7 +199,6 @@ const [container, slider] = useKeenSlider({
 
         </div>
 
-
       </div>
 
       <div class="container inset-0 absolute h-full mx-auto mt-20">
@@ -219,7 +218,7 @@ const [container, slider] = useKeenSlider({
             <div class="flex mt-8  motion-preset-slide-up-lg">
 
               <input
-                  class="w-full  mx-auto qcss  focus:outline-none focus:appearance-auto motion-duration-500 motion-delay-200 bg-white rounded-sm shadow-lg py-5 max-w-4xl px-5 z-30"
+                  class="w-full mx-auto qcss  focus:outline-none focus:appearance-auto motion-duration-500 motion-delay-200 bg-white rounded-sm shadow-lg py-5 max-w-4xl px-5 z-30"
                   placeholder="Trouver des données , des indicateurs par catégories" type="search">
 
               <button
@@ -269,7 +268,7 @@ const [container, slider] = useKeenSlider({
 
 
     <!--SECTION MOT DU DIRECTEUR -->
-    <section class="py-16 h-full  relative ">
+    <section class="py-16 h-full  relative">
 
       <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
            src="~/assets/images/cadre_world.jpg">
