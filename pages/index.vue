@@ -3,6 +3,7 @@
 import Vue3autocounter from "vue3-autocounter";
 import Footer from "~/components/Home/Footer.vue";
 import Navbar from "~/components/Home/Navbar.vue";
+import ProjectCard from "~/components/Home/ProjectCard.vue";
 
 const cadresSearchElements = reactive([
 
@@ -180,9 +181,9 @@ const [container, slider] = useKeenSlider({
 
       <div class="bg-black/80 absolute opacity-60 inset-0"></div>
 
-      <div class="h-fit mx-auto absolute top-7 rounded-lg shadow-lg left-0 right-0 z-20 max-w-7xl bg-sisep-hit">
+      <div class="h-fit mx-auto absolute top-7 rounded-lg shadow-lg left-0 right-0 z-20 max-w-[90vw] bg-sisep-hit">
 
-        <div class="flex gap-12 justify-between items-center pr-10">
+        <div class="flex gap-12 justify-start  items-center pr-10">
 
           <div class="img-box flex rounded-l-lg bg-white w-fit">
 
@@ -251,22 +252,6 @@ const [container, slider] = useKeenSlider({
 
     </header>
 
-
-    <!-- SECTION DES IMAGES PARTENAIRES-->
-    <section class="py-16">
-      <div class=" max-w-7xl mx-auto overflow-x-clip">
-        <div
-            class="grid grid-flow-col gap-10 items-center [grid-auto-columns:min-content] justify-center min-w-fit animate-slide">
-
-          <div v-for="item in [...partenairesImg, ...partenairesImg]" class="el w-[300px]">
-            <img :src="`/images/${item.src}`" class="w-full motion-blur">
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-
     <!--SECTION MOT DU DIRECTEUR -->
     <section class="py-16 h-full  relative">
 
@@ -313,63 +298,6 @@ const [container, slider] = useKeenSlider({
 
     </section>
 
-
-    <!--SECTION DECOUVERTE -->
-
-    <section class="py-16 h-full relative ">
-
-      <div class="bg-white absolute opacity-90 inset-0"></div>
-
-      <div class="relative max-w-7xl mx-auto">
-
-        <div class="flex items-center  h-full inset-0  gap-20">
-
-          <div class="right w-1/2">
-            <img alt="" class="w-full" src="~/assets/images/sport_duo.jpg">
-          </div>
-
-          <div class="left w-1/2 space-y-8">
-
-            <h3 class="text-3xl font-bold text-permis-base"> Découvrez SISEB Bénin, la boussole des données </h3>
-
-            <p>
-              Le site SISEB Bénin est une plateforme dédiée à la collecte, à la gestion et à la diffusion des données
-              statistiques sur l’état de l’environnement au Bénin.
-            </p>
-
-            <div class="stats-bloc grid grid-cols-2 gap-4 grid-rows-2">
-
-              <div v-for="item in statsImg" class="h-24 flex gap-2 items-center px-5 shadow-lg bg-sisep-hit">
-
-                <img :src="`/icons/${item.src}`" class="size-10 object-cover">
-
-                <div class="text-white text-4xl flex items-center gap-2">
-                  <Vue3autocounter
-                      ref="counter"
-                      :autoinit="true"
-                      :duration="5"
-                      :endAmount="Number.parseInt(item.value)"
-                      :startAmount="0"
-                      class="font-bold"
-                  />
-                  <span class="text-lg">{{ item.label }}</span>
-                </div>
-
-
-              </div>
-
-
-            </div>
-
-          </div>
-
-
-        </div>
-
-      </div>
-
-
-    </section>
 
 
     <!--SECTION DES TENDANCES -->
@@ -544,6 +472,12 @@ const [container, slider] = useKeenSlider({
 
           <h3 class="text-3xl text-center font-bold text-permis-base"> DECOUVRER LES DERNIERS PROJETS </h3>
 
+          <div class="grid grid-cols-1 sm:grid-cols-2 w-full md:grid-cols-2 lg:grid-cols-3 gap-4 place-content-center ">
+
+            <ProjectCard v-for="item in 3" :project="item"/>
+          
+          </div>
+
         </div>
 
       </div>
@@ -602,6 +536,20 @@ const [container, slider] = useKeenSlider({
       </div>
 
 
+    </section>
+
+        <!-- SECTION DES IMAGES PARTENAIRES-->
+    <section class="py-16">
+      <div class=" max-w-7xl mx-auto overflow-x-clip">
+        <div
+            class="grid grid-flow-col gap-10 items-center [grid-auto-columns:min-content] justify-center min-w-fit animate-slide">
+
+          <div v-for="item in [...partenairesImg, ...partenairesImg]" class="el w-[300px]">
+            <img :src="`/images/${item.src}`" class="w-full motion-blur">
+          </div>
+
+        </div>
+      </div>
     </section>
 
     <!--    SECTION FOOTER -->

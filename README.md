@@ -143,3 +143,15 @@ Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de
 ## 📞 Contact
 
 Pour toute question ou suggestion, veuillez ouvrir une issue sur GitHub ou nous contacter à [evrajodygildas@gmail.com](mailto:evrajodygildas@gmail.com)
+
+
+                    <!-- left column -->
+                    <div class="col-span-1 lg:px-5">
+                        <!-- Wrapper sticky -->
+                        <div class="lg:sticky lg:top-4">
+                            <div class="bg-red-500 h-[50vh]  rounded">
+                                <!-- ton contenu gauche -->
+                                
+                            </div>
+                        </div>
+                    </div>

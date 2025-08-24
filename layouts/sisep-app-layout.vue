@@ -159,7 +159,7 @@ const changModuleForm = computed(() => ({
 
               <template #title>
                 <div class="flex flex-col w-full">
-                  <h3 class="font-bold  "> Espace d'administration de SISEP BENIN </h3>
+                  <h3 class="font-bold  "> Espace d'administration de SISEB BENIN </h3>
                   <div class="bg-green-800 w-fit text-lg text-white font-extrabold">
                     <span>-- Module de gestion des projets -- </span>
                   </div>

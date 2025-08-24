@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  ssr: false,
     runtimeConfig: {
     apiSecret: '0198b20d-4a7c-7412-9f05-97e88bb6b3cb',
     public: {
@@ -7,7 +8,7 @@ export default defineNuxtConfig({
     }
   },
   css: ['~/assets/css/main-siseb.css'],
-  debug: true,
+  debug: false,
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
 
@@ -67,6 +68,10 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@sidebase/nuxt-auth",
     "nuxt-authorization",
-    'nuxt-keen-slider'
-  ]
+    'nuxt-keen-slider',
+    '@nuxtjs/leaflet',
+  ],
+  leaflet: {
+    markerCluster: false
+  }
 })

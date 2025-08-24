@@ -1,41 +1,42 @@
 <template>
     <main class="">
         <!-- SECTION BANNER PRINCIPAL-->
-        <header class="h-[600px] relative bg-gray-100 ">
-
+        <header class="h-[40dvh] relative bg-gray-100">
             <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
-                src="~/assets/images/convention_banner.png">
+                src="~/assets/images/cadre_world.jpg" />
 
             <div class="bg-black/80 absolute opacity-60 inset-0"></div>
 
-            <div class="h-fit mx-auto absolute top-7 rounded-lg shadow-lg left-0 right-0 z-20 max-w-7xl bg-sisep-hit">
-
-                <div class="flex gap-12 justify-between items-center pr-10">
-
+            <div
+                class="h-fit mx-auto absolute top-7 rounded-lg shadow-lg left-0 right-0 z-20 max-w-[90vw] bg-sisep-hit">
+                <div class="flex gap-12 justify-start items-center pr-10">
                     <div class="img-box flex rounded-l-lg bg-white w-fit">
-
                         <div class="w-[300px]">
                             <a href="">
-                                <img class="" src="~/assets/images/logo_cadre_vie.png">
+                                <img class="" src="~/assets/images/logo_cadre_vie.png" />
                             </a>
                         </div>
-
                     </div>
 
-                    <!--Navbar   -->
+                    <!-- Navbar -->
                     <Navbar />
-
-                </div>
-
-
-            </div>
-
-            <div class="container text-white inset-0  absolute h-full mx-auto top-52  ">
-                <div class="flex flex-col items-center gap-8 justify-center ">
-                    <h1 class="font-extrabold text-5xl ">Les Conventions</h1>
                 </div>
             </div>
 
+            <div class="container inset-0 absolute h-full mx-auto mt-20">
+                <div class="grid h-full place-items-center justify-start">
+                    <div class="group space-y-6 text-start">
+                        <h1 class="text-6xl text-white  text-start font-bold">
+                            Les conventions
+                        </h1>
+
+                        <div class="font-medium text-white">
+                            Faits et informations sur les secteurs d'activité liés au cadre de
+                            vie et au développement durable.
+                        </div>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <section class="min-h-[100dvh] bg-[#F2F7F7] ">

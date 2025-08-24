@@ -14,38 +14,23 @@
 const navMenuElements = reactive([
   {
     label: "Accueil",
-    href: "#",
+    href: "/",
   },
 
-  {
-    label: "ODDs",
-    href: "/odds",
-  },
 
   {
-    label: "A propos",
-    href: "#",
-  },
-
-  {
-    label: "Données",
-    href: "#",
+    label: "Projet",
+    href: "/project",
   },
 
 
   {
     label: "Conventions",
-    href: "#",
+    href: "/conventions",
   },
-
   {
-    label: "Projet",
-    href: "#",
-  },
-
-  {
-    label: "Faqs",
-    href: "#",
+    label: "ODDs",
+    href: "/odds",
   },
 
   {
@@ -53,5 +38,21 @@ const navMenuElements = reactive([
     href: "/admin/login",
   },
 
+
+  // {
+  //   label: "A propos",
+  //   href: "#",
+  // },
+
+  // {
+  //   label: "Données",
+  //   href: "#",
+  // },
+
+
+  // {
+  //   label: "Faqs",
+  //   href: "#",
+  // },
 ]);
 </script>
