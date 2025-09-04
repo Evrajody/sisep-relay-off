@@ -407,5 +407,5 @@
 
 body {
     font-family: 'General Sans', sans-serif;
-     @apply bg-gray-50;
+     @apply bg-gray-100;
 }

@@ -4,6 +4,68 @@ import Vue3autocounter from "vue3-autocounter";
 import FooterSiseb from "~/components/Home/FooterSiseb.vue";
 import Navbar from "~/components/Home/Navbar.vue";
 import ProjectCard from "~/components/Home/ProjectCard.vue";
+import ConventionCard from "~/components/Home/ConventionCard.vue";
+
+// Hero carousel state
+const slides = reactive([
+  {
+    title: "Données clés sur le cadre de vie",
+    subtitle: "Faits et informations pour orienter l'action publique",
+    image: "cadre_world.webp",
+    cta: { label: "Explorer les données", href: "/" }
+  },
+  {
+    title: "Projets structurants",
+    subtitle: "Suivez l'avancée des grands chantiers",
+    image: "media_travaux.jpeg",
+    cta: { label: "Voir les projets", href: "/project" }
+  },
+  {
+    title: "Conventions et engagements",
+    subtitle: "Découvrez les accords majeurs pour l'environnement",
+    image: "img-odds.png",
+    cta: { label: "Parcourir", href: "/conventions" }
+  }
+])
+
+const currentSlide = ref(0)
+const progress = ref(0) // 0..100
+const isPlaying = ref(true)
+const SLIDE_DURATION = 7000 // ms
+let rafId: number | null = null
+let startTs = 0
+
+function step(ts: number) {
+  if (!isPlaying.value) return
+  if (!startTs) startTs = ts
+  const elapsed = ts - startTs
+  progress.value = Math.min(100, (elapsed / SLIDE_DURATION) * 100)
+  if (elapsed >= SLIDE_DURATION) {
+    nextSlide()
+    startTs = ts
+    progress.value = 0
+  }
+  rafId = requestAnimationFrame(step)
+}
+
+function nextSlide() {
+  currentSlide.value = (currentSlide.value + 1) % slides.length
+}
+function prevSlide() {
+  currentSlide.value = (currentSlide.value - 1 + slides.length) % slides.length
+}
+function goToSlide(i: number) {
+  currentSlide.value = i
+  startTs = performance.now()
+  progress.value = 0
+}
+
+onMounted(() => {
+  rafId = requestAnimationFrame(step)
+})
+onUnmounted(() => {
+  if (rafId) cancelAnimationFrame(rafId)
+})
 
 const cadresSearchElements = reactive([
 
@@ -125,47 +187,6 @@ const statsImg = reactive([
 
 ])
 
-const questions = reactive([{
-  label: 'Comment importer mes documents existants ?',
-  icon: 'i-heroicons-information-circle',
-  content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
-}, {
-  label: 'Comment s’inscrire sur la plateforme Piinova ?',
-  icon: 'i-heroicons-arrow-down-tray',
-  content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
-}, {
-  label: 'Comment acceder interpreter les données sur la plateforme ?',
-  icon: 'i-heroicons-arrow-down-tray',
-  content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
-}, {
-  label: 'Puis librement utiliser ces données ?',
-  icon: 'i-heroicons-eye-dropper',
-  content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.'
-},])
-
-const animation = {duration: 50000, easing: (t: any) => t}
-
-const [container, slider] = useKeenSlider({
-  loop: true,
-  mode: "free-snap",
-  renderMode: "performance",
-  created(s) {
-    s.moveToIdx(5, true)
-  },
-  updated(s) {
-    s.moveToIdx(s.track.details.abs + 5, true)
-  },
-
-  Ended(s) {
-    s.moveToIdx(s.track.details.abs + 5, true)
-  },
-
-  slides: {
-    perView: 3,
-    spacing: 20,
-  },
-});
-
 
 </script>
 
@@ -173,383 +194,402 @@ const [container, slider] = useKeenSlider({
 
   <main class="">
 
-    <!-- SECTION BANNER PRINCIPAL-->
-    <header class="h-[600px] relative bg-gray-100 ">
-
-      <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"  src="~/assets/images/cadre_world.jpg">
-
-      <div class="bg-black/80 absolute opacity-60 inset-0"></div>
-
+    <!-- SECTION BANNIÈRE PRINCIPALE: CAROUSEL -->
+    <header class="relative bg-gray-900">
+      <!-- Top nav bar with brand + navbar overlay -->
       <div class="h-fit mx-auto absolute top-7 rounded-lg shadow-lg left-0 right-0 z-20 max-w-[90vw] bg-sisep-hit">
-
-        <div class="flex gap-12 justify-start  items-center pr-10">
-
+        <div class="flex gap-12 justify-start items-center pr-10">
           <div class="img-box flex rounded-l-lg bg-white w-fit">
-
             <div class="w-[300px]">
-              <a href="">
-                <img class="" src="~/assets/images/logo_cadre_vie.png">
-              </a>
+              <a href=""><img class="" src="~/assets/images/logo_cadre_vie.png"></a>
             </div>
-
           </div>
-
-          <!-- Navbar -->
           <Navbar/>
-
         </div>
-
       </div>
 
-      <div class="container inset-0 absolute h-full mx-auto mt-20">
+      <div class="relative h-[70dvh] overflow-hidden">
+        <!-- Slides -->
+        <div class="absolute inset-0">
+          <transition name="fade" mode="out-in">
+            <img
+                :key="currentSlide"
+                :src="`/images/${slides[currentSlide].image}`"
+                :alt="slides[currentSlide].title"
+                class="w-full h-full object-cover"
+            />
+          </transition>
+          <div class="absolute inset-0 bg-black/60"></div>
+        </div>
 
-        <div class="grid h-full place-items-center">
-
-          <div class="group space-y-6 text-center ">
-
-            <h1 class="text-6xl text-white font-bold">
-              Données clés sur le cadre de vie.
-            </h1>
-
-            <div class="font-medium text-white">
-              Faits et informations sur les secteurs d'activité liés au cadre de vie et au développement durable.
-            </div>
-
-            <div class="flex mt-8  motion-preset-slide-up-lg">
-
-              <input
-                  class="w-full mx-auto qcss  focus:outline-none focus:appearance-auto motion-duration-500 motion-delay-200 bg-white rounded-sm shadow-lg py-5 max-w-4xl px-5 z-30"
-                  placeholder="Trouver des données , des indicateurs par catégories" type="search">
-
-              <button
-                  class="bg-red-600  text-white rounded-sm shadow-md px-5 py-2.5">
-                <span class="font-medium"> Rechercher </span>
+        <!-- Content -->
+        <div class="relative z-10 h-full container mx-auto px-6 flex items-center">
+          <div class="max-w-3xl space-y-6 pt-16">
+            <h1 class="text-4xl md:text-6xl text-white font-bold">{{ slides[currentSlide].title }}</h1>
+            <p class="text-white/90 text-lg md:text-xl">{{ slides[currentSlide].subtitle }}</p>
+            <div class="flex gap-3 motion-preset-slide-up-lg">
+              <NuxtLink :to="slides[currentSlide].cta.href" class="inline-flex items-center gap-2 bg-sisep-hit text-white rounded-md px-5 py-3 shadow hover:shadow-lg transition">
+                <span class="font-semibold">{{ slides[currentSlide].cta.label }}</span>
+              </NuxtLink>
+              <button @click="isPlaying = !isPlaying; if(isPlaying){ startTs = performance.now(); rafId = requestAnimationFrame(step)}" class="inline-flex items-center gap-2 bg-white/10 text-white rounded-md px-4 py-3 backdrop-blur hover:bg-white/20 transition">
+                <span class="font-medium">{{ isPlaying ? 'Pause' : 'Lire' }}</span>
               </button>
-
             </div>
 
-            <div class="tag-search">
+            <!-- Search bar -->
+            <div class="flex mt-6 max-w-2xl motion-preset-slide-up-lg">
+              <input class="w-full focus:outline-none bg-white rounded-l-md shadow-lg py-4 px-5" placeholder="Rechercher des données, indicateurs..." type="search"/>
+              <button class="bg-red-600 text-white rounded-r-md shadow-md px-5">Rechercher</button>
+            </div>
 
-              <div class="max-w-4xl flex items-center justify-center flex-wrap gap-2">
-
-                <UBadge v-for="item in cadresSearchElements" class="backdrop-blur-sm bg-opacity-50">
-                  <a href="">{{ item.label }}</a>
-                </UBadge>
-
+            <!-- Tags -->
+            <div class="mt-4">
+              <div class="max-w-3xl flex items-center flex-wrap gap-2">
+                <UBadge v-for="item in cadresSearchElements" :key="item.label" class="backdrop-blur-sm bg-white/20 text-white">{{ item.label }}</UBadge>
               </div>
-
-
             </div>
-
-
           </div>
 
-
+          <!-- Next preview -->
+          <div class="ml-auto hidden md:block">
+            <div class="relative w-60 h-36 rounded-lg overflow-hidden shadow-lg">
+              <img :src="`/images/${slides[(currentSlide+1)%slides.length].image}`" class="w-full h-full object-cover blur-sm scale-105" alt=""/>
+              <div class="absolute inset-0 bg-black/20"></div>
+              <div class="absolute bottom-2 left-2 text-white text-sm">À suivre</div>
+            </div>
+          </div>
         </div>
 
+        <!-- Controls -->
+        <div class="absolute inset-x-0 bottom-4 z-10 container mx-auto px-6">
+          <div class="flex items-center gap-4">
+            <button @click="prevSlide" class="size-9 rounded-full bg-white/10 text-white backdrop-blur hover:bg-white/20">‹</button>
+            <div class="h-1 flex-1 rounded bg-white/20 overflow-hidden">
+              <div class="h-full bg-sisep-hit" :style="{ width: progress + '%' }"></div>
+            </div>
+            <button @click="nextSlide" class="size-9 rounded-full bg-white/10 text-white backdrop-blur hover:bg-white/20">›</button>
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button v-for="(s, i) in slides" :key="i" @click="goToSlide(i)" class="w-8 h-1 rounded-full" :class="i===currentSlide ? 'bg-white' : 'bg-white/40'"/>
+          </div>
+        </div>
       </div>
-
     </header>
 
-    <!--SECTION MOT DU DIRECTEUR -->
-    <section class="py-16 h-full  relative">
+    <!-- PAGE WRAPPER FOR CONSISTENT ALIGNMENT -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 
-      <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
-           src="~/assets/images/cadre_world.webp">
+      <!--SECTION MOT DU DIRECTEUR -->
+      <section class="py-16 h-full  relative">
 
-      <div class="bg-white absolute opacity-90 inset-0"></div>
+        <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
+             src="~/assets/images/cadre_world.webp">
 
-      <div class="relative max-w-7xl mx-auto">
+        <div class="bg-white absolute opacity-90 inset-0"></div>
 
-        <div class="flex items-center  h-full inset-0  gap-20">
+        <div class="relative max-w-7xl mx-auto">
 
-          <div class="left w-1/2 space-y-8">
+          <div class="grid md:grid-cols-2 items-center gap-10">
 
-            <h3 class="text-3xl font-bold text-permis-base"> MOT DU MINISTRE DE CADRE DE VIE </h3>
+            <div class="left space-y-8">
 
-            <p>
-              Améliorer notre cadre de vie, c’est investir dans notre bien-être collectif et celui des générations
-              futures. Chaque projet, chaque action menée par le ministère vise à rendre nos villes et villages plus
-              propres, plus verts et plus agréables à vivre.
-            </p>
+              <h3 class="text-3xl font-bold text-permis-base"> MOT DU MINISTRE DE CADRE DE VIE </h3>
 
-            <p>
-              À travers la modernisation des infrastructures, la promotion des espaces verts, la gestion durable des
-              déchets et l’aménagement harmonieux de nos territoires, nous affirmons notre engagement pour un
-              environnement respectueux et un urbanisme inclusif.
-            </p>
-
-            <p>
-              Ce chantier est l’affaire de tous. J’invite chacun à faire preuve de civisme et de responsabilité pour que
-              nos efforts portent durablement leurs fruits. Ensemble, faisons de notre cadre de vie un véritable
-              héritage dont nous serons fiers.Ce chantier est l’affaire de tous. J’invite chacun à
-            </p>
-
-          </div>
-
-          <div class="right w-1/2">
-            <img class="" src="~/assets/images/double_ministre.jpeg">
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-
-    <!--SECTION DES TENDANCES -->
-
-    <section class="py-16 hidden h-full relative">
-
-      <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
-           src="~/assets/images/cadre_world.webp">
-
-      <div class="bg-white absolute opacity-90 inset-0"></div>
-
-      <div class="relative max-w-7xl mx-auto">
-
-        <div class="flex flex-col items-center justify-center h-full inset-0  gap-8">
-
-          <h3 class="text-3xl text-center font-bold text-permis-base"> LES DONNEES DE TENDANCE </h3>
-
-          <div ref="container" class="keen-slider">
-
-            <div class="w-80 keen-slider__slide bg-white p-5">
-
-              <div class="flex gap-6">
-                <div class="w-1/3">
-                  <img class="w-full" src="~/assets/images/bill_director.jpg">
-                </div>
-                <div class="flex w-2/3  py-4 flex-col space-y-3">
-                  <span class="font-bold text-yellow-600 text-2xl">Données 2013 </span>
-                  <h3 class="text-xl font-bold text-permis-base">Population vivant dans des zones rurales</h3>
-                  <p>
-                    Les données suivantes illustrent la répartition de la population vivant en zones rurales, un
-                    indicateur clé pour orienter les politiques de développement territorial.
-                  </p>
-
-                  <div class="">
-                    <UButton class="font-semibold" color="primary" icon="i-heroicons-arrow-right" label="En savoir plus"
-                             variant="link"></UButton>
-                  </div>
-
-                </div>
-
-              </div>
-            </div>
-
-            <div class="w-80 keen-slider__slide bg-white p-5">
-
-              <div class="flex gap-6">
-                <div class="w-1/3">
-                  <img class="w-full" src="~/assets/images/bill_director.jpg">
-                </div>
-                <div class="flex w-2/3  py-4 flex-col space-y-3">
-                  <span class="font-bold text-yellow-600 text-2xl">Données 2014 </span>
-                  <h3 class="text-xl font-bold text-permis-base">Population vivant dans des zones rurales</h3>
-                  <p>
-                    Les données suivantes illustrent la répartition de la population vivant en zones rurales, un
-                    indicateur clé pour orienter les politiques de développement territorial.
-                  </p>
-
-                  <div class="">
-                    <UButton class="font-semibold" color="primary" icon="i-heroicons-arrow-right" label="En savoir plus"
-                             variant="link"></UButton>
-                  </div>
-
-                </div>
-
-              </div>
-            </div>
-
-            <div class="w-80 keen-slider__slide bg-white p-5">
-
-              <div class="flex gap-6">
-                <div class="w-1/3">
-                  <img class="w-full" src="~/assets/images/bill_director.jpg">
-                </div>
-                <div class="flex w-2/3  py-4 flex-col space-y-3">
-                  <span class="font-bold text-yellow-600 text-2xl">Données 2024 </span>
-                  <h3 class="text-xl font-bold text-permis-base">Population vivant dans des zones rurales</h3>
-                  <p>
-                    Les données suivantes illustrent la répartition de la population vivant en zones rurales, un
-                    indicateur clé pour orienter les politiques de développement territorial.
-                  </p>
-
-                  <div class="">
-                    <UButton class="font-semibold" color="primary" icon="i-heroicons-arrow-right" label="En savoir plus"
-                             variant="link"></UButton>
-                  </div>
-
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-    </section>
-
-
-    <!--SECTION DES ODDs -->
-
-    <section class="py-16 h-full relative ">
-
-      <div class="bg-white absolute opacity-90 inset-0"></div>
-
-      <div class="relative max-w-7xl mx-auto">
-
-        <div class="flex items-center  h-full inset-0  gap-20">
-
-          <div class="right w-1/2">
-            <img alt="" class="w-full" src="~/assets/images/sport_duo.jpg">
-          </div>
-
-          <div class="left w-1/2 space-y-8">
-
-            <h3 class="text-3xl font-bold text-permis-base"> Découvrez SISEB Bénin, la boussole des données </h3>
-
-            <p>
-              Le site SISEB Bénin est une plateforme dédiée à la collecte, à la gestion et à la diffusion des données
-              statistiques sur l’état de l’environnement au Bénin.
-            </p>
-
-            <div class="stats-bloc grid grid-cols-2 gap-4 grid-rows-2">
-
-              <div v-for="item in statsImg" class="h-24 flex gap-2 items-center px-5 shadow-lg bg-sisep-hit">
-
-                <img :src="`/icons/${item.src}`" class="size-10 object-cover">
-
-                <div class="text-white text-4xl flex items-center gap-2">
-                  <Vue3autocounter
-                      ref="counter"
-                      :autoinit="true"
-                      :duration="5"
-                      :endAmount="item.value"
-                      :startAmount="0"
-                      class="font-bold"
-                  />
-                  <span class="text-lg">{{ item.label }}</span>
-                </div>
-
-
-              </div>
-
-
-            </div>
-
-          </div>
-
-
-        </div>
-
-      </div>
-
-
-    </section>
-
-
-    <!--SECTION DES PROJETS -->
-
-    <section class="py-16 h-full relative">
-
-      <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
-           src="~/assets/images/cadre_world.jpg">
-
-      <div class="bg-white absolute opacity-90 inset-0"></div>
-
-      <div class="relative max-w-7xl mx-auto">
-
-        <div class="flex flex-col items-center justify-center h-full inset-0  gap-8">
-
-          <h3 class="text-3xl text-center font-bold text-permis-base"> DECOUVRER LES DERNIERS PROJETS </h3>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 w-full md:grid-cols-2 lg:grid-cols-3 gap-4 place-content-center ">
-
-            <ProjectCard v-for="item in 3" :project="item"/>
-          
-          </div>
-
-        </div>
-
-      </div>
-
-
-    </section>
-
-    <!--    SECTIONS DES QUESTION | FAQs-->
-    <section class="py-16 hidden h-full relative">
-
-      <div class="bg-white absolute opacity-90 inset-0"></div>
-
-      <div class="relative max-w-7xl mx-auto">
-
-        <div class="flex flex-col items-center justify-center h-full inset-0  gap-8">
-
-          <h3 class="text-3xl text-center font-bold text-permis-base"> QUESTIONS </h3>
-
-
-          <UAccordion :items="questions" :ui="{ wrapper: 'flex border-y flex-col w-full',  }">
-            <template #default="{ item, index, open }">
-              <UButton :class="`motion-delay-[${index * 100}00ms]`"
-                       :ui="{ rounded: 'rounded-none', padding: { sm: 'p-3' } }"
-                       class="border-b py-4 intersect:motion-preset-slide-up-lg   cursor-pointer border-gray-200 dark:border-gray-700"
-                       color="gray"
-                       variant="ghost">
-                <template #leading>
-                  <div
-                      class="size-10 rounded-full bg-primary-500/10 dark:bg-primary-400 flex items-center justify-center -my-1">
-                    <span class="font-bold text-lg text-tawk-green"> {{ index + 1 }} </span>
-                  </div>
-                </template>
-
-                <span class=" font-semibold text-lg truncate">{{ item.label }}</span>
-
-                <template #trailing>
-                  <UIcon
-                      :class="[open && 'rotate-90']"
-                      class="w-5 h-5 ms-auto transform transition-transform duration-200"
-                      name="i-heroicons-chevron-right-20-solid"
-                  />
-                </template>
-              </UButton>
-            </template>
-
-            <template #item="{item}">
-              <p class="px-8 py-2 text-base leading-snug">
-                {{ item.content }}
+              <p>
+                Améliorer notre cadre de vie, c’est investir dans notre bien-être collectif et celui des générations
+                futures. Chaque projet, chaque action menée par le ministère vise à rendre nos villes et villages plus
+                propres, plus verts et plus agréables à vivre.
               </p>
-            </template>
 
-          </UAccordion>
+              <p>
+                À travers la modernisation des infrastructures, la promotion des espaces verts, la gestion durable des
+                déchets et l’aménagement harmonieux de nos territoires, nous affirmons notre engagement pour un
+                environnement respectueux et un urbanisme inclusif.
+              </p>
 
-        </div>
+              <p>
+                Ce chantier est l’affaire de tous. J’invite chacun à faire preuve de civisme et de responsabilité pour que
+                nos efforts portent durablement leurs fruits. Ensemble, faisons de notre cadre de vie un véritable
+                héritage dont nous serons fiers.Ce chantier est l’affaire de tous. J’invite chacun à
+              </p>
 
-      </div>
+            </div>
 
+            <div class="right">
+              <img class="" src="~/assets/images/double_ministre.jpeg">
+            </div>
 
-    </section>
-
-        <!-- SECTION DES IMAGES PARTENAIRES-->
-    <section class="py-16">
-      <div class=" max-w-7xl mx-auto overflow-x-clip">
-        <div
-            class="grid grid-flow-col gap-10 items-center [grid-auto-columns:min-content] justify-center min-w-fit animate-slide">
-
-          <div v-for="item in [...partenairesImg, ...partenairesImg]" class="el w-[300px]">
-            <img :src="`/images/${item.src}`" class="w-full motion-blur">
           </div>
 
         </div>
-      </div>
-    </section>
+
+      </section>
+
+
+
+      <!--SECTION DES TENDANCES -->
+
+      <section class="py-16 hidden h-full relative">
+
+        <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
+             src="~/assets/images/cadre_world.webp">
+
+        <div class="bg-white absolute opacity-90 inset-0"></div>
+
+        <div class="relative max-w-7xl mx-auto">
+
+          <div class="flex flex-col items-center justify-center h-full inset-0  gap-8">
+
+            <h3 class="text-3xl text-center font-bold text-permis-base"> LES DONNEES DE TENDANCE </h3>
+
+            <div ref="container" class="keen-slider">
+
+              <div class="w-80 keen-slider__slide bg-white p-5">
+
+                <div class="flex gap-6">
+                  <div class="w-1/3">
+                    <img class="w-full" src="~/assets/images/bill_director.jpg">
+                  </div>
+                  <div class="flex w-2/3  py-4 flex-col space-y-3">
+                    <span class="font-bold text-yellow-600 text-2xl">Données 2013 </span>
+                    <h3 class="text-xl font-bold text-permis-base">Population vivant dans des zones rurales</h3>
+                    <p>
+                      Les données suivantes illustrent la répartition de la population vivant en zones rurales, un
+                      indicateur clé pour orienter les politiques de développement territorial.
+                    </p>
+
+                    <div class="">
+                      <UButton class="font-semibold" color="primary" icon="i-heroicons-arrow-right" label="En savoir plus"
+                               variant="link"></UButton>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="w-80 keen-slider__slide bg-white p-5">
+
+                <div class="flex gap-6">
+                  <div class="w-1/3">
+                    <img class="w-full" src="~/assets/images/bill_director.jpg">
+                  </div>
+                  <div class="flex w-2/3  py-4 flex-col space-y-3">
+                    <span class="font-bold text-yellow-600 text-2xl">Données 2014 </span>
+                    <h3 class="text-xl font-bold text-permis-base">Population vivant dans des zones rurales</h3>
+                    <p>
+                      Les données suivantes illustrent la répartition de la population vivant en zones rurales, un
+                      indicateur clé pour orienter les politiques de développement territorial.
+                    </p>
+
+                    <div class="">
+                      <UButton class="font-semibold" color="primary" icon="i-heroicons-arrow-right" label="En savoir plus"
+                               variant="link"></UButton>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="w-80 keen-slider__slide bg-white p-5">
+
+                <div class="flex gap-6">
+                  <div class="w-1/3">
+                    <img class="w-full" src="~/assets/images/bill_director.jpg">
+                  </div>
+                  <div class="flex w-2/3  py-4 flex-col space-y-3">
+                    <span class="font-bold text-yellow-600 text-2xl">Données 2024 </span>
+                    <h3 class="text-xl font-bold text-permis-base">Population vivant dans des zones rurales</h3>
+                    <p>
+                      Les données suivantes illustrent la répartition de la population vivant en zones rurales, un
+                      indicateur clé pour orienter les politiques de développement territorial.
+                    </p>
+
+                    <div class="">
+                      <UButton class="font-semibold" color="primary" icon="i-heroicons-arrow-right" label="En savoir plus"
+                               variant="link"></UButton>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+      </section>
+
+
+      <!--SECTION STATS ODDs -->
+
+      <section class="py-16 h-full relative ">
+
+        <div class="bg-white absolute opacity-90 inset-0"></div>
+
+        <div class="relative max-w-7xl mx-auto">
+
+          <div class="grid md:grid-cols-2 items-center gap-10">
+
+            <div class="right order-1 md:order-none">
+            <img alt="SISEB Bénin, la boussole des données" class="w-full object-cover rounded-md" src="/images/cadre_world.webp">
+          </div>
+
+            <div class="left space-y-8">
+
+              <h3 class="text-3xl font-bold text-permis-base"> Découvrez SISEB Bénin, la boussole des données </h3>
+
+              <p>
+                Le site SISEB Bénin est une plateforme dédiée à la collecte, à la gestion et à la diffusion des données
+                statistiques sur l’état de l’environnement au Bénin.
+              </p>
+
+              <div class="stats-bloc grid grid-cols-2 gap-4 grid-rows-2">
+
+                <div v-for="item in statsImg" class="h-24 flex gap-2 items-center px-5 shadow-lg bg-sisep-hit">
+
+                  <img :src="`/icons/${item.src}`" class="size-10 object-cover">
+
+                  <div class="text-white text-4xl flex items-center gap-2">
+                    <Vue3autocounter
+                        ref="counter"
+                        :autoinit="true"
+                        :duration="5"
+                        :endAmount="item.value"
+                        :startAmount="0"
+                        class="font-bold"
+                    />
+                    <span class="text-lg">{{ item.label }}</span>
+                  </div>
+
+
+                </div>
+
+
+              </div>
+
+            </div>
+
+
+          </div>
+
+        </div>
+
+
+      </section>
+
+
+      <!--SECTION DERNIERS PROJETS (featured + mediums + grid row) -->
+
+      <section class="py-16 h-full relative">
+        <div class="bg-white absolute opacity-90 inset-0"></div>
+
+        <div class="relative max-w-7xl mx-auto">
+          <div class="flex flex-col items-center justify-center gap-10">
+          <!-- Header with CTA -->
+          <div class="w-full flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+              <h3 class="text-3xl md:text-4xl lg:text-5xl font-bold text-permis-base">Derniers projets</h3>
+              <p class="text-gray-600 mt-2 max-w-2xl">Suivez les chantiers prioritaires et les réalisations en cours partout sur le territoire.</p>
+            </div>
+            <NuxtLink to="/project" class="inline-flex w-fit items-center gap-2 rounded-md bg-sisep-hit text-white px-5 py-3 shadow hover:shadow-lg transition">
+              Voir plus
+              <span aria-hidden>→</span>
+            </NuxtLink>
+          </div>
+
+          <!-- Row 1: Featured + two medium cards -->
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 w-full">
+            <div class="lg:col-span-2">
+              <ProjectCard :project="{ title: 'Rénovation urbaine', image: 'https://images.unsplash.com/photo-1486304873000-235643847519?w=1200', status: 'En cours', category: 'Urbanisme' }"/>
+            </div>
+            <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <ProjectCard :project="{ title: 'Assainissement', image: 'https://images.unsplash.com/photo-1563447310550-3081749fb321?w=800', status: 'Planifié', category: 'Hydraulique' }"/>
+              <ProjectCard :project="{ title: 'Éclairage public', image: 'https://images.unsplash.com/photo-1509395176047-4a66953fd231?w=800', status: 'Planifié', category: 'Infrastructures' }"/>
+            </div>
+          </div>
+
+          <!-- Row 2: Responsive grid of more projects -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
+            <div v-for="i in 4" :key="'grid-'+i">
+              <ProjectCard :project="{ title: 'Projet '+ i, image: i%2 ? 'https://images.unsplash.com/photo-1556767576-cfba1efe4fd0?w=800' : 'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?w=800', status: i%2 ? 'En cours' : 'Planifié', category: i%2 ? 'Voirie' : 'Aménagement' }"/>
+            </div>
+          </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION CONVENTIONS (slider horizontal) -->
+      <section class="py-16 h-full relative">
+        <div class="relative max-w-7xl mx-auto">
+          <div class="flex flex-col items-center gap-8">
+            <!-- Header with CTA -->
+            <div class="w-full flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+              <div>
+                <h3 class="text-3xl md:text-4xl lg:text-5xl font-bold text-permis-base"> Découvrez les conventions </h3>
+                <p class="text-gray-600 mt-2 max-w-2xl"> Suivez les conventions ratifiées et en cours de ratification </p>
+              </div>
+              <NuxtLink to="/conventions" class="inline-flex w-fit items-center gap-2 rounded-md bg-sisep-hit text-white px-5 py-3 shadow hover:shadow-lg transition">
+                Voir plus
+                <span aria-hidden>→</span>
+              </NuxtLink>
+            </div>
+            <div class="relative w-full">
+              <div class="grid grid-cols-2 w-full  gap-4 pb-2">
+                <div v-for="i in 4" :key="i" class="min-w-[320px] snap-start" :style="{ transitionDelay: `${(i-1)*60}ms` }">
+                  <ConventionCard :convention="{ title: 'Convention ' + i, image: i%2 ? 'https://img.freepik.com/photos-gratuite/tour-eiffel-au-champ-mars-paris-france_53876-94787.jpg' : 'https://cadredevie.gouv.bj/media?id=462', type: 'Multilatérale', status: 'Ratifiée', date: '2024-01-01', category: 'Climat', description: 'Texte descriptif de la convention.' }"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!--    SECTIONS DES PARTENAIRES-->
+      <section class="py-16 h-full relative">
+        <div class=" max-w-7xl mx-auto overflow-x-clip">
+          <div  class="grid grid-flow-col gap-10 items-center [grid-auto-columns:min-content] justify-center min-w-fit animate-slide">
+
+            <div v-for="item in [...partenairesImg, ...partenairesImg]" class="el w-[300px]">
+              <img :src="`/images/${item.src}`" class="w-full motion-blur">
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Newsletter CTA enlarged with background image and overlay -->
+      <section class="py-20 relative">
+        <div class="absolute inset-0 -z-10">
+          <img src="/images/cadre_world.jpg" alt="Newsletter background" class="w-full h-full object-cover"/>
+          <div class="absolute inset-0 bg-gradient-to-br from-black/50 to-black/30"></div>
+        </div>
+        <div class="max-w-6xl mx-auto rounded-2xl bg-white/10 backdrop-blur-md text-white p-8 md:p-14 relative overflow-hidden">
+          <div class="absolute -top-10 -right-10 size-40 bg-white/20 rounded-full blur-2xl"></div>
+          <div class="flex flex-col md:flex-row items-center gap-8">
+            <div class="flex-1">
+              <h3 class="text-3xl md:text-4xl font-bold">Restez informé des nouveautés</h3>
+              <p class="text-white/90 mt-3 max-w-2xl">Abonnez-vous à notre newsletter pour recevoir les nouveaux jeux de données, projets et actualités.</p>
+            </div>
+            <div class="w-full md:w-auto flex items-stretch gap-2 motion-preset-slide-up-lg">
+              <input type="email" placeholder="Votre email" class="w-full md:w-96 px-4 py-3 rounded-md text-gray-800 focus:outline-none"/>
+              <button class="px-6 py-3 rounded-md bg-sisep-hit text-white font-semibold shadow hover:shadow-lg transition relative overflow-hidden">
+                <span class="relative z-10">S'abonner</span>
+                <span class="absolute inset-0 bg-white/10 animate-pulse"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div> <!-- END WRAPPER -->
 
     <!--    SECTION FOOTER -->
     <FooterSiseb/>
@@ -560,5 +600,13 @@ const [container, slider] = useKeenSlider({
 </template>
 
 <style scoped>
+/* Fade transition for hero carousel */
+.fade-enter-active,
+.fade-leave-active { transition: opacity .5s ease; }
+.fade-enter-from,
+.fade-leave-to { opacity: 0; }
 
+/* Optional: hide horizontal scrollbar for conventions slider */
+.scrollbar-none { scrollbar-width: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
 </style>

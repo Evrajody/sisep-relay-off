@@ -123,17 +123,117 @@ const locations = [
   {name: 'Basse-Goulaine', lat: 47.2, lng: -1.483}
 ];
 
-const projets = [
-  {ville: 'Cotonou', coords: [6.379448, 2.451324], nom: 'Énergies Renouvelables de Cotonou', budget: 150_000_000},
-  {ville: 'Porto-Novo', coords: [6.49646, 2.60359], nom: 'Rénovation du Marché Central', budget: 100_000_000},
-  {ville: 'Parakou', coords: [9.33716, 2.63031], nom: 'Centre de Formation Agro-écologique', budget: 80_000_000},
-  {ville: 'Abomey-Calavi', coords: [6.44852, 2.35566], nom: 'Zone Industrielle Écologique', budget: 200_000_000},
-  {ville: 'Djougou', coords: [9.70853, 1.66598], nom: 'Réseau Hydraulique Rural', budget: 90_000_000},
-  {ville: 'Tchaourou', coords: [8.88649, 2.59753], nom: 'Parc Agricole Innovant', budget: 120_000_000},
-  {ville: 'Natitingou', coords: [10.30416, 1.37962], nom: 'Tourisme Patrimonial', budget: 110_000_000},
-  {ville: 'Bohicon', coords: [7.17826, 2.0667], nom: 'Marché Numérique de Bohicon', budget: 70_000_000},
-  {ville: 'Ouidah', coords: [6.36307, 2.08506], nom: 'Promenade culturelle de Ouidah', budget: 130_000_000},
-  {ville: 'Lokossa', coords: [6.63869, 1.71674], nom: 'E-santé Lokossa', budget: 95_000_000},
+const projects = [
+  {
+    title: 'Parc Solaire de Cotonou',
+    category: 'Énergie',
+    status: 'En cours',
+    location: 'Cotonou',
+    date: '12/03/2024',
+    budget: '150 000 000 F CFA',
+    description: "Déploiement d'un parc solaire pour renforcer la capacité énergétique renouvelable.",
+    image: 'https://images.unsplash.com/photo-1509395176047-4a66953fd231?w=800&h=600&fit=crop',
+    coords: [6.379448, 2.451324],
+  },
+  {
+    title: 'Rénovation du Marché Central de Porto-Novo',
+    category: 'Infrastructures',
+    status: 'Planifié',
+    location: 'Porto-Novo',
+    date: '05/08/2024',
+    budget: '100 000 000 F CFA',
+    description: 'Modernisation du marché central pour améliorer les conditions commerciales.',
+    image: 'https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?w=800&h=600&fit=crop',
+    coords: [6.49646, 2.60359],
+  },
+  {
+    title: 'Centre de Formation Agro-écologique',
+    category: 'Agriculture',
+    status: 'En cours',
+    location: 'Parakou',
+    date: '21/01/2024',
+    budget: '80 000 000 F CFA',
+    description: 'Création d’un centre dédié aux pratiques agricoles durables et à la formation.',
+    image: 'https://images.unsplash.com/photo-1500937386664-56f3d9c9b0f5?w=800&h=600&fit=crop',
+    coords: [9.33716, 2.63031],
+  },
+  // {
+  //   title: 'Zone Industrielle Écologique',
+  //   category: 'Industrie',
+  //   status: 'En cours',
+  //   location: 'Abomey-Calavi',
+  //   date: '02/06/2024',
+  //   budget: '200 000 000 F CFA',
+  //   description: 'Aménagement d’une zone industrielle écoresponsable avec gestion des déchets.',
+  //   image: 'https://images.unsplash.com/photo-1504312000169-8f07dbf5bf1d?w=800&h=600&fit=crop',
+  //   coords: [6.44852, 2.35566],
+  // },
+  {
+    title: 'Réseau Hydraulique Rural',
+    category: 'Eau',
+    status: 'En cours',
+    location: 'Djougou',
+    date: '14/02/2024',
+    budget: '90 000 000 F CFA',
+    description: 'Mise en place d’un réseau pour l’accès à l’eau potable en milieu rural.',
+    image: 'https://images.unsplash.com/photo-1469122312224-c5846569feb1?w=800&h=600&fit=crop',
+    coords: [9.70853, 1.66598],
+  },
+  {
+    title: 'Parc Agricole Innovant',
+    category: 'Agriculture',
+    status: 'Terminé',
+    location: 'Tchaourou',
+    date: '30/11/2023',
+    budget: '120 000 000 F CFA',
+    description: 'Création d’un parc agricole intégrant technologies et pratiques durables.',
+    image: 'https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=800&h=600&fit=crop',
+    coords: [8.88649, 2.59753],
+  },
+  {
+    title: 'Tourisme Patrimonial de Natitingou',
+    category: 'Tourisme',
+    status: 'En cours',
+    location: 'Natitingou',
+    date: '18/04/2024',
+    budget: '110 000 000 F CFA',
+    description: 'Valorisation du patrimoine culturel et aménagement de circuits touristiques.',
+    image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&h=600&fit=crop',
+    coords: [10.30416, 1.37962],
+  },
+  {
+    title: 'Marché Numérique de Bohicon',
+    category: 'Numérique',
+    status: 'Planifié',
+    location: 'Bohicon',
+    date: '07/09/2024',
+    budget: '70 000 000 F CFA',
+    description: 'Digitalisation des services marchands et amélioration de la traçabilité.',
+    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=600&fit=crop',
+    coords: [7.17826, 2.0667],
+  },
+  {
+    title: 'Promenade culturelle de Ouidah',
+    category: 'Culture',
+    status: 'En cours',
+    location: 'Ouidah',
+    date: '25/05/2024',
+    budget: '130 000 000 F CFA',
+    description: 'Aménagement d’une promenade culturelle et touristique le long du littoral.',
+    image: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?w=800&h=600&fit=crop',
+    coords: [6.36307, 2.08506],
+  },
+  {
+    title: 'Programme E-santé Lokossa',
+    category: 'Santé',
+    status: 'En cours',
+    location: 'Lokossa',
+    date: '12/01/2024',
+    budget: '95 000 000 F CFA',
+    description: 'Déploiement de solutions numériques pour l’accès aux soins et télémédecine.',
+    image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=800&h=600&fit=crop',
+    coords: [6.63869, 1.71674],
+  },
 ];
 
 // :center="[9.30769, 2.315834]
@@ -151,12 +251,12 @@ const map = ref(null) as any;
     <header class="h-[40dvh] bg-gray-100 relative top-0">
 
       <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
-           src="~/assets/images/cadre_world.webp"/>
+           src="~/assets/images/media_travaux.jpeg"/>
 
       <div class="bg-black/80 absolute opacity-60 inset-0"></div>
 
       <div
-          class="h-fit mx-auto absolute top-7 rounded-lg shadow-lg left-0 right-0 z-20 max-w-[90vw] bg-sisep-hit">
+          class="h-fit mx-auto absolute top-7 rounded-lg shadow-lg left-0 right-0 z-20 lg:max-w-[90vw] bg-sisep-hit">
         <div class="flex gap-12 justify-start items-center pr-10">
           <div class="img-box flex rounded-l-lg bg-white w-fit">
             <div class="w-[300px]">
@@ -226,10 +326,9 @@ const map = ref(null) as any;
 
           <div v-if="isList" class="col-span-2 w-full lg:w-3/4 text-sm/relaxed md:text-base/relaxed lg:pr-8 ">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-              <div v-for="i in 6">
-                <ProjectCard/>
+              <div v-for="(project, idx) in projects" :key="idx" :style="{ transitionDelay: `${idx * 80}ms` }">
+                <ProjectCard :project="project" />
               </div>
-
             </div>
             <div class="flex items-end justify-end w-full my-10 ">
               <UPagination v-model="page" :page-count="5" :total="100" class="text-end" size="xl"/>
@@ -243,10 +342,10 @@ const map = ref(null) as any;
                 <LTileLayer attribution="&amp;copy; <a href=&quot;https://www.openstreetmap.org/&quot;>OpenStreetMap</a> contributors"
                             layer-type="base"
                             name="OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
-                <LMarker v-for="marker in projets" :key="marker.nom" :lat-lng="[marker.coords[0], marker.coords[1]]">
+                <LMarker v-for="project in projects" :key="project.title" :lat-lng="[project.coords[0], project.coords[1]]">
                   <LTooltip style="background-color: transparent !important ; padding: 0 !important;">
                     <div class="max-w-[20vw]">
-                      <ProjectCard/>
+                      <ProjectCard :project="project" />
 
                     </div>
                   </LTooltip>
