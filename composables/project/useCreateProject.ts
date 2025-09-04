@@ -4,6 +4,7 @@
 export const useCreateProject = () => {
 
     const { $sisepApi } = useNuxtApp()
+
     const createProject = async (data: any) => {
 
         const response = await $sisepApi('projects', {
@@ -20,6 +21,7 @@ export const useCreateProject = () => {
     }
 
     const createProjectFormEl = ref(null)
+
     const createProjectForm = computed(() => ({
         scrollOnNext: true,
         id: "createProjetForm",
@@ -27,17 +29,16 @@ export const useCreateProject = () => {
         displayErrors: true,
         showRequired: ["label"],
 
-
-
         endpoint: async (form: any, payload: any) => {
+
             console.log(JSON.stringify(payload.requestData));
             
             // await createProject(payload.requestData)
         },
 
-        steps: {
+        tabs: {
             info_project: {
-                label: "Informations générale du projet",
+                label: "Informations Générales",
                 elements: [
                     "title",
                     "description",
@@ -49,8 +50,22 @@ export const useCreateProject = () => {
                 ],
             },
 
-            finances: {
-                label: "Finances",
+            actions: {
+                label: "Actions",
+                elements: [
+                    "title",
+                ],
+            },
+
+            indicateurs: {
+                label: "Indicateurs",
+                elements: [
+                    "title",
+                ],
+            },
+
+            financement: {
+                label: "Financements",
                 elements: [
                     "findingSource",
                     "reportingYear",
@@ -61,6 +76,36 @@ export const useCreateProject = () => {
                     "exchangeRateUsed",
                 ],
             },
+
+            territoire: {
+                label: "Territoire",
+                elements: [
+                    "title",
+                ],
+            },
+
+            partenaires: {
+                label: "Partenaires",
+                elements: [
+                    "title",
+                ],
+            },
+
+            population_cible: {
+                label: "Populations cibles",
+                elements: [
+                    "title",
+                ],
+            },
+
+            verification: {
+                label: "Verification",
+                elements: [
+                    "title",
+                ],
+            },
+
+
         },
         schema: {
 

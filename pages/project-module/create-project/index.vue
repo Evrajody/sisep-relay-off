@@ -26,13 +26,14 @@ const { createProjectForm, createProjectFormEl } = useCreateProject();
   </UDashboardToolbar>
 
 
-  <div class="max-w-5xl w-full py-5 mx-auto">
+  <div class="max-w-7xl w-full py-5 mx-auto">
 
     <UDashboardCard
         :ui="{
         wrapper: 'border-b border-gray-100',
         header: {
-          wrapper: 'border-b border-gray-100'
+          wrapper: 'border-b border-gray-100',
+          padding: '!px-4  py-3', background: 'bg-primary-50'
         }
       }"
     >
@@ -49,6 +50,27 @@ const { createProjectForm, createProjectFormEl } = useCreateProject();
       <div class="">
         <Vueform v-bind="createProjectForm" ref="createProjectFormEl"/>
       </div>
+
+      <template #footer>
+
+        <div class="flex gap-2">
+          <UButton
+              class="rounded-md"
+              color="red"
+              icon="i-heroicons-x-circle-solid"
+              label="Annuler"
+              size="lg"
+              @click.prevent="null"
+          />
+          <UButton
+              class="rounded-md shadow bg-primary font-medium"
+              icon="i-heroicons-check-solid"
+              label="Enregistrer"
+              size="lg"
+          />
+        </div>
+
+      </template>
 
     </UDashboardCard>
 
