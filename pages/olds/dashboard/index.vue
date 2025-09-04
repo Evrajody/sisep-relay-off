@@ -12,12 +12,12 @@
                 <!-- Navigation -->
                 <nav class="flex-1 ">
                     <ul class="px-4 py-2 my-14">
-                        <a href="/dashboard" class="bg-[#1498DA] text-white px-4 py-2 rounded mb-2 flex items-center">
+                        <a href="/olds/dashboard" class="bg-[#1498DA] text-white px-4 py-2 rounded mb-2 flex items-center">
                             <i class="fas fa-table mr-2"></i>
                             Tableau de bord
                         </a>
 
-                        <a href="/dashboard/projets" class="px-4 py-2 text-green-200 flex items-center">
+                        <a href="/olds/dashboard/projets" class="px-4 py-2 text-green-200 flex items-center">
                             <i class="fas fa-folder mr-2"></i>
                             Projets
                         </a>

@@ -176,8 +176,7 @@ const [container, slider] = useKeenSlider({
     <!-- SECTION BANNER PRINCIPAL-->
     <header class="h-[600px] relative bg-gray-100 ">
 
-      <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
-           src="~/assets/images/cadre_world.jpg">
+      <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"  src="~/assets/images/cadre_world.jpg">
 
       <div class="bg-black/80 absolute opacity-60 inset-0"></div>
 
@@ -256,7 +255,7 @@ const [container, slider] = useKeenSlider({
     <section class="py-16 h-full  relative">
 
       <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
-           src="~/assets/images/cadre_world.jpg">
+           src="~/assets/images/cadre_world.webp">
 
       <div class="bg-white absolute opacity-90 inset-0"></div>
 
@@ -302,10 +301,10 @@ const [container, slider] = useKeenSlider({
 
     <!--SECTION DES TENDANCES -->
 
-    <section class="py-16 h-full relative">
+    <section class="py-16 hidden h-full relative">
 
       <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
-           src="~/assets/images/cadre_world.jpg">
+           src="~/assets/images/cadre_world.webp">
 
       <div class="bg-white absolute opacity-90 inset-0"></div>
 
@@ -486,7 +485,7 @@ const [container, slider] = useKeenSlider({
     </section>
 
     <!--    SECTIONS DES QUESTION | FAQs-->
-    <section class="py-16 h-full relative">
+    <section class="py-16 hidden h-full relative">
 
       <div class="bg-white absolute opacity-90 inset-0"></div>
 

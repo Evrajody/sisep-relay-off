@@ -12,12 +12,12 @@
                 <!-- Navigation -->
                 <nav class="flex-1 ">
                     <ul class="px-4 py-2 my-14">
-                        <a href="/dashboard" class="bg-[#1498DA] text-white px-4 py-2 rounded mb-2 flex items-center">
+                        <a href="/olds/dashboard" class="bg-[#1498DA] text-white px-4 py-2 rounded mb-2 flex items-center">
                             <i class="fas fa-table mr-2"></i>
                             Tableau de bord
                         </a>
 
-                        <a href="/dashboard/projets" class="px-4 py-2 text-green-200 flex items-center">
+                        <a href="/olds/dashboard/projets" class="px-4 py-2 text-green-200 flex items-center">
                             <i class="fas fa-folder mr-2"></i>
                             Projets
                         </a>
@@ -74,7 +74,7 @@
 
                         <div class="p-14 flex flex-row items-center justify-between">
                             <h2 class="text-3xl font-extrabold mb-2">La liste de vos projets </h2>
-                            <a href="/dashboard/projets-create"
+                            <a href="/olds/dashboard/projets-create"
                                 class="bg-[#1498DA] text-white font-medium py-2 px-6 rounded-md transition-colors duration-200 mt-auto">
                                 Ajouter un projet
                             </a>

@@ -94,7 +94,7 @@ const changModuleForm = computed(() => ({
         >
           <UDashboardNavbar
               :ui="{
-              wrapper: 'bg-white border-none dark:bg-gray-900  h-[80px]',
+              wrapper: 'bg-white border-none dark:bg-gray-900 h-[80px]',
               container: '',
             }"
           >
