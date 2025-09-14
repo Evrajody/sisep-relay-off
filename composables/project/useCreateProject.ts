@@ -30,50 +30,129 @@ export const useCreateProject = () => {
         showRequired: ["label"],
 
         endpoint: async (form: any, payload: any) => {
+            // Build the request object to match the expected API structure
+            const d = payload.requestData || {}
 
-            console.log(JSON.stringify(payload.requestData));
-            
-            // await createProject(payload.requestData)
+            // Helper: parse JSON textarea safely
+            const parseJson = (val: any, fallback: any) => {
+                if (typeof val !== 'string') return fallback
+                try { const out = JSON.parse(val); return out ?? fallback } catch { return fallback }
+            }
+            // Helper: split lines to array (ignores empty lines)
+            const splitLines = (val: any) => (typeof val === 'string' ? val.split(/\r?\n/).map(s => s.trim()).filter(Boolean) : Array.isArray(val) ? val : [])
+
+            // Map coordinates to [lon, lat]
+            const lon = Number(d?.location?.location?.coordinates?.longitude ?? d?.location?.longitude)
+            const lat = Number(d?.location?.location?.coordinates?.latitude ?? d?.location?.latitude)
+            const hasCoords = !Number.isNaN(lon) && !Number.isNaN(lat)
+
+            const req = {
+                title: d.title ?? '',
+                description: d.description ?? '',
+                typeId: d.typeId ?? undefined,
+                status: d.status ?? 'DRAFT',
+                createdBy: d.createdBy ?? undefined,
+                coverImageId: d.coverImageId ?? undefined,
+                indicatorIds: splitLines(d.indicatorIds),
+                implementingPartners: {
+                    partner1: {
+                        name: d?.implementingPartners?.partner1_name ?? '',
+                        role: d?.implementingPartners?.partner1_role ?? '',
+                    },
+                    partner2: {
+                        name: d?.implementingPartners?.partner2_name ?? '',
+                        role: d?.implementingPartners?.partner2_role ?? '',
+                    },
+                },
+                moduleClimat: {
+                    mitigation: { actions: splitLines(d?.moduleClimat?.mitigation_actions) },
+                    adaptation: { actions: splitLines(d?.moduleClimat?.adaptation_actions) },
+                },
+                objective: { goal: d?.objective?.objective_goal ?? '' },
+                expectedResults: { result: d?.expectedResults?.expectedResults_result ?? '' },
+                lessonsLearned: { lesson: d?.lessonsLearned?.lessonsLearned_lesson ?? '' },
+                totalBudget: d.totalBudget ? Number(d.totalBudget) : undefined,
+                infoLinks: { website: d.infoLinks_website ?? '' },
+                startDate: d.startDate ?? undefined,
+                endDate: d.endDate ?? undefined,
+                sectorId: d.sectorId ?? undefined,
+                subsectorId: d.subsectorId ?? undefined,
+                budget: {
+                    projectId: d.budget_projectId ?? undefined,
+                    budget: d.budget_budget ? Number(d.budget_budget) : undefined,
+                    currency: d.budget_currency ?? undefined,
+                    deletedAt: d.budget_deletedAt ?? null,
+                },
+                location: {
+                    projectId: d.location_projectId ?? undefined,
+                    location: hasCoords ? {
+                        type: (d?.location?.location?.type ?? d?.location?.type ?? 'Point'),
+                        coordinates: [lon, lat],
+                    } : undefined,
+                    region: d?.location?.region ?? d?.region ?? undefined,
+                    city: d?.location?.city ?? d?.city ?? undefined,
+                    deletedAt: d.location_deletedAt ?? null,
+                },
+                files: parseJson(d.filesJson, []),
+                finances: parseJson(d.financesJson, []),
+                verifications: parseJson(d.verificationsJson, []),
+                partners: parseJson(d.partnersJson, []),
+                targets: parseJson(d.targetsJson, []),
+                actions: parseJson(d.actionsJson, []),
+                indicators: parseJson(d.indicatorsJson, []),
+            }
+
+            console.log(JSON.stringify(req))
+            await createProject(req)
         },
 
         tabs: {
             info_project: {
                 label: "Informations Générales",
                 elements: [
+                    "coverImageId",
                     "title",
-                    "description",
                     "typeId",
-                    "budget",
-                    "location",
-                    "image_principal",
-                    "files",
+                    "status",
+                    "description",
+
+                    //
+                    // "moduleClimat",
+                    // "objective",
+                    // "expectedResults",
+                    // "lessonsLearned",
+                    // "totalBudget",
+                    // "location",
+                    // "infoLinks",
+                    // "startDate",
+                    // "endDate",
+                    // "sectorId",
+                    // "subsectorId",
+                    //
+                    // "filesJson",
                 ],
             },
 
             actions: {
                 label: "Actions",
                 elements: [
-                    "title",
+                    "actionsJson",
                 ],
             },
 
             indicateurs: {
                 label: "Indicateurs",
                 elements: [
-                    "title",
+                    "indicatorsJson",
+                    "indicatorIds",
                 ],
             },
 
             financement: {
                 label: "Financements",
                 elements: [
-                    "findingSource",
-                    "reportingYear",
-                    "instrumentType",
-                    "amountCommitedCfa",
-                    "amountDisbursedCfa",
-                    "currency",
-                    "exchangeRateUsed",
+                    "budget",
+                    "financesJson",
                 ],
             },
 
@@ -87,21 +166,22 @@ export const useCreateProject = () => {
             partenaires: {
                 label: "Partenaires",
                 elements: [
-                    "title",
+                    "partnersJson",
+                    "implementingPartners",
                 ],
             },
 
             population_cible: {
                 label: "Populations cibles",
                 elements: [
-                    "title",
+                    "targetsJson",
                 ],
             },
 
             verification: {
                 label: "Verification",
                 elements: [
-                    "title",
+                    "verificationsJson",
                 ],
             },
 
@@ -151,10 +231,54 @@ export const useCreateProject = () => {
                 autocomplete: "off",
             },
 
-            budget: {
+            status: {
+                type: 'select',
+                label: "Statut du projet",
+                items: [
+                    { value: 'DRAFT', label: 'Brouillon' },
+                    { value: 'PUBLISHED', label: 'Publié' },
+                    { value: 'ARCHIVED', label: 'Archivé' },
+                ],
+                rules: ["required"],
+                native: false,
+            },
+
+
+            indicatorIds: {
+                type: 'textarea',
+                label: "Indicateurs (un par ligne)",
+                rows: 3,
+                rules: [],
+            },
+
+            implementingPartners: {
+                type: 'object',
+                label: 'Partenaires d\'exécution',
+                schema: {
+                    partner1_name: { type: 'text', label: 'Partenaire 1 - Nom' },
+                    partner1_role: { type: 'text', label: 'Partenaire 1 - Rôle' },
+                    partner2_name: { type: 'text', label: 'Partenaire 2 - Nom' },
+                    partner2_role: { type: 'text', label: 'Partenaire 2 - Rôle' },
+                },
+            },
+
+            moduleClimat: {
+                type: 'object',
+                label: 'Module Climat',
+                schema: {
+                    mitigation_actions: { type: 'textarea', label: 'Atténuation - actions (1/ligne)', rows: 3 },
+                    adaptation_actions: { type: 'textarea', label: 'Adaptation - actions (1/ligne)', rows: 3 },
+                },
+            },
+
+            objective: { type: 'object', label: 'Objectif', schema: { objective_goal: { type: 'text', label: 'But' } } },
+            expectedResults: { type: 'object', label: 'Résultats attendus', schema: { expectedResults_result: { type: 'text', label: 'Résultat' } } },
+            lessonsLearned: { type: 'object', label: 'Leçons apprises', schema: { lessonsLearned_lesson: { type: 'text', label: 'Leçon' } } },
+
+            totalBudget: {
                 type: 'text',
-                label: "Budget estimé",
-                info: "Budget estimé",
+                label: "Budget total",
+                info: "Montant total du budget",
                 rules: [],
             },
 
@@ -257,7 +381,15 @@ export const useCreateProject = () => {
                 },
             },
 
-            image_principal: {
+            infoLinks: { type: 'object', label: 'Liens d\'infos', schema: { infoLinks_website: { type: 'text', label: 'Site web' } } },
+
+            startDate: { type: 'date', label: 'Date de début' },
+            endDate: { type: 'date', label: 'Date de fin' },
+
+            sectorId: { type: 'text', label: 'Secteur (ID)' },
+            subsectorId: { type: 'text', label: 'Sous-secteur (ID)' },
+
+            coverImageId: {
                 type: 'file',
                 accepted: ["image/jpeg", "image/jpg", "image/png"],
                 label: "Image principale",
@@ -270,6 +402,17 @@ export const useCreateProject = () => {
                 },
                 rules: [],
                 drop:true
+            },
+
+            budget: {
+                label: "Budget (objet)",
+                type: "object",
+                schema: {
+                    budget_projectId: { type: 'text', label: 'Project ID (optionnel)' },
+                    budget_budget: { type: 'text', label: 'Montant' },
+                    budget_currency: { type: 'text', label: 'Devise' },
+                    budget_deletedAt: { type: 'text', label: 'Supprimé le (null si actif)' },
+                },
             },
 
             findingSource: {
@@ -355,6 +498,14 @@ export const useCreateProject = () => {
                     lg: { container: 12, label: 12, wrapper: 12 },
                 },
             }
+
+            ,filesJson: { type: 'textarea', label: 'Fichiers (JSON)' },
+            financesJson: { type: 'textarea', label: 'Finances (JSON)' },
+            verificationsJson: { type: 'textarea', label: 'Vérifications (JSON)' },
+            partnersJson: { type: 'textarea', label: 'Partenaires (JSON)' },
+            targetsJson: { type: 'textarea', label: 'Cibles (JSON)' },
+            actionsJson: { type: 'textarea', label: 'Actions (JSON)' },
+            indicatorsJson: { type: 'textarea', label: 'Indicateurs (JSON)' },
         }
 
     }))

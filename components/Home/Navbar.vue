@@ -1,6 +1,6 @@
 <template>
-  <nav class="relative">
-    <ul class="flex gap-6 items-center">
+  <nav class="relative w-full">
+    <ul class="flex gap-6 items-center w-full pr-14 sm:pr-16">
       <li
         v-for="(item, idx) in navMenuElements"
         :key="idx"
@@ -66,6 +66,10 @@
         </template>
       </li>
     </ul>
+    <!-- App launcher pinned to the extreme right -->
+    <div class="absolute inset-y-0 right-0 flex items-center">
+      <AppLauncher />
+    </div>
   </nav>
 </template>
 
