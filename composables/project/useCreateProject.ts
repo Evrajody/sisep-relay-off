@@ -143,7 +143,6 @@ export const useCreateProject = () => {
             indicateurs: {
                 label: "Indicateurs",
                 elements: [
-                    "indicatorsJson",
                     "indicatorIds",
                 ],
             },
@@ -152,7 +151,7 @@ export const useCreateProject = () => {
                 label: "Financements",
                 elements: [
                     "budget",
-                    "financesJson",
+                    "finance",
                 ],
             },
 
@@ -166,7 +165,7 @@ export const useCreateProject = () => {
             partenaires: {
                 label: "Partenaires",
                 elements: [
-                    "partnersJson",
+                    "partners",
                     "implementingPartners",
                 ],
             },
@@ -174,14 +173,14 @@ export const useCreateProject = () => {
             population_cible: {
                 label: "Populations cibles",
                 elements: [
-                    "targetsJson",
+                    "targets",
                 ],
             },
 
             verification: {
                 label: "Verification",
                 elements: [
-                    "verificationsJson",
+                    "verifications",
                 ],
             },
 
@@ -245,9 +244,17 @@ export const useCreateProject = () => {
 
 
             indicatorIds: {
-                type: 'textarea',
-                label: "Indicateurs (un par ligne)",
-                rows: 3,
+                type: 'tags',
+                label: "Indicateurs",
+                search: true,
+                native: false,
+                inputType: 'search',
+                autocomplete: 'off',
+                items: [
+                    { value: 'DRAFT', label: 'Brouillon' },
+                    { value: 'PUBLISHED', label: 'Publié' },
+                    { value: 'ARCHIVED', label: 'Archivé' },
+                ],
                 rules: [],
             },
 
@@ -500,12 +507,212 @@ export const useCreateProject = () => {
             }
 
             ,filesJson: { type: 'textarea', label: 'Fichiers (JSON)' },
-            financesJson: { type: 'textarea', label: 'Finances (JSON)' },
-            verificationsJson: { type: 'textarea', label: 'Vérifications (JSON)' },
-            partnersJson: { type: 'textarea', label: 'Partenaires (JSON)' },
-            targetsJson: { type: 'textarea', label: 'Cibles (JSON)' },
+            finance: {
+                type: 'object', 
+                label: 'Finances',
+                columns: {
+                    default: { container: 12, label: 12, wrapper: 12 },
+                    sm: { container: 12, label: 12, wrapper: 12 },
+                    md: { container: 12, label: 12, wrapper: 12 },
+                    lg: { container: 12, label: 12, wrapper: 12 },
+                },
+                schema: {
+                    reportingYear: { type: 'date', label: 'Date du rapport' },
+                    instrumentType: { type: 'text', label: 'Type d\'instrument' },
+                    amountCommitedCfa: { type: 'text', label: 'Montant engagé' },
+                    amountDisbursedCfa: { type: 'text', label: 'Montant distribué' },
+                    currency: {
+                        type: 'select',
+                        label: 'Devise',
+                        columns: {
+                            default: { container: 12, label: 12, wrapper: 12 },
+                            sm: { container: 12, label: 12, wrapper: 12 },
+                            md: { container: 12, label: 12, wrapper: 12 },
+                            lg: { container: 12, label: 12, wrapper: 12 },
+                        },
+                        items: [
+                            { value: 'EUR', label: 'Euros' },
+                            { value: 'US', label: 'Dollar' },
+                            { value: 'XOF', label: 'XOF' },
+                        ],
+                    },
+                    fundingSource: {
+                        type: 'object',
+                        label: 'Source de financement',
+                        columns: {
+                            default: { container: 12, label: 12, wrapper: 12 },
+                            sm: { container: 12, label: 12, wrapper: 12 },
+                            md: { container: 12, label: 12, wrapper: 12 },
+                            lg: { container: 12, label: 12, wrapper: 12 },
+                        },
+                        schema: {
+                            donor: { type: 'text', label: 'Donateur' },
+                            program: { type: 'text', label: 'Programme' },
+                        },
+                    }
+                }
+            },
+            verifications: {
+                type: 'object',
+                // label: 'Vérifications',
+                columns: {
+                    default: { container: 12, label: 12, wrapper: 12 },
+                    sm: { container: 12, label: 12, wrapper: 12 },
+                    md: { container: 12, label: 12, wrapper: 12 },
+                    lg: { container: 12, label: 12, wrapper: 12 },
+                },
+                schema: {
+                    verificationLevel: {
+                        type: "text",
+                        label: "Niveau de vérification",
+                    },
+                    verificationDate: {
+                        type: "date",
+                        label: "Date de vérification",
+                    },
+                    verifier: {
+                        type: "object",
+                        label: "Vérificateur",
+                        columns: {
+                            default: { container: 12, label: 12, wrapper: 12 },
+                            sm: { container: 12, label: 12, wrapper: 12 },
+                            md: { container: 12, label: 12, wrapper: 12 },
+                            lg: { container: 12, label: 12, wrapper: 12 },
+                        },    
+                        schema: {
+                            name: {
+                                type: 'text', 
+                                label: 'Nom',
+                            },
+                            organization: {
+                                type: "text",
+                                label: "Organisation",
+                            }
+                        }
+                    },
+                    verificationReportReference: {
+                        type: "file",
+                        label: "Rapport de vérification",
+                        columns: {
+                            default: { container: 12, label: 12, wrapper: 12 },
+                            sm: { container: 12, label: 12, wrapper: 12 },
+                            md: { container: 12, label: 12, wrapper: 12 },
+                            lg: { container: 12, label: 12, wrapper: 12 },
+                        },
+                        drop:true
+                    }
+                }
+            },
+            partners: {
+                type: 'object', // Normalement ceci c'est une liste pour permettre d'ajpouter plusieurs partenaires (j'arrivais pas à configurer cela)
+                label: 'Partenaires',
+                columns: {
+                    default: { container: 12, label: 12, wrapper: 12 },
+                    sm: { container: 12, label: 12, wrapper: 12 },
+                    md: { container: 12, label: 12, wrapper: 12 },
+                    lg: { container: 12, label: 12, wrapper: 12 },
+                },
+                schema:{
+                    name: {
+                        type: 'text', 
+                        label: 'Nom',
+                        columns: {
+                            default: { container: 12, label: 12, wrapper: 12 },
+                            sm: { container: 4, label: 12, wrapper: 12 },
+                            md: { container: 4, label: 12, wrapper: 12 },
+                            lg: { container: 4, label: 12, wrapper: 12 },
+                        },
+                    },
+                    type: {
+                        type: 'text',
+                        label: 'Type',
+                        columns: {
+                            default: { container: 12, label: 12, wrapper: 12 },
+                            sm: { container: 4, label: 12, wrapper: 12 },
+                            md: { container: 4, label: 12, wrapper: 12 },
+                            lg: { container: 4, label: 12, wrapper: 12 },
+                        },
+                    },
+                    otherData: {
+                        type: 'object',
+                        // label: 'Autres données',
+                        columns: {
+                            default: { container: 4, label: 12, wrapper: 12 },
+                            sm: { container: 4, label: 12, wrapper: 12 },
+                            md: { container: 4, label: 12, wrapper: 12 },
+                            lg: { container: 4, label: 12, wrapper: 12 },
+                        },
+                        schema: {
+                            role: {  
+                                label: 'Role',                         
+                                type: 'text',
+                                columns: {
+                                    default: { container: 12, label: 12, wrapper: 12 },
+                                    sm: { container: 12, label: 12, wrapper: 12 },
+                                    md: { container: 12, label: 12, wrapper: 12 },
+                                    lg: { container: 12, label: 12, wrapper: 12 },
+                                }, 
+                            },
+                        }
+                    }
+                }
+            },
+            targets: {
+                type: 'object', 
+                label: 'Cibles',
+                columns: {
+                    default: { container: 12, label: 12, wrapper: 12 },
+                    sm: { container: 12, label: 12, wrapper: 12 },
+                    md: { container: 12, label: 12, wrapper: 12 },
+                    lg: { container: 12, label: 12, wrapper: 12 },
+                },
+                schema:{
+                    name: {
+                        type: 'text', 
+                        label: 'Nom',
+                        columns: {
+                            default: { container: 12, label: 12, wrapper: 12 },
+                            sm: { container: 6, label: 12, wrapper: 12 },
+                            md: { container: 6, label: 12, wrapper: 12 },
+                            lg: { container: 6, label: 12, wrapper: 12 },
+                        },
+                    },
+                    otherData: {
+                        type: 'object',
+                        // label: 'Autres données',
+                        columns: {
+                            default: { container: 6, label: 12, wrapper: 12 },
+                            sm: { container: 6, label: 12, wrapper: 12 },
+                            md: { container: 6, label: 12, wrapper: 12 },
+                            lg: { container: 6, label: 12, wrapper: 12 },
+                        },
+                        schema: {
+                            size: {  
+                                label: 'Taille',
+                                type: 'text',
+                                inputType: 'number',
+                                columns: {
+                                    default: { container: 12, label: 12, wrapper: 12 },
+                                    sm: { container: 12, label: 12, wrapper: 12 },
+                                    md: { container: 12, label: 12, wrapper: 12 },
+                                    lg: { container: 12, label: 12, wrapper: 12 },
+                                }, 
+                            },
+                        }
+                    },
+                    description: {
+                        type: 'textarea',
+                        label: 'Description',
+                        columns: {
+                            default: { container: 12, label: 12, wrapper: 12 },
+                            sm: { container: 12, label: 12, wrapper: 12 },
+                            md: { container: 12, label: 12, wrapper: 12 },
+                            lg: { container: 12, label: 12, wrapper: 12 },
+                        },
+                    },
+                }
+            },
             actionsJson: { type: 'textarea', label: 'Actions (JSON)' },
-            indicatorsJson: { type: 'textarea', label: 'Indicateurs (JSON)' },
         }
 
     }))
