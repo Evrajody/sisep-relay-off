@@ -51,8 +51,17 @@ export const useCreateProject = () => {
 
             // console.log(JSON.stringify(req))
 
-            console.log(JSON.stringify(d))
-            await createProject(d)
+            let payloadProject = {
+                ...d,
+                location: {
+                    ...d.location,
+                    location: [[d.location.location.latitude, d.location.location.longitude]]
+                }
+            }
+
+            console.log(JSON.stringify(payloadProject))
+
+            await createProject(payloadProject)
         },
 
         tabs: {
