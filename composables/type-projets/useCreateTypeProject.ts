@@ -29,7 +29,6 @@ export const useCreateTypeProject = ( refreshTypeProjets: () => void ) => {
         showRequired: ["label"],
 
 
-
         endpoint: async (form: any, payload: any) => {
             await createTypeProject(payload.requestData)
         },

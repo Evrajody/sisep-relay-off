@@ -10,8 +10,21 @@ export default defineNuxtPlugin((nuxtApp) => {
         headers: {
             'Content-Type': 'application/json',
         },
-        onResponse: (response) => {
+        onResponse: ({response}) => {
             // console.log(response)
+
+            if (response.status === 201 || response.status === 200) {
+                alert('Opération effectuée avec succès')
+            }
+
+            if (response.status === 400) {
+                alert('Opération echouée')
+            }
+        },
+
+        onError: ({error}) => {
+            alert(error)
+            console.log(error)
         }
     })
 

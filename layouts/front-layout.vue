@@ -4,8 +4,6 @@
 </script>
 
 <template>
-
-
     <Footer></Footer>
 </template>
 

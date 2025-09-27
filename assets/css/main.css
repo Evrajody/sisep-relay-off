@@ -4,6 +4,25 @@
 @import url("https://fonts.cdnfonts.com/css/inter");
 @import url("https://fonts.cdnfonts.com/css/manrope");
 
+@import url("https://fonts.cdnfonts.com/css/manrope");
+@import url("https://fonts.cdnfonts.com/css/tt-rounds-neue-trial");
+@import url('https://fonts.cdnfonts.com/css/cabinet-grotesk');
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+@font-face {
+    font-family: "Inter Variable";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url(https://cdn.jsdelivr.net/fontsource/fonts/inter:vf@latest/latin-wght-normal.woff2)
+    format("woff2-variations");
+    unicode-range:
+            U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+            U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+            U+2215, U+FEFF, U+FFFD;
+}
+
 
 @keyframes pulsar {
     100% {
@@ -398,6 +417,29 @@
     --vf-slider-tooltip-arrow-size-lg: var(--vf-slider-tooltip-arrow-size);
 }
 
-body {
-    font-family: 'Montserrat Ace', sans-serif !important;
+.reset-imgs {
+    color: white;
+    object-fit: contain;
+    mix-blend-mode: luminosity;
 }
+
+.bg-bottom-fade {
+    background-image:   linear-gradient(to right, #e2e8f0 1px, transparent 1px), linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 100%, #000 60%, transparent 100%);
+    --webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 100%, #000 60%, transparent 100%);
+    background-size: 20px 30px;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    @apply min-h-screen !bg-gray-200 dark:bg-gray-900;
+}
+
+.custom-path {
+    position: relative;
+    clip-path: polygon(0% 15%, 0 0, 15% 0%, 85% 0%, 85% 15%, 100% 15%, 100% 85%, 100% 100%, 85% 100%, 15% 100%, 15% 85%, 0% 85%);
+    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect x="0" y="0" width="200" height="200" rx="10" ry="10" fill="white"/></svg>');
+    mask-size: 100% 100%;
+    /*clip-path: polygon(0% 15%, 0 0, 15% 0%, 85% 0%, 85% 15%, 100% 15%, 100% 85%, 100% 100%, 85% 100%, 15% 100%, 15% 85%, 0% 85%);*/
+}
+

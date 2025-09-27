@@ -197,18 +197,18 @@ const statsImg = reactive([
     <!-- SECTION BANNIÈRE PRINCIPALE: CAROUSEL -->
     <header class="relative bg-gray-900">
       <!-- Top nav bar with brand + navbar overlay -->
-      <div class="h-fit mx-auto absolute top-7 rounded-lg shadow-lg left-0 right-0 z-20 max-w-[90vw] bg-sisep-hit">
-        <div class="flex gap-12 justify-start items-center pr-10">
-          <div class="img-box flex rounded-l-lg bg-white w-fit">
-            <div class="w-[300px]">
-              <a href=""><img class="" src="~/assets/images/logo_cadre_vie.png"></a>
+      <div class="h-fit mx-auto absolute top-2 md:top-4 lg:top-7 rounded-lg shadow-lg left-0 right-0 z-20 max-w-[95vw] md:max-w-[90vw] bg-sisep-hit">
+        <div class="flex flex-col md:flex-row gap-2 md:gap-6 justify-between md:justify-start items-center p-2 md:pr-6">
+          <div class="img-box flex rounded-lg md:rounded-l-lg bg-white w-full md:w-fit">
+            <div class="w-full md:w-[250px] lg:w-[300px] p-2 md:p-0">
+              <a href="/"><img class="h-12 md:h-auto w-auto mx-auto" src="~/assets/images/logo_cadre_vie.png" alt="Logo Cadre de Vie"></a>
             </div>
           </div>
-          <Navbar/>
+          <Navbar class="w-full md:w-auto"/>
         </div>
       </div>
 
-      <div class="relative h-[70dvh] overflow-hidden">
+      <div class="relative h-[50vh] sm:h-[60vh] md:h-[70vh] overflow-hidden">
         <!-- Slides -->
         <div class="absolute inset-0">
           <transition name="fade" mode="out-in">
@@ -217,60 +217,120 @@ const statsImg = reactive([
                 :src="`/images/${slides[currentSlide].image}`"
                 :alt="slides[currentSlide].title"
                 class="w-full h-full object-cover"
+                loading="lazy"
+                :srcset="`/images/${slides[currentSlide].image} 1x, /images/${slides[currentSlide].image} 2x`"
             />
           </transition>
           <div class="absolute inset-0 bg-black/60"></div>
         </div>
 
         <!-- Content -->
-        <div class="relative z-10 h-full container mx-auto px-6 flex items-center">
-          <div class="max-w-3xl space-y-6 pt-16">
-            <h1 class="text-4xl md:text-6xl text-white font-bold">{{ slides[currentSlide].title }}</h1>
-            <p class="text-white/90 text-lg md:text-xl">{{ slides[currentSlide].subtitle }}</p>
-            <div class="flex gap-3 motion-preset-slide-up-lg">
-              <NuxtLink :to="slides[currentSlide].cta.href" class="inline-flex items-center gap-2 bg-sisep-hit text-white rounded-md px-5 py-3 shadow hover:shadow-lg transition">
+        <div class="relative z-10 h-full container mx-auto px-3 sm:px-4 md:px-6 flex items-center">
+          <div class="w-full md:max-w-2xl lg:max-w-3xl space-y-3 sm:space-y-4 md:space-y-6 pt-16 md:pt-20">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white font-bold leading-tight">{{ slides[currentSlide].title }}</h1>
+            <p class="text-white/90 text-base sm:text-lg md:text-xl">{{ slides[currentSlide].subtitle }}</p>
+            
+            <!-- Boutons d'action -->
+            <div class="flex flex-wrap gap-2 sm:gap-3 motion-preset-slide-up-lg">
+              <NuxtLink :to="slides[currentSlide].cta.href" class="inline-flex items-center justify-center gap-2 bg-sisep-hit hover:bg-sisep-hit/90 text-white rounded-md px-4 py-2 sm:px-5 sm:py-2.5 text-sm sm:text-base shadow hover:shadow-lg transition-all duration-200 flex-1 sm:flex-none text-center">
                 <span class="font-semibold">{{ slides[currentSlide].cta.label }}</span>
               </NuxtLink>
-              <button @click="isPlaying = !isPlaying; if(isPlaying){ startTs = performance.now(); rafId = requestAnimationFrame(step)}" class="inline-flex items-center gap-2 bg-white/10 text-white rounded-md px-4 py-3 backdrop-blur hover:bg-white/20 transition">
+              <button 
+                @click="isPlaying = !isPlaying; if(isPlaying){ startTs = performance.now(); rafId = requestAnimationFrame(step)}" 
+                class="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white rounded-md px-4 py-2 sm:px-5 sm:py-2.5 text-sm sm:text-base backdrop-blur transition-all duration-200 flex-1 sm:flex-none"
+                :aria-label="isPlaying ? 'Mettre en pause le carrousel' : 'Lire le carrousel'"
+              >
+                <UIcon :name="isPlaying ? 'i-heroicons-pause' : 'i-heroicons-play'" class="w-4 h-4" />
                 <span class="font-medium">{{ isPlaying ? 'Pause' : 'Lire' }}</span>
               </button>
             </div>
 
-            <!-- Search bar -->
-            <div class="flex mt-6 max-w-2xl motion-preset-slide-up-lg">
-              <input class="w-full focus:outline-none bg-white rounded-l-md shadow-lg py-4 px-5" placeholder="Rechercher des données, indicateurs..." type="search"/>
-              <button class="bg-red-600 text-white rounded-r-md shadow-md px-5">Rechercher</button>
+            <!-- Barre de recherche -->
+            <div class="mt-4 sm:mt-6 max-w-2xl motion-preset-slide-up-lg">
+              <div class="relative flex">
+                <input 
+                  class="w-full focus:outline-none bg-white rounded-l-md shadow-lg py-3 sm:py-4 px-4 sm:px-5 text-sm sm:text-base" 
+                  placeholder="Rechercher des données, indicateurs..." 
+                  type="search"
+                  aria-label="Rechercher des données et indicateurs"
+                />
+                <button class="bg-red-600 hover:bg-red-700 text-white rounded-r-md shadow-md px-4 sm:px-5 transition-colors duration-200">
+                  <span class="hidden sm:inline">Rechercher</span>
+                  <UIcon name="i-heroicons-magnifying-glass" class="sm:hidden w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             <!-- Tags -->
-            <div class="mt-4">
-              <div class="max-w-3xl flex items-center flex-wrap gap-2">
-                <UBadge v-for="item in cadresSearchElements" :key="item.label" class="backdrop-blur-sm bg-white/20 text-white">{{ item.label }}</UBadge>
+            <div class="mt-3 sm:mt-4">
+              <div class="flex flex-wrap gap-1.5 sm:gap-2 max-h-20 sm:max-h-24 overflow-y-auto pb-1 custom-scrollbar">
+                <UBadge 
+                  v-for="item in cadresSearchElements" 
+                  :key="item.label" 
+                  class="backdrop-blur-sm bg-white/20 hover:bg-white/30 text-white text-xs sm:text-sm px-2.5 py-1 cursor-pointer transition-colors"
+                  @click="$router.push(item.href)"
+                >
+                  {{ item.label }}
+                </UBadge>
               </div>
             </div>
           </div>
 
-          <!-- Next preview -->
-          <div class="ml-auto hidden md:block">
-            <div class="relative w-60 h-36 rounded-lg overflow-hidden shadow-lg">
-              <img :src="`/images/${slides[(currentSlide+1)%slides.length].image}`" class="w-full h-full object-cover blur-sm scale-105" alt=""/>
+          <!-- Next preview - visible uniquement sur desktop -->
+          <div class="ml-auto hidden lg:block">
+            <div class="relative w-48 xl:w-60 h-32 xl:h-36 rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl">
+              <img 
+                :src="`/images/${slides[(currentSlide+1)%slides.length].image}`" 
+                class="w-full h-full object-cover blur-sm scale-105 transition-transform duration-300 hover:scale-110" 
+                :alt="`Aperçu: ${slides[(currentSlide+1)%slides.length].title}`"
+                loading="lazy"
+              />
               <div class="absolute inset-0 bg-black/20"></div>
-              <div class="absolute bottom-2 left-2 text-white text-sm">À suivre</div>
+              <div class="absolute bottom-2 left-2 text-white text-xs xl:text-sm font-medium">À suivre</div>
             </div>
           </div>
         </div>
 
         <!-- Controls -->
-        <div class="absolute inset-x-0 bottom-4 z-10 container mx-auto px-6">
-          <div class="flex items-center gap-4">
-            <button @click="prevSlide" class="size-9 rounded-full bg-white/10 text-white backdrop-blur hover:bg-white/20">‹</button>
-            <div class="h-1 flex-1 rounded bg-white/20 overflow-hidden">
-              <div class="h-full bg-sisep-hit" :style="{ width: progress + '%' }"></div>
+        <div class="absolute inset-x-0 bottom-2 sm:bottom-4 z-10 container mx-auto px-3 sm:px-4 md:px-6">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <button 
+              @click="prevSlide" 
+              class="size-7 sm:size-8 md:size-9 rounded-full bg-white/10 text-white backdrop-blur hover:bg-white/20 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-white/50"
+              aria-label="Diapositive précédente"
+            >
+              <UIcon name="i-heroicons-chevron-left" class="w-4 h-4" />
+            </button>
+            
+            <div class="h-1.5 sm:h-2 flex-1 rounded-full bg-white/20 overflow-hidden">
+              <div 
+                class="h-full bg-sisep-hit transition-all duration-300 ease-out" 
+                :style="{ width: progress + '%' }"
+                :aria-valuenow="progress"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                role="progressbar"
+              ></div>
             </div>
-            <button @click="nextSlide" class="size-9 rounded-full bg-white/10 text-white backdrop-blur hover:bg-white/20">›</button>
+            
+            <button 
+              @click="nextSlide" 
+              class="size-7 sm:size-8 md:size-9 rounded-full bg-white/10 text-white backdrop-blur hover:bg-white/20 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-white/50"
+              aria-label="Diapositive suivante"
+            >
+              <UIcon name="i-heroicons-chevron-right" class="w-4 h-4" />
+            </button>
           </div>
-          <div class="mt-3 flex gap-2">
-            <button v-for="(s, i) in slides" :key="i" @click="goToSlide(i)" class="w-8 h-1 rounded-full" :class="i===currentSlide ? 'bg-white' : 'bg-white/40'"/>
+          
+          <div class="mt-2 sm:mt-3 flex justify-center gap-1.5 sm:gap-2">
+            <button 
+              v-for="(s, i) in slides" 
+              :key="i" 
+              @click="goToSlide(i)" 
+              class="h-1 sm:h-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50" 
+              :class="i===currentSlide ? 'w-6 sm:w-8 bg-white' : 'w-3 sm:w-4 bg-white/40 hover:bg-white/60'"
+              :aria-label="`Aller à la diapositive ${i+1}`"
+            ></button>
           </div>
         </div>
       </div>

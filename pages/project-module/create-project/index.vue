@@ -60,13 +60,14 @@ const { createProjectForm, createProjectFormEl } = useCreateProject();
               icon="i-heroicons-x-circle-solid"
               label="Annuler"
               size="lg"
-              @click.prevent="null"
+              @click.prevent="createProjectFormEl.submit()"
           />
           <UButton
               class="rounded-md shadow bg-primary font-medium"
               icon="i-heroicons-check-solid"
               label="Enregistrer"
               size="lg"
+              @click.prevent="createProjectFormEl?.submit()"
           />
         </div>
 

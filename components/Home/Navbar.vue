@@ -1,6 +1,16 @@
 <template>
   <nav class="relative w-full">
-    <ul class="flex gap-6 items-center w-full pr-14 sm:pr-16">
+    <!-- Bouton menu mobile -->
+    <div class="md:hidden flex items-center justify-between w-full p-4">
+      <div class="flex-1"></div>
+      <button @click="isMobileMenuOpen = !isMobileMenuOpen" class="text-white p-2 focus:outline-none">
+        <UIcon v-if="!isMobileMenuOpen" name="i-heroicons-bars-3-20-solid" class="w-6 h-6" />
+        <UIcon v-else name="i-heroicons-x-mark-20-solid" class="w-6 h-6" />
+      </button>
+    </div>
+    
+    <!-- Menu principal -->
+    <ul :class="['md:flex gap-6 items-center w-full pr-14 sm:pr-16', isMobileMenuOpen ? 'block absolute top-full left-0 right-0 bg-sisep-hit z-50 p-4' : 'hidden']">
       <li
         v-for="(item, idx) in navMenuElements"
         :key="idx"
@@ -75,8 +85,31 @@
 
 <script lang="ts" setup>
 import { UIcon } from '#components'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+
 // State for open mega menu index
 const openIndex = ref<number | null>(null)
+const isMobileMenuOpen = ref(false)
+const isMobile = ref(false)
+
+// Vérifier la taille de l'écran au chargement
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth < 768
+  if (!isMobile.value) {
+    isMobileMenuOpen.value = false
+  }
+}
+
+// Écouter les changements de taille d'écran
+onMounted(() => {
+  checkScreenSize()
+  window.addEventListener('resize', checkScreenSize)
+})
+
+// Nettoyer l'écouteur d'événement
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', checkScreenSize)
+})
 
 function openMenu(idx: number) {
   openIndex.value = idx
