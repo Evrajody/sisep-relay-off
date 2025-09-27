@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import { useProjects } from "~/composables/project/useProjects";
+import type { Project } from '~/types';
+
+const router = useRouter();
 
 definePageMeta({
   layout: "sisep-app-layout",
@@ -8,182 +11,360 @@ definePageMeta({
 const links = [
   {
     label: "Liste des projets",
-    icon: "i-heroicons-user-circle",
+    icon: "i-heroicons-document-chart-bar",
   },
 ];
 
-const page = ref(1)
+// Configuration du tableau
+const page = ref(1);
+const pageCount = ref(10);
+const selected = ref<Project[]>([]);
+const sort = ref({ column: 'createdAt', direction: 'desc' as const });
 
 useHead({
   title: "Liste des projets",
 });
 
-// chargement de la liste des types de projets
+// Chargement de la liste des projets
 const {
-  search,
-  current_page,
+  projectList,
+  refreshProjectList,
+  projectListStatus,
   columns,
-  projets,
+  search,
   pagination,
-  error,
-  projetsStatus,
-  refreshProjets,
+  selectedStatus
 } = useProjects();
+
+// Options de statut pour le filtre
+const statuses = [
+  { value: 'all', label: 'Tous les statuts' },
+  { value: 'DRAFT', label: 'Brouillon' },
+  { value: 'PENDING', label: 'En attente' },
+  { value: 'PUBLISHED', label: 'Publié' },
+  { value: 'REJECTED', label: 'Rejeté' },
+];
+
+// Actions disponibles pour chaque projet
+const getActions = (row: Project) => [
+  {
+    label: 'Voir les détails',
+    icon: 'i-heroicons-eye',
+    click: () => navigateTo(`/project-module/${row.id}`)
+  },
+  {
+    label: 'Modifier',
+    icon: 'i-heroicons-pencil-square',
+    click: () => navigateTo(`/project-module/${row.id}/edit`)
+  },
+  {
+    label: 'Supprimer',
+    icon: 'i-heroicons-trash',
+    click: async () => {
+      if (confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
+        // Implémentez la logique de suppression ici
+        await refreshProjectList();
+      }
+    }
+  }
+];
+
+// Configuration des badges de statut
+const getStatusBadge = (status: string) => {
+  const statusMap: Record<string, { color: string, label: string }> = {
+    'DRAFT': { color: 'gray', label: 'Brouillon' },
+    'PENDING': { color: 'yellow', label: 'En attente' },
+    'PUBLISHED': { color: 'green', label: 'Publié' },
+    'REJECTED': { color: 'red', label: 'Rejeté' },
+  };
+  return statusMap[status] || { color: 'gray', label: 'Inconnu' };
+};
+
+// Gestion du changement de page
+const onPageChange = (newPage: number) => {
+  page.value = newPage;
+  refreshProjectList();
+};
+
+// Gestion du tri
+const onSort = (e: { column: string; direction: 'asc' | 'desc' }) => {
+  sort.value = e;
+  refreshProjectList();
+};
+
+// Formatage de la date
+const formatDate = (dateString: string) => {
+  if (!dateString) return 'N/A';
+  return new Date(dateString).toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+// Calcul de la progression du projet
+const getProjectProgress = (project: Project) => {
+  if (!project.startDate || !project.endDate) return 0;
+  
+  const start = new Date(project.startDate).getTime();
+  const end = new Date(project.endDate).getTime();
+  const now = new Date().getTime();
+  
+  if (now >= end) return 100;
+  if (now <= start) return 0;
+  
+  return Math.round(((now - start) / (end - start)) * 100);
+};
+
+// Formatage du temps restant avant la fin du projet
+const getTimeRemaining = (endDate: string) => {
+  if (!endDate) return 'Date de fin non définie';
+  
+  const end = new Date(endDate);
+  const now = new Date();
+  
+  if (now > end) return 'Terminé';
+  
+  const diffTime = end.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 0) return 'Se termine aujourd\'hui';
+  if (diffDays === 1) return 'Se termine demain';
+  if (diffDays < 30) return `Se termine dans ${diffDays} jours`;
+  
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths === 1) return 'Se termine dans 1 mois';
+  if (diffMonths < 12) return `Se termine dans ${diffMonths} mois`;
+  
+  const diffYears = Math.floor(diffMonths / 12);
+  return `Se termine dans ${diffYears} an${diffYears > 1 ? 's' : ''}`;
+};
+
+// Calcul du nombre de jours restants
+const getDaysRemaining = (endDate: string) => {
+  if (!endDate) return 0;
+  
+  const end = new Date(endDate);
+  const now = new Date();
+  
+  if (now > end) return 0;
+  
+  const diffTime = end.getTime() - now.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
 </script>
 
 <template>
+
   <UDashboardToolbar
     :ui="{ wrapper: 'bg-white dark:bg-gray-900' }"
     class="py-0 px-1.5 overflow-x-auto"
   >
     <UHorizontalNavigation :links="links" />
+    <template #right>
+      <UButton
+        to="/project-module/create-project"
+        color="primary"
+        icon="i-heroicons-plus"
+        label="Nouveau projet"
+        size="sm"
+      />
+    </template>
   </UDashboardToolbar>
 
-  <div class="max-w-[70vw] w-full py-5 mx-auto">
+  <div class="max-w-[95vw] w-full py-5 mx-auto px-4">
+
+
+<!--  <pre>-->
+<!--    {{ projectList }}-->
+<!--  </pre>-->
+
     <UDashboardCard
       :ui="{
         divide: 'divide-x divide-gray-200 dark:divide-gray-700',
         title: 'text-gray-900 dark:text-white font-semibold',
-        wrapper: ' border-gray-100',
+        wrapper: 'border border-gray-200 dark:border-gray-800 rounded-lg',
         header: {
-          wrapper: ' border-gray-100',
+          wrapper: 'border-b border-gray-200 dark:border-gray-800',
         },
       }"
     >
-      <template #title>
-        <h3 class="text-lg font-semibold">Liste des projets</h3>
+      <!-- En-tête avec titre et filtres -->
+      <template #header>
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 gap-4">
+          <div>
+            <h3 class="text-lg font-semibold">Liste des projets</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {{ pagination.totalItems }} projet(s) au total
+            </p>
+          </div>
+          <div class="flex flex-col sm:flex-row items-end sm:items-center gap-3 w-full sm:w-auto">
+            <USelectMenu 
+              v-model="selectedStatus"
+              :options="statuses" 
+              option-attribute="label"
+              placeholder="Filtrer par statut"
+              class="w-full sm:w-48"
+              size="sm"
+              @update:modelValue="refreshProjectList"
+            />
+            <UInput 
+              v-model="search" 
+              icon="i-heroicons-magnifying-glass"
+              placeholder="Rechercher un projet..." 
+              class="w-full sm:w-64"
+              size="sm"
+              @keyup.enter="refreshProjectList"
+            />
+          </div>
+        </div>
       </template>
 
-      <div class="">
-
-                      <!-- Filters -->
-                <div class="flex items-center justify-between py-5 gap-3">
-                    <UInput v-model="search" class="w-[500px]" icon="i-heroicons-magnifying-glass-20-solid"
-                        placeholder="Filter les types projets..." size="lg" />
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-sm leading-5">Element par page:</span>
-                        <USelect :options="[3, 5, 10, 20, 30]" class="me-2 w-[100px]" size="lg" />
-                    </div>
-                </div>
-        <!-- TABLES -->
+      <!-- Contenu principal du tableau -->
+      <div class="overflow-x-auto">
         <UTable
-          :columns="columns"
-          :loading="false"
-          :rows="projets?.data"
+          :columns="[
+            { key: 'title', label: 'Projet', sortable: true },
+            { key: 'type.name', label: 'Type', sortable: true },
+            { key: 'status', label: 'Statut', sortable: true },
+            { key: 'dates', label: 'Période', sortable: true },
+            { key: 'progress', label: 'Progression' },
+            { key: 'actions', label: 'Actions' }
+          ]"
+          :rows="projectList?.data || []"
+          :loading="projectListStatus === 'pending'"
+          :loading-state="{ icon: 'i-heroicons-arrow-path-20-solid', label: 'Chargement...' }"
+          :empty-state="{
+            icon: 'i-heroicons-document-magnifying-glass',
+            label: 'Aucun projet trouvé',
+            description: 'Essayez de modifier vos critères de recherche',
+          }"
           class="w-full"
-          @select="null"
+          :ui="{
+            td: { base: 'whitespace-nowrap' },
+            th: { base: 'whitespace-nowrap' }
+          }"
+          v-model:sort="sort"
+          @update:sort="onSort"
         >
+          <!-- Colonne Titre avec image -->
           <template #title-data="{ row }">
-            <div class="flex gap-3 space-y-2">
-              <NuxtImg
-                class="rounded-md"
-                width="200"
-                height="200"
-                src="https://images.pexels.com/photos/545068/pexels-photo-545068.jpeg"
+            <div class="flex items-center gap-3 min-w-[200px]">
+              <UAvatar
+                :src="row.coverImage?.url || `https://ui-avatars.com/api/?name=${encodeURIComponent(row.title || '')}&background=3b82f6&color=fff`"
+                :alt="row.title"
+                size="md"
+                class="flex-shrink-0"
+                :ui="{ size: { 'md': 'h-10 w-10 text-sm' } }"
               />
-
-              <div class="flex">
-                <p class="font-extrabold text-lg">{{ row.title }}</p>
+              <div class="min-w-0">
+                <p class="font-medium text-gray-900 dark:text-white truncate">
+                  {{ row.title || 'Sans titre' }}
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
+                  {{ row.type?.name || 'Sans catégorie' }}
+                </p>
               </div>
             </div>
           </template>
 
-          <template #empty-state>
-            <div class="flex flex-col items-center gap-5 justify-center py-12">
-              <div class="size-10">
-                <svg
-                  class="size-10 text-gray-500"
-                  viewBox="0 0 16 16"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M7.628 1.099a.75.75 0 0 1 .744 0l5.25 3a.75.75 0 0 1 0 1.302l-5.25 3a.75.75 0 0 1-.744 0l-5.25-3a.75.75 0 0 1 0-1.302z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="m2.57 7.24l-.192.11a.75.75 0 0 0 0 1.302l5.25 3a.75.75 0 0 0 .744 0l5.25-3a.75.75 0 0 0 0-1.303l-.192-.11l-4.314 2.465a2.25 2.25 0 0 1-2.232 0z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="m2.378 10.6l.192-.11l4.314 2.464a2.25 2.25 0 0 0 2.232 0l4.314-2.465l.192.11a.75.75 0 0 1 0 1.303l-5.25 3a.75.75 0 0 1-.744 0l-5.25-3a.75.75 0 0 1 0-1.303"
-                    fill="currentColor"
-                  />
-                </svg>
+          <!-- Colonne Statut -->
+          <template #status-data="{ row }">
+            <UBadge 
+              :color="getStatusBadge(row.status).color" 
+              variant="subtle"
+              size="sm"
+              class="capitalize"
+              :ui="{ 
+                color: { 
+                  gray: 'dark:bg-gray-800/50 dark:text-gray-300',
+                  yellow: 'dark:bg-yellow-900/50 dark:text-yellow-300',
+                  green: 'dark:bg-green-900/50 dark:text-green-300',
+                  red: 'dark:bg-red-900/50 dark:text-red-300'
+                } 
+              }"
+            >
+              {{ getStatusBadge(row.status).label }}
+            </UBadge>
+          </template>
+
+          <!-- Colonne Période -->
+          <template #dates-data="{ row }">
+            <div class="flex flex-col gap-1">
+              <div class="text-sm text-gray-900 dark:text-white font-medium">
+                {{ formatDate(row.startDate) }} - {{ formatDate(row.endDate) }}
               </div>
-              <span class="text-sm"> Aucune donnée </span>
+              <div class="text-xs text-gray-500 dark:text-gray-400">
+                {{ getTimeRemaining(row.endDate) }}
+              </div>
             </div>
           </template>
 
-          <template #loading-state>
-            <div class="flex flex-col items-center gap-5 justify-center py-12">
-              <div class="size-10">
-                <svg
-                  class="size-10"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 3c4.97 0 9 4.03 9 9"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-dasharray="16"
-                    stroke-dashoffset="16"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                  >
-                    <animate
-                      attributeName="stroke-dashoffset"
-                      dur="0.2s"
-                      fill="freeze"
-                      values="16;0"
-                    />
-                    <animateTransform
-                      attributeName="transform"
-                      dur=".5s"
-                      repeatCount="indefinite"
-                      type="rotate"
-                      values="0 12 12;360 12 12"
-                    />
-                  </path>
-                </svg>
+          <!-- Colonne Progression -->
+          <template #progress-data="{ row }">
+            <div class="flex flex-col gap-1 min-w-[150px]">
+              <UProgress 
+                :value="getProjectProgress(row)" 
+                size="sm" 
+                color="blue"
+                :show-animation="true"
+                class="w-full"
+              />
+              <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                <span>{{ getProjectProgress(row) }}%</span>
+                <span>{{ getDaysRemaining(row.endDate) }} jours restants</span>
               </div>
-              <span class="text-sm"> Chargement des données... </span>
             </div>
+          </template>
+
+          <!-- Colonne Actions -->
+          <template #actions-data="{ row }">
+            <UDropdown :items="[getActions(row)]" :popper="{ placement: 'bottom-start' }">
+              <UButton 
+                color="gray" 
+                variant="ghost" 
+                icon="i-heroicons-ellipsis-vertical"
+                :loading="projectListStatus === 'pending'"
+              />
+              
+              <template #item="{ item: actionItem }">
+                <div class="flex items-center gap-2" @click="actionItem.click">
+                  <UIcon :name="actionItem.icon" class="h-4 w-4" />
+                  <span>{{ actionItem.label }}</span>
+                </div>
+              </template>
+            </UDropdown>
           </template>
         </UTable>
       </div>
 
+      <!-- Pied de tableau avec pagination -->
       <template #footer>
-        <div class="flex flex-wrap justify-between items-center">
-          <div>
-            <span class="text-sm leading-5">
-              Affichage
-              <span class="font-medium">{{ pagination?.pageFrom }}</span>
-              à
-              <span class="font-medium">{{ pagination?.pageTo }}</span>
-              sur
-              <span class="font-medium">{{ pagination?.totalItems }}</span>
-              élement(s)
-            </span>
+        <div class="flex flex-col sm:flex-row items-center justify-between px-6 py-3 border-t border-gray-200 dark:border-gray-700">
+          <div class="text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-0">
+            Affichage de <span class="font-medium">{{ pagination.pageFrom }}</span> à 
+            <span class="font-medium">{{ pagination.pageTo }}</span> sur
+            <span class="font-medium">{{ pagination.totalItems }}</span> projets
           </div>
-
+          
           <UPagination
             v-model="page"
-            :page-count="10"
-            :total="10"
+            :page-count="pageCount"
+            :total="projectList?.data?.length"
             :ui="{
               wrapper: 'flex items-center gap-1',
               rounded: '!rounded-full min-w-[32px] justify-center',
               default: {
                 activeButton: {
-                  variant: 'outline',
-                },
-              },
+                  variant: 'outline'
+                }
+              }
             }"
+            @update:modelValue="onPageChange"
           />
         </div>
       </template>
+
     </UDashboardCard>
   </div>
 </template>

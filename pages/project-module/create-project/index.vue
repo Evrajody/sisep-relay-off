@@ -29,6 +29,12 @@ const { createProjectForm, createProjectFormEl } = useCreateProject();
   <div class="max-w-7xl w-full py-5 mx-auto">
 
     <UDashboardCard
+
+        v-loading="createProjectFormEl?.submitting"
+        element-loading-text="Loading..."
+        element-loading-svg-view-box="-10, -10, 50, 50"
+        element-loading-background="rgba(255, 255, 255, 0.8)"
+
         :ui="{
         wrapper: 'border-b border-gray-100',
         header: {
@@ -60,13 +66,16 @@ const { createProjectForm, createProjectFormEl } = useCreateProject();
               icon="i-heroicons-x-circle-solid"
               label="Annuler"
               size="lg"
-              @click.prevent="createProjectFormEl.submit()"
+              :loading="createProjectFormEl?.submitting"
+              @click.prevent="null"
           />
           <UButton
               class="rounded-md shadow bg-primary font-medium"
               icon="i-heroicons-check-solid"
               label="Enregistrer"
               size="lg"
+              :disabled="createProjectFormEl?.submitting"
+              :loading="createProjectFormEl?.submitting"
               @click.prevent="createProjectFormEl?.submit()"
           />
         </div>

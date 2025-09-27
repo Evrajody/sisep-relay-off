@@ -8,12 +8,25 @@ export const useCreateProject = () => {
 
             method: 'POST',
             body: data,
+
             onResponse: ({response}) => {
                 console.log(response);
 
                 if (response.status === 201 || response.status === 200) {
                     // redirection vers la liste
                     alert('Projet créé avec succès')
+                }
+
+                if (response.status === 400) {
+
+                    makeAlert({
+                        type: "error",
+                        title: "OUPS ERREUR !",
+                        message: `Erreur sur la cle ${response?._data?.errors[0]?.path}, ${response?._data?.errors[0]?.message}`,
+                        extraClass: "bg-red-500",
+                    })
+
+
                 }
             },
 
@@ -124,7 +137,7 @@ export const useCreateProject = () => {
         schema: {
 
             title: {
-                type: 'text',
+                type: 'text', default: '',
                 label: "Intitulé du projet",
                 info: "Fournisseur un titre génériques pour le projet",
                 columns: {
@@ -145,6 +158,7 @@ export const useCreateProject = () => {
 
             description: {
                 type: 'editor',
+                default: '',
                 rows: 7,
                 label: "Description du projet",
                 info: "Décrivez le projet",
@@ -306,7 +320,7 @@ export const useCreateProject = () => {
                             schema: {
 
                                 indicatorName: {
-                                    type: 'text',
+                                    type: 'text', default: '',
                                     label: "Libelle de l'indicateur",
                                     rules: ["required"],
                                     info: "Formuler un libelle pour l'indicateur",
@@ -323,7 +337,7 @@ export const useCreateProject = () => {
                                 },
 
                                 baselineValue: {
-                                    type: 'text',
+                                    type: 'text', default: '',
                                     label: "Valeur de base",
                                     rules: ["required"],
                                     info: "Formuler un libelle pour l'indicateur",
@@ -337,7 +351,7 @@ export const useCreateProject = () => {
                                 },
 
                                 targetValue: {
-                                    type: 'text',
+                                    type: 'text', default: '',
                                     label: "Valeur cible",
                                     rules: ["required"],
                                     info: "Formuler un libelle pour l'indicateur",
@@ -351,7 +365,7 @@ export const useCreateProject = () => {
                                 },
 
                                 latestValue: {
-                                    type: 'text',
+                                    type: 'text', default: '',
                                     label: "Valeur la plus récente",
                                     rules: ["required"],
                                     info: "Formuler un libelle pour l'indicateur",
@@ -365,7 +379,7 @@ export const useCreateProject = () => {
                                     schema: {
                                         url: {
                                             rules: [],
-                                            type: 'text',
+                                            type: 'text', default: '',
                                             label: "Methodologie de référence",
                                             info: "Url de la methodologie de référence",
                                             columns: {
@@ -413,20 +427,20 @@ export const useCreateProject = () => {
                     schema: {
 
                         type: {
-                            type: 'text',
+                            type: 'text', default: '',
                             label: "Type de l'action",
                             description: "Nature de l'action",
                             rules: [],
                         },
 
                         status: {
-                            type: 'text',
+                            type: 'text', default: '',
                             label: "Statut de l'action",
                             rules: [],
                         },
 
                         description: {
-                            type: 'text',
+                            type: 'text', default: '',
                             label: "Description de l'action",
                             description: "Décrivez l'action",
                             rules: [],
@@ -470,12 +484,12 @@ export const useCreateProject = () => {
                     schema: {
 
                         name: {
-                            type: 'text',
+                            type: 'text', default: '',
                             label: 'Nom',
                         },
 
                         type: {
-                            type: 'text',
+                            type: 'text', default: '',
                             label: 'Type de partenaire',
                         },
 
@@ -489,7 +503,7 @@ export const useCreateProject = () => {
                             schema: {
                                 role: {
                                     label: 'Role',
-                                    type: 'text',
+                                    type: 'text', default: '',
                                     columns: {
                                         lg: {container: 12, label: 12, wrapper: 12},
                                     },
@@ -558,12 +572,12 @@ export const useCreateProject = () => {
                     schema: {
 
                         name: {
-                            type: 'text',
+                            type: 'text', default: '',
                             label: 'Nom',
                         },
 
                         description: {
-                            type: 'text',
+                            type: 'text', default: '',
                             label: 'Description',
                         },
 
@@ -609,7 +623,7 @@ export const useCreateProject = () => {
                         },
                         schema: {
                             name: {
-                                type: 'text',
+                                type: 'text', default: '',
                                 label: 'Nom',
                             },
                             organization: {
@@ -654,9 +668,9 @@ export const useCreateProject = () => {
                 },
                 schema: {
                     reportingYear: {type: 'date', label: 'Date du rapport'},
-                    instrumentType: {type: 'text', label: 'Type d\'instrument'},
-                    amountCommitedCfa: {type: 'text', label: 'Montant engagé'},
-                    amountDisbursedCfa: {type: 'text', label: 'Montant distribué'},
+                    instrumentType: {type: 'text', default: '', label: 'Type d\'instrument'},
+                    amountCommitedCfa: {type: 'text', default: '', label: 'Montant engagé'},
+                    amountDisbursedCfa: {type: 'text', default: '', label: 'Montant distribué'},
                     currency: {
                         type: 'select',
                         label: 'Devise',
@@ -667,7 +681,7 @@ export const useCreateProject = () => {
                             {value: 'XOF', label: 'F CFA'},
                         ],
                     },
-                    exchangeRateUsed: {type: 'text', label: 'Taux de change utilisé'},
+                    exchangeRateUsed: {type: 'text', default: '', label: 'Taux de change utilisé'},
                     fundingSource: {
                         type: 'object',
                         label: 'Source de financement',
@@ -678,8 +692,8 @@ export const useCreateProject = () => {
                             lg: {container: 12, label: 12, wrapper: 12},
                         },
                         schema: {
-                            donor: {type: 'text', label: 'Donateur'},
-                            program: {type: 'text', label: 'Programme'},
+                            donor: {type: 'text', default: '', label: 'Donateur'},
+                            program: {type: 'text', default: '', label: 'Programme'},
                         },
                     }
                 }
@@ -718,7 +732,7 @@ export const useCreateProject = () => {
 
                         fileLabel: {
                             label: 'Indications sur le fichier / document',
-                            type: 'text',
+                            type: 'text', default: '',
                         },
 
                         fileId: {
@@ -823,7 +837,7 @@ export const useCreateProject = () => {
                 },
                 schema: {
                     infoLinks_website: {
-                        type: 'text',
+                        type: 'text', default: '',
                         label: 'Site web'
                     }
                 }

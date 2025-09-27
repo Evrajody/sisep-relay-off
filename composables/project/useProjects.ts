@@ -1,64 +1,90 @@
-import type { Project, SisebResponseType, TypeProject } from "~/types"
 
 export const useProjects = () => {
+    const { $sisepApi } = useNuxtApp();
 
-    const { $sisepApi } = useNuxtApp()
-
-    const search = ref('')
-    const current_page = ref(1)
-    const columns = ref([
-        {
-            key: 'id',
-            label: 'PROJET',
-            class: ""
-        },
-        {
-            key: 'action',
-            label: 'ACTION',
-            class: ""
-        },
-    ])
+    // CONFIGURATION API
+    const search = ref("");
+    const statusProjet = ref("");
+    const selectedStatus = ref([]);
 
     // ELEMENTS ASSOCIE A LA PAGINATIONS
     const page = ref(1);
-    const pageTotal = ref(0);
     const pageCount = ref(10);
-    const totalItems = ref(10);
+    const totalItems = ref(0);
+    const pageTotal = ref(0);
     const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1);
     const pageTo = computed(() =>
-        Math.min(page.value * pageCount.value, pageTotal.value),
+        Math.min(page.value * pageCount.value, totalItems.value),
     );
 
+    // GESTION DES FILTRES
 
-    const { data: projets, error, status: projetsStatus, refresh: refreshProjets } = useAsyncData <SisebResponseType <Project> > ('projets', () => {
+    const resetFilters = () => {
+        search.value = "";
+        statusProjet.value = "";
+        selectedStatus.value = [];
+    };
 
-        return $sisepApi('projects/not-deleted', {
-            query: {
-                search: search.value,
-                page: current_page.value,
+    // COLUMNS ASSOCIE SELON LE PROFILE
+    const columns = [
+        {
+            key: "numero",
+            label: "Numéro",
+        },
+        {
+            key: "statutIn",
+            label: "Statut",
+        },
+        {
+            key: "createdAt",
+            label: "Date de la demande",
+        },
+
+        {
+            key: "actions",
+            label: "Actions",
+        },
+    ];
+
+    const {
+        data: projectList,
+        refresh: refreshProjectList,
+        status: projectListStatus,
+    } = useFetch(`projects`, {
+        method: "GET",
+        key: "auth-projets-list",
+        $fetch: $sisepApi,
+
+
+        onResponse: ({ response }) => {
+            if (response.status != 200) {
+                makeAlert({
+                    title: "Oups Erreur !",
+                    message: `${response._data.message}`,
+                    type: "error",
+                });
+            } else {
+                page.value = response._data.pagination.currentPage;
+                totalItems.value = response._data.pagination.totalItems;
+                pageTotal.value = response._data.pagination.totalPages;
             }
-        } )
-    }, {
-        deep: false,
-        watch: [search, current_page]
-    } )
-
+        },
+    });
 
     return {
-        search,
-        current_page,
+        projectList,
+        refreshProjectList,
+        projectListStatus,
         columns,
-        projets,
-        error,
-        refreshProjets,
-        projetsStatus,
+        search,
+        selectedStatus,
         pagination: {
-        page,
-        pageTotal,
-        pageCount,
-        totalItems,
-        pageFrom,
-        pageTo,
-    },
-    }
-}
+            page,
+            pageTotal,
+            pageCount,
+            totalItems,
+            pageFrom,
+            pageTo,
+        },
+    };
+};
