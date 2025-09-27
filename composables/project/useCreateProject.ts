@@ -5,7 +5,8 @@ export const useCreateProject = () => {
     const createProject = async (data: any) => {
 
         const response = await $sisepApi('projects', {
-            method: 'post',
+
+            method: 'POST',
             body: data,
             onResponse: ({response}) => {
                 console.log(response);
@@ -35,80 +36,6 @@ export const useCreateProject = () => {
             // Build the request object to match the expected API structure
             const d = payload.requestData || {}
 
-            // Helper: parse JSON textarea safely
-            // const parseJson = (val: any, fallback: any) => {
-            //     if (typeof val !== 'string') return fallback
-            //     try {
-            //         const out = JSON.parse(val);
-            //         return out ?? fallback
-            //     } catch {
-            //         return fallback
-            //     }
-            // }
-            // // Helper: split lines to array (ignores empty lines)
-            // const splitLines = (val: any) => (typeof val === 'string' ? val.split(/\r?\n/).map(s => s.trim()).filter(Boolean) : Array.isArray(val) ? val : [])
-            //
-            // // Map coordinates to [lon, lat]
-            // const lon = Number(d?.location?.location?.coordinates?.longitude ?? d?.location?.longitude)
-            // const lat = Number(d?.location?.location?.coordinates?.latitude ?? d?.location?.latitude)
-            // const hasCoords = !Number.isNaN(lon) && !Number.isNaN(lat)
-            //
-            // const req = {
-            //     title: d.title ?? '',
-            //     description: d.description ?? '',
-            //     typeId: d.typeId ?? undefined,
-            //     status: d.status ?? 'DRAFT',
-            //     createdBy: d.createdBy ?? undefined,
-            //     coverImageId: d.coverImageId ?? undefined,
-            //     indicatorIds: splitLines(d.indicatorIds),
-            //     implementingPartners: {
-            //         partner1: {
-            //             name: d?.implementingPartners?.partner1_name ?? '',
-            //             role: d?.implementingPartners?.partner1_role ?? '',
-            //         },
-            //         partner2: {
-            //             name: d?.implementingPartners?.partner2_name ?? '',
-            //             role: d?.implementingPartners?.partner2_role ?? '',
-            //         },
-            //     },
-            //     moduleClimat: {
-            //         mitigation: {actions: splitLines(d?.moduleClimat?.mitigation_actions)},
-            //         adaptation: {actions: splitLines(d?.moduleClimat?.adaptation_actions)},
-            //     },
-            //     objective: {goal: d?.objective?.objective_goal ?? ''},
-            //     expectedResults: {result: d?.expectedResults?.expectedResults_result ?? ''},
-            //     lessonsLearned: {lesson: d?.lessonsLearned?.lessonsLearned_lesson ?? ''},
-            //     totalBudget: d.totalBudget ? Number(d.totalBudget) : undefined,
-            //     infoLinks: {website: d.infoLinks_website ?? ''},
-            //     startDate: d.startDate ?? undefined,
-            //     endDate: d.endDate ?? undefined,
-            //     sectorId: d.sectorId ?? undefined,
-            //     subsectorId: d.subsectorId ?? undefined,
-            //     budget: {
-            //         projectId: d.budget_projectId ?? undefined,
-            //         budget: d.budget_budget ? Number(d.budget_budget) : undefined,
-            //         currency: d.budget_currency ?? undefined,
-            //         deletedAt: d.budget_deletedAt ?? null,
-            //     },
-            //     location: {
-            //         projectId: d.location_projectId ?? undefined,
-            //         location: hasCoords ? {
-            //             type: (d?.location?.location?.type ?? d?.location?.type ?? 'Point'),
-            //             coordinates: [lon, lat],
-            //         } : undefined,
-            //         region: d?.location?.region ?? d?.region ?? undefined,
-            //         city: d?.location?.city ?? d?.city ?? undefined,
-            //         deletedAt: d.location_deletedAt ?? null,
-            //     },
-            //     files: parseJson(d.filesJson, []),
-            //     finances: parseJson(d.financesJson, []),
-            //     verifications: parseJson(d.verificationsJson, []),
-            //     partners: parseJson(d.partnersJson, []),
-            //     targets: parseJson(d.targetsJson, []),
-            //     actions: parseJson(d.actionsJson, []),
-            //     indicators: parseJson(d.indicatorsJson, []),
-            // }
-            //
             // console.log(JSON.stringify(req))
 
             console.log(JSON.stringify(d))
@@ -129,66 +56,69 @@ export const useCreateProject = () => {
                     "objective",
                     "expectedResults",
                     "lessonsLearned",
-                    // "totalBudget",
-                    // "infoLinks",
-                    // "sectorId",
-                    // "subsectorId",
+                    'infoLinks'
                 ],
             },
 
-            // indicateurs: {
-            //     label: "Indicateurs",
-            //     elements: [
-            //         "indicatorIds",
-            //     ],
-            // },
-            //
-            // partenaires: {
-            //     label: "Partenaires",
-            //     elements: [
-            //         "partners",
-            //         // "implementingPartners",
-            //     ],
-            // },
-            //
-            // actions: {
-            //     label: "Actions",
-            //     elements: [
-            //         "actionsJson",
-            //     ],
-            // },
-            //
-            // financement: {
-            //     label: "Financements",
-            //     elements: [
-            //         // "totalBudget",
-            //         "budget",
-            //         "finance",
-            //     ],
-            // },
-            //
-            // territoire: {
-            //     label: "Territoire",
-            //     elements: [
-            //         "location",
-            //         "region",
-            //         "city"
-            //     ],
-            // },
-            //
-            // population_cible: {
-            //     label: "Populations cibles",
-            //     elements: [
-            //         "targets",
-            //     ],
-            // },
-            //
-            // verification: {
-            //     label: "Verification",
-            //     elements: [
-            //         "verifications",
-            //     ],
-            // },
+            indicateurs: {
+                label: "Indicateurs",
+                elements: [
+                    "indicators",
+                ],
+            },
+
+            actions: {
+                label: "Actions",
+                elements: [
+                    "actions",
+                ],
+            },
+
+            partenaires: {
+                label: "Partenaires",
+                elements: [
+                    "partners",
+                ],
+            },
+
+            targets: {
+                label: "Cibles",
+                elements: [
+                    "targets",
+                ],
+            },
+
+            filesAssocieted: {
+                label: "Fichiers associés",
+                elements: [
+                    "files"
+                ]
+            },
+
+
+            financement: {
+                label: "Financements",
+                elements: [
+                    // "budget",
+                    "finance",
+                ],
+            },
+
+            territoire: {
+                label: "Territoire",
+                elements: [
+                    "location",
+                    "region",
+                    "city"
+                ],
+            },
+
+            verification: {
+                label: "Verification",
+                elements: [
+                    "verifications",
+                ],
+            },
 
         },
         schema: {
@@ -198,9 +128,6 @@ export const useCreateProject = () => {
                 label: "Intitulé du projet",
                 info: "Fournisseur un titre génériques pour le projet",
                 columns: {
-                    default: {container: 12, label: 12, wrapper: 12},
-                    sm: {container: 12, label: 12, wrapper: 12},
-                    md: {container: 12, label: 12, wrapper: 12},
                     lg: {container: 12, label: 12, wrapper: 12},
                 },
                 rules: [],
@@ -219,8 +146,7 @@ export const useCreateProject = () => {
             description: {
                 type: 'editor',
                 rows: 7,
-                label: "Description du pro" +
-                    "jet",
+                label: "Description du projet",
                 info: "Décrivez le projet",
                 rules: [],
             },
@@ -232,9 +158,6 @@ export const useCreateProject = () => {
                     goal: {
                         type: 'editor',
                         columns: {
-                            default: {container: 12, label: 12, wrapper: 12},
-                            sm: {container: 12, label: 12, wrapper: 12},
-                            md: {container: 12, label: 12, wrapper: 12},
                             lg: {container: 12, label: 12, wrapper: 12},
                         },
                     }
@@ -248,14 +171,12 @@ export const useCreateProject = () => {
                     result: {
                         type: 'editor',
                         columns: {
-                            default: {container: 12, label: 12, wrapper: 12},
-                            sm: {container: 12, label: 12, wrapper: 12},
-                            md: {container: 12, label: 12, wrapper: 12},
                             lg: {container: 12, label: 12, wrapper: 12},
                         },
                     }
                 }
             },
+
             lessonsLearned: {
                 type: 'object',
                 label: 'Leçons apprises',
@@ -264,9 +185,6 @@ export const useCreateProject = () => {
                         {
                             type: 'editor',
                             columns: {
-                                default: {container: 12, label: 12, wrapper: 12},
-                                sm: {container: 12, label: 12, wrapper: 12},
-                                md: {container: 12, label: 12, wrapper: 12},
                                 lg: {container: 12, label: 12, wrapper: 12},
                             },
                         }
@@ -301,15 +219,12 @@ export const useCreateProject = () => {
             },
 
 
-            indicatorIds: {
+            indicators: {
 
                 type: "list",
-                // label: "Indicateurs",
+                initial: 0,
                 addText: "Ajouter un nouvel indicateur",
                 columns: {
-                    default: {container: 12, label: 12, wrapper: 12},
-                    sm: {container: 12, label: 12, wrapper: 12},
-                    md: {container: 12, label: 12, wrapper: 12},
                     lg: {container: 12, label: 12, wrapper: 12},
                 },
 
@@ -329,177 +244,269 @@ export const useCreateProject = () => {
                     },
 
                     columns: {
-                        default: {container: 12, label: 12, wrapper: 12},
-                        sm: {container: 12, label: 12, wrapper: 12},
-                        md: {container: 12, label: 12, wrapper: 12},
                         lg: {container: 12, label: 12, wrapper: 12},
                     },
 
                     schema: {
 
-                        code: {
-                            type: "select",
-                            label: "Libelle de l'indicateur",
-                            search: true,
-                            native: false,
-                            inputType: 'search',
-                            autocomplete: 'off',
-                            items: [
-                                {value: 'DRAFT', label: 'Brouillon'},
-                                {value: 'PUBLISHED', label: 'Publié'},
-                                {value: 'ARCHIVED', label: 'Archivé'},
-                            ],
-                            rules: [],
+                        activate_select_indicators: {
+                            type: "toggle",
+                            text: "Activer la selection d'un indicateur",
+                        },
+
+                        separator: {
+                            type: "static",
+                            tag: "hr",
                             columns: {
-                                default: {container: 12, label: 12, wrapper: 12},
-                                sm: {container: 12, label: 12, wrapper: 12},
-                                md: {container: 12, label: 12, wrapper: 12},
                                 lg: {container: 12, label: 12, wrapper: 12},
                             },
                         },
 
+                        indicatorss: {
 
-                    },
-                },
+                            label: "Indicateur associable au projet",
+                            type: "select",
+                            description: "Sélectionnez un indicateur existant associé au projet",
+                            conditions: [["indicators.*.activate_select_indicators", true]], //
+                            search: true,
+                            native: true,
+                            object: true,
+                            inputType: "search",
+                            searchParam: "search",
+                            valueProp: "id",
+                            labelProp: "nom",
+                            delay: 1,
+                            autocomplete: "off",
+                            columns: {
+                                lg: {container: 12, label: 12, wrapper: 12},
+                            },
 
-
-            },
-
-            implementingPartners: {
-                type: 'object',
-                label: 'Partenaires d\'exécution',
-                schema: {
-                    partner1_name: {type: 'text', label: 'Partenaire 1 - Nom'},
-                    partner1_role: {type: 'text', label: 'Partenaire 1 - Rôle'},
-                    partner2_name: {type: 'text', label: 'Partenaire 2 - Nom'},
-                    partner2_role: {type: 'text', label: 'Partenaire 2 - Rôle'},
-                },
-            },
-
-            moduleClimat: {
-                type: 'object',
-                label: 'Module Climat',
-                schema: {
-                    mitigation_actions: {type: 'textarea', label: 'Atténuation - actions (1/ligne)', rows: 3},
-                    adaptation_actions: {type: 'textarea', label: 'Adaptation - actions (1/ligne)', rows: 3},
-                },
-            },
-
-
-            totalBudget: {
-                type: 'text',
-                label: "Budget total",
-                info: "Montant total du budget",
-                rules: [],
-            },
-
-            location: {
-                label: "Lieu du projet",
-                type: "object",
-                addClasses: {
-                    ElementLayout: {
-                        innerContainer:
-                            "border border-gray-200 bg-primary-50 px-3 px-2 py-5",
-                    },
-
-                    ElementLabel: {
-                        wrapper: "text-lg py-1.5",
-                        container_lg: "!pb-0",
-                    },
-                },
-                columns: {
-                    default: {container: 12, label: 12, wrapper: 12},
-                    sm: {container: 12, label: 12, wrapper: 12},
-                    md: {container: 12, label: 12, wrapper: 12},
-                    lg: {container: 12, label: 12, wrapper: 12},
-                },
-                schema: {
-                    location: {
-                        label: "Localisation",
-                        info: "Localisation du projet",
-                        type: "object",
-                        schema: {
-                            type: {
-                                type: "text",
-                                label: "Type",
-                                rules: [],
-                                columns: {
-                                    default: {container: 12, label: 12, wrapper: 12},
-                                    sm: {container: 12, label: 12, wrapper: 12},
-                                    md: {container: 12, label: 12, wrapper: 12},
-                                    lg: {container: 12, label: 12, wrapper: 12},
+                            addClasses: {
+                                dropdown: "max-h-60 overflow-y-auto",
+                                ElementDescription: {
+                                    container_lg: "!text-gray-400 font-medium",
                                 },
                             },
 
-                            coordinates: {
-                                label: "Coordonnées",
-                                type: "object",
-                                columns: {
-                                    default: {container: 12, label: 12, wrapper: 12},
-                                    sm: {container: 12, label: 12, wrapper: 12},
-                                    md: {container: 12, label: 12, wrapper: 12},
-                                    lg: {container: 12, label: 12, wrapper: 12},
-                                },
-                                schema: {
-                                    latitude: {
-                                        type: "text",
-                                        label: "Latitude",
-                                        rules: [],
+                            items: [
+                                'indicatoris 01',
+                                'indicatoris 02',
+                                'indicatoris 03',
+                            ],
+
+                        },
+
+                        create_indicator_stuff: {
+                            conditions: [["indicators.*.activate_select_indicators", false]],
+                            type: "group",
+                            columns: {
+                                lg: {container: 12, label: 12, wrapper: 12},
+                            },
+
+                            schema: {
+
+                                indicatorName: {
+                                    type: 'text',
+                                    label: "Libelle de l'indicateur",
+                                    rules: ["required"],
+                                    info: "Formuler un libelle pour l'indicateur",
+                                    columns: {
+                                        lg: {container: 12, label: 12, wrapper: 12},
                                     },
-                                    longitude: {
-                                        type: "text",
-                                        label: "Longitude",
-                                        rules: [],
-                                    },
                                 },
+
+                                baselineYear: {
+                                    type: 'date',
+                                    label: "Année de base",
+                                    rules: ["required"],
+                                    info: "Formuler un libelle pour l'indicateur",
+                                },
+
+                                baselineValue: {
+                                    type: 'text',
+                                    label: "Valeur de base",
+                                    rules: ["required"],
+                                    info: "Formuler un libelle pour l'indicateur",
+                                },
+
+                                targetYear: {
+                                    type: 'date',
+                                    label: "Année cible",
+                                    rules: ["required"],
+                                    info: "Formuler un libelle pour l'indicateur",
+                                },
+
+                                targetValue: {
+                                    type: 'text',
+                                    label: "Valeur cible",
+                                    rules: ["required"],
+                                    info: "Formuler un libelle pour l'indicateur",
+                                },
+
+                                latestYear: {
+                                    type: 'date',
+                                    label: "Année la plus récente",
+                                    rules: ["required"],
+                                    info: "Formuler un libelle pour l'indicateur",
+                                },
+
+                                latestValue: {
+                                    type: 'text',
+                                    label: "Valeur la plus récente",
+                                    rules: ["required"],
+                                    info: "Formuler un libelle pour l'indicateur",
+                                },
+
+                                methodologyReference: {
+                                    type: 'object',
+                                    columns: {
+                                        lg: {container: 12, label: 12, wrapper: 12},
+                                    },
+                                    schema: {
+                                        url: {
+                                            rules: [],
+                                            type: 'text',
+                                            label: "Methodologie de référence",
+                                            info: "Url de la methodologie de référence",
+                                            columns: {
+                                                lg: {container: 12, label: 12, wrapper: 12},
+                                            },
+                                        },
+                                    }
+                                }
                             }
-                        },
-                        columns: {
-                            default: {container: 12, label: 12, wrapper: 12},
-                            sm: {container: 12, label: 12, wrapper: 12},
-                            md: {container: 12, label: 12, wrapper: 12},
-                            lg: {container: 12, label: 12, wrapper: 12},
-                        },
-                    },
+                        }
 
-                    region: {
-                        label: "Region",
-                        type: "select",
-                        rules: [],
-                        items: "project-types",
-                        dataKey: "data",
-                        labelProp: "name",
-                        valueProp: "id",
-                        search: true,
-                        native: true,
-                        inputType: "search",
-                        autocomplete: "off",
-                    },
-
-                    city: {
-                        label: "Villes",
-                        type: "select",
-                        rules: [],
-                        items: "project-types",
-                        dataKey: "data",
-                        labelProp: "name",
-                        valueProp: "id",
-                        search: true,
-                        native: true,
-                        inputType: "search",
-                        autocomplete: "off",
                     },
                 },
+
             },
 
-            infoLinks: {
-                type: 'object',
-                label: 'Liens d\'infos',
-                schema: {infoLinks_website: {type: 'text', label: 'Site web'}}
+            actions: {
+                type: 'list',
+                initial: 0,
+                label: 'Actions',
+                addText: "Ajouter une action",
+                columns: {
+                    lg: {container: 12, label: 12, wrapper: 12},
+                },
+                element: {
+
+                    type: 'object',
+
+                    columns: {
+                        lg: {container: 12, label: 12, wrapper: 12},
+                    },
+
+                    addClasses: {
+
+                        ElementLayout: {
+                            innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
+                        },
+
+                        ElementLabel: {
+                            wrapper: "text-xl text-primary py-1.5",
+                            container_lg: "!pb-0",
+                        },
+                    },
+
+                    schema: {
+
+                        type: {
+                            type: 'text',
+                            label: "Type de l'action",
+                            description: "Nature de l'action",
+                            rules: [],
+                        },
+
+                        status: {
+                            type: 'text',
+                            label: "Statut de l'action",
+                            rules: [],
+                        },
+
+                        description: {
+                            type: 'text',
+                            label: "Description de l'action",
+                            description: "Décrivez l'action",
+                            rules: [],
+                            columns: {
+                                lg: {container: 12, label: 12, wrapper: 12},
+                            },
+                        },
+                    }
+                }
             },
 
-            sectorId: {type: 'text', label: 'Secteur (ID)'},
-            subsectorId: {type: 'text', label: 'Sous-secteur (ID)'},
+            partners: {
+
+                type: 'list',
+                initial: 0,
+                label: 'Partenaires du projet',
+                addText: "Ajouter un partenaire",
+                columns: {
+                    lg: {container: 12, label: 12, wrapper: 12},
+                },
+
+                element: {
+
+                    type: 'object',
+
+                    columns: {
+                        lg: {container: 12, label: 12, wrapper: 12},
+                    },
+
+                    addClasses: {
+
+                        ElementLayout: {
+                            innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
+                        },
+
+                        ElementLabel: {
+                            wrapper: "text-xl text-primary py-1.5",
+                            container_lg: "!pb-0",
+                        },
+                    },
+                    schema: {
+
+                        name: {
+                            type: 'text',
+                            label: 'Nom',
+                        },
+
+                        type: {
+                            type: 'text',
+                            label: 'Type de partenaire',
+                        },
+
+                        otherData: {
+
+                            type: 'object',
+
+                            columns: {
+                                lg: {container: 12, label: 12, wrapper: 12},
+                            },
+                            schema: {
+                                role: {
+                                    label: 'Role',
+                                    type: 'text',
+                                    columns: {
+                                        lg: {container: 12, label: 12, wrapper: 12},
+                                    },
+                                },
+
+                                partnerImage: {
+                                    type: 'file',
+                                    accepted: ["image/jpeg", "image/jpg", "image/png"],
+                                    label: "Image du partenaire",
+                                    rules: [],
+                                },
+                            },
+                        }
+                    }
+                }
+
+            },
 
             coverImageId: {
                 type: 'file',
@@ -516,150 +523,70 @@ export const useCreateProject = () => {
                 drop: true
             },
 
-            budget: {
-                label: "Budget (objet)",
-                type: "object",
-                schema: {
-                    budget_projectId: {type: 'text', label: 'Project ID (optionnel)'},
-                    budget_budget: {type: 'text', label: 'Montant'},
-                    budget_currency: {type: 'text', label: 'Devise'},
-                    budget_deletedAt: {type: 'text', label: 'Supprimé le (null si actif)'},
-                },
-            },
+            targets: {
 
-            findingSource: {
-                label: "Source de financement",
-                type: "object",
-                addClasses: {
-                    ElementLayout: {
-                        innerContainer:
-                            "border border-gray-200 bg-primary-50 px-3 px-2 py-5",
+                type: 'list',
+                initial: 0,
+                label: 'Cible du projet',
+                addText: "Ajouter une cible",
+
+                columns: {
+                    lg: {container: 12, label: 12, wrapper: 12},
+                },
+
+                element: {
+
+                    type: 'object',
+
+                    columns: {
+                        lg: {container: 12, label: 12, wrapper: 12},
                     },
 
-                    ElementLabel: {
-                        wrapper: "text-lg py-1.5",
-                        container_lg: "!pb-0",
-                    },
-                },
-                columns: {
-                    default: {container: 12, label: 12, wrapper: 12},
-                    sm: {container: 12, label: 12, wrapper: 12},
-                    md: {container: 12, label: 12, wrapper: 12},
-                    lg: {container: 12, label: 12, wrapper: 12},
-                },
-                schema: {
-                    donor: {
-                        label: "Donateur",
-                        info: "Donateur",
-                        type: "text",
-                        rules: [],
-                    },
-                    program: {
-                        label: "Programme",
-                        info: "Programme",
-                        type: "text",
-                        rules: [],
-                    }
-                },
-            },
+                    addClasses: {
 
-            reportingYear: {
-                type: "date",
-                label: "Date du rapport",
-                info: "Date",
-                rules: [],
-            },
-
-            instrumentType: {
-                type: "select",
-                label: "Type d'instrument",
-                info: "Type d'instrument",
-                rules: [],
-                items: "project-types",
-                dataKey: "data",
-                labelProp: "name",
-                valueProp: "id",
-                search: true,
-                native: true,
-                inputType: "search",
-                autocomplete: "off",
-            },
-
-            amountCommitedCfa: {
-                type: "string",
-                label: "Montant engagé",
-                info: "Montant engagé",
-                rules: [],
-                columns: {
-                    default: {container: 12, label: 12, wrapper: 12},
-                    sm: {container: 12, label: 12, wrapper: 12},
-                    md: {container: 12, label: 12, wrapper: 12},
-                    lg: {container: 12, label: 12, wrapper: 12},
-                },
-            },
-
-            amountDisbursedCfa: {
-                type: "string",
-                label: "Montant distribué",
-                info: "Montant distribué",
-                rules: [],
-                columns: {
-                    default: {container: 12, label: 12, wrapper: 12},
-                    sm: {container: 12, label: 12, wrapper: 12},
-                    md: {container: 12, label: 12, wrapper: 12},
-                    lg: {container: 12, label: 12, wrapper: 12},
-                },
-            }
-
-            , filesJson: {type: 'textarea', label: 'Fichiers (JSON)'},
-            finance: {
-                type: 'object',
-                label: 'Finances',
-                columns: {
-                    default: {container: 12, label: 12, wrapper: 12},
-                    sm: {container: 12, label: 12, wrapper: 12},
-                    md: {container: 12, label: 12, wrapper: 12},
-                    lg: {container: 12, label: 12, wrapper: 12},
-                },
-                schema: {
-                    reportingYear: {type: 'date', label: 'Date du rapport'},
-                    instrumentType: {type: 'text', label: 'Type d\'instrument'},
-                    amountCommitedCfa: {type: 'text', label: 'Montant engagé'},
-                    amountDisbursedCfa: {type: 'text', label: 'Montant distribué'},
-                    currency: {
-                        type: 'select',
-                        label: 'Devise',
-                        columns: {
-                            default: {container: 12, label: 12, wrapper: 12},
-                            sm: {container: 12, label: 12, wrapper: 12},
-                            md: {container: 12, label: 12, wrapper: 12},
-                            lg: {container: 12, label: 12, wrapper: 12},
+                        ElementLayout: {
+                            innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
                         },
-                        items: [
-                            {value: 'EUR', label: 'Euros'},
-                            {value: 'US', label: 'Dollar'},
-                            {value: 'XOF', label: 'XOF'},
-                        ],
+
+                        ElementLabel: {
+                            wrapper: "text-xl text-primary py-1.5",
+                            container_lg: "!pb-0",
+                        },
+
                     },
-                    fundingSource: {
-                        type: 'object',
-                        label: 'Source de financement',
-                        columns: {
-                            default: {container: 12, label: 12, wrapper: 12},
-                            sm: {container: 12, label: 12, wrapper: 12},
-                            md: {container: 12, label: 12, wrapper: 12},
-                            lg: {container: 12, label: 12, wrapper: 12},
+
+                    schema: {
+
+                        name: {
+                            type: 'text',
+                            label: 'Nom',
                         },
-                        schema: {
-                            donor: {type: 'text', label: 'Donateur'},
-                            program: {type: 'text', label: 'Programme'},
+
+                        description: {
+                            type: 'text',
+                            label: 'Description',
                         },
+
+
                     }
                 }
+
             },
+
             verifications: {
                 type: 'object',
                 // label: 'Vérifications',
+                addClasses: {
+
+                    ElementLayout: {
+                        innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
+                    },
+
+                    ElementLabel: {
+                        wrapper: "text-xl text-primary py-1.5",
+                        container_lg: "!pb-0",
+                    },
+                },
                 columns: {
                     default: {container: 12, label: 12, wrapper: 12},
                     sm: {container: 12, label: 12, wrapper: 12},
@@ -677,11 +604,7 @@ export const useCreateProject = () => {
                     },
                     verifier: {
                         type: "object",
-                        label: "Vérificateur",
                         columns: {
-                            default: {container: 12, label: 12, wrapper: 12},
-                            sm: {container: 12, label: 12, wrapper: 12},
-                            md: {container: 12, label: 12, wrapper: 12},
                             lg: {container: 12, label: 12, wrapper: 12},
                         },
                         schema: {
@@ -708,63 +631,21 @@ export const useCreateProject = () => {
                     }
                 }
             },
-            partners: {
-                type: 'object', // Normalement ceci c'est une liste pour permettre d'ajpouter plusieurs partenaires (j'arrivais pas à configurer cela)
-                label: 'Partenaires',
-                columns: {
-                    default: {container: 12, label: 12, wrapper: 12},
-                    sm: {container: 12, label: 12, wrapper: 12},
-                    md: {container: 12, label: 12, wrapper: 12},
-                    lg: {container: 12, label: 12, wrapper: 12},
-                },
-                schema: {
-                    name: {
-                        type: 'text',
-                        label: 'Nom',
-                        columns: {
-                            default: {container: 12, label: 12, wrapper: 12},
-                            sm: {container: 4, label: 12, wrapper: 12},
-                            md: {container: 4, label: 12, wrapper: 12},
-                            lg: {container: 4, label: 12, wrapper: 12},
-                        },
-                    },
-                    type: {
-                        type: 'text',
-                        label: 'Type',
-                        columns: {
-                            default: {container: 12, label: 12, wrapper: 12},
-                            sm: {container: 4, label: 12, wrapper: 12},
-                            md: {container: 4, label: 12, wrapper: 12},
-                            lg: {container: 4, label: 12, wrapper: 12},
-                        },
-                    },
-                    otherData: {
-                        type: 'object',
-                        // label: 'Autres données',
-                        columns: {
-                            default: {container: 4, label: 12, wrapper: 12},
-                            sm: {container: 4, label: 12, wrapper: 12},
-                            md: {container: 4, label: 12, wrapper: 12},
-                            lg: {container: 4, label: 12, wrapper: 12},
-                        },
-                        schema: {
-                            role: {
-                                label: 'Role',
-                                type: 'text',
-                                columns: {
-                                    default: {container: 12, label: 12, wrapper: 12},
-                                    sm: {container: 12, label: 12, wrapper: 12},
-                                    md: {container: 12, label: 12, wrapper: 12},
-                                    lg: {container: 12, label: 12, wrapper: 12},
-                                },
-                            },
-                        }
-                    }
-                }
-            },
-            targets: {
+
+            finance: {
                 type: 'object',
-                label: 'Cibles',
+                label: 'Finances',
+                addClasses: {
+
+                    ElementLayout: {
+                        innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
+                    },
+
+                    ElementLabel: {
+                        wrapper: "text-xl text-primary py-1.5",
+                        container_lg: "!pb-0",
+                    },
+                },
                 columns: {
                     default: {container: 12, label: 12, wrapper: 12},
                     sm: {container: 12, label: 12, wrapper: 12},
@@ -772,52 +653,182 @@ export const useCreateProject = () => {
                     lg: {container: 12, label: 12, wrapper: 12},
                 },
                 schema: {
-                    name: {
-                        type: 'text',
-                        label: 'Nom',
-                        columns: {
-                            default: {container: 12, label: 12, wrapper: 12},
-                            sm: {container: 6, label: 12, wrapper: 12},
-                            md: {container: 6, label: 12, wrapper: 12},
-                            lg: {container: 6, label: 12, wrapper: 12},
-                        },
+                    reportingYear: {type: 'date', label: 'Date du rapport'},
+                    instrumentType: {type: 'text', label: 'Type d\'instrument'},
+                    amountCommitedCfa: {type: 'text', label: 'Montant engagé'},
+                    amountDisbursedCfa: {type: 'text', label: 'Montant distribué'},
+                    currency: {
+                        type: 'select',
+                        label: 'Devise',
+                        native: false,
+                        items: [
+                            {value: 'EUR', label: 'Euros'},
+                            {value: 'US', label: 'Dollar'},
+                            {value: 'XOF', label: 'F CFA'},
+                        ],
                     },
-                    otherData: {
+                    exchangeRateUsed: {type: 'text', label: 'Taux de change utilisé'},
+                    fundingSource: {
                         type: 'object',
-                        // label: 'Autres données',
-                        columns: {
-                            default: {container: 6, label: 12, wrapper: 12},
-                            sm: {container: 6, label: 12, wrapper: 12},
-                            md: {container: 6, label: 12, wrapper: 12},
-                            lg: {container: 6, label: 12, wrapper: 12},
-                        },
-                        schema: {
-                            size: {
-                                label: 'Taille',
-                                type: 'text',
-                                inputType: 'number',
-                                columns: {
-                                    default: {container: 12, label: 12, wrapper: 12},
-                                    sm: {container: 12, label: 12, wrapper: 12},
-                                    md: {container: 12, label: 12, wrapper: 12},
-                                    lg: {container: 12, label: 12, wrapper: 12},
-                                },
-                            },
-                        }
-                    },
-                    description: {
-                        type: 'textarea',
-                        label: 'Description',
+                        label: 'Source de financement',
                         columns: {
                             default: {container: 12, label: 12, wrapper: 12},
                             sm: {container: 12, label: 12, wrapper: 12},
                             md: {container: 12, label: 12, wrapper: 12},
                             lg: {container: 12, label: 12, wrapper: 12},
                         },
-                    },
+                        schema: {
+                            donor: {type: 'text', label: 'Donateur'},
+                            program: {type: 'text', label: 'Programme'},
+                        },
+                    }
                 }
             },
-            actionsJson: {type: 'textarea', label: 'Actions (JSON)'},
+
+            files: {
+                type: 'list',
+                initial: 0,
+                label: 'Fichier associé au projet',
+                addText: "Ajouter un fichier",
+                columns: {
+                    lg: {container: 12, label: 12, wrapper: 12},
+                },
+
+                element: {
+
+                    type: 'object',
+
+                    columns: {
+                        lg: {container: 12, label: 12, wrapper: 12},
+                    },
+
+                    addClasses: {
+
+                        ElementLayout: {
+                            innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
+                        },
+
+                        ElementLabel: {
+                            wrapper: "text-xl text-primary py-1.5",
+                            container_lg: "!pb-0",
+                        },
+                    },
+
+                    schema: {
+
+                        fileLabel: {
+                            label: 'Indications sur le fichier / document',
+                            type: 'text',
+                        },
+
+                        fileId: {
+                            type: 'file',
+                            label: 'Fichier',
+                        },
+
+                    }
+                }
+
+            },
+
+            location: {
+                label: "Lieu du projet",
+                type: "object",
+                addClasses: {
+                    ElementLayout: {
+                        innerContainer: "border border-gray-200 bg-gray-50 px-3 px-2 py-5",
+                    },
+
+                    ElementLabel: {
+                        wrapper: "text-lg py-1.5",
+                        container_lg: "!pb-0",
+                    },
+                },
+                columns: {
+                    lg: {container: 12, label: 12, wrapper: 12},
+                },
+                schema: {
+                    region: {
+                        label: "Département",
+                        type: "select",
+                        rules: [],
+                        items: [
+                            'cotonou',
+                            'calavi'
+                        ],
+                        valueProp: "id",
+                        search: true,
+                        native: true,
+                        inputType: "search",
+                        autocomplete: "off",
+                    },
+
+                    city: {
+                        label: "Villes (Communes)",
+                        type: "select",
+                        rules: [],
+                        items: [
+                            'cotonou',
+                            'calavi'
+                        ],
+                        labelProp: "name",
+                        valueProp: "id",
+                        search: true,
+                        native: true,
+                        inputType: "search",
+                        autocomplete: "off",
+                    },
+
+                    location: {
+                        type: "object",
+                        schema: {
+                            type: {
+                                type: "hidden",
+                                default: "point",
+                                columns: {
+                                    lg: {container: 12, label: 12, wrapper: 12},
+                                },
+                            },
+                            coordinates: {
+                                type: "object",
+                                columns: {
+                                    lg: {container: 12, label: 12, wrapper: 12},
+                                },
+                                schema: {
+                                    latitude: {
+                                        type: "text",
+                                        label: "Latitude",
+                                        rules: [],
+                                    },
+                                    longitude: {
+                                        type: "text",
+                                        label: "Longitude",
+                                        rules: [],
+                                    },
+                                },
+                            }
+                        },
+                        columns: {
+                            lg: {container: 12, label: 12, wrapper: 12},
+                        },
+                    },
+                },
+            },
+
+            infoLinks: {
+                type: 'object',
+                label: 'Liens d\'infos',
+                columns: {
+                    lg: {container: 12, label: 12, wrapper: 12},
+                },
+                schema: {
+                    infoLinks_website: {
+                        type: 'text',
+                        label: 'Site web'
+                    }
+                }
+            },
+
         }
 
     }))
