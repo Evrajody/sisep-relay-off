@@ -10,11 +10,21 @@ export const useCreateProject = () => {
             body: data,
 
             onResponse: ({response}) => {
+
                 console.log(response);
 
                 if (response.status === 201 || response.status === 200) {
+
                     // redirection vers la liste
-                    alert('Projet créé avec succès')
+                    // alert('Projet créé avec succès')
+                    makeAlert({
+                        type: "success",
+                        title: "Nouveau projet créé !",
+                        message: `Le projet ${response._data.title} a été créé avec succès`,
+                    })
+
+                    navigateTo({name: 'project-module', params: {id: response._data.id}})
+
                 }
 
                 if (response.status === 400) {
@@ -26,13 +36,9 @@ export const useCreateProject = () => {
                         extraClass: "bg-red-500",
                     })
 
-
                 }
             },
 
-            onError: ({response}) => {
-                console.log(response)
-            }
         })
     }
 
@@ -55,7 +61,10 @@ export const useCreateProject = () => {
                 ...d,
                 location: {
                     ...d.location,
-                    location: [[d.location.location.latitude, d.location.location.longitude]]
+                    location: (d.location.location.latitude && d.location.location.longitude) ? {
+                        ...d.location.location,
+                        coordinates:   [[d.location.location.latitude, d.location.location.longitude]]
+                    } : null,
                 }
             }
 
@@ -597,60 +606,65 @@ export const useCreateProject = () => {
             },
 
             verifications: {
-                type: 'object',
-                // label: 'Vérifications',
-                addClasses: {
+                type: 'list',
+                canAdd: true,
+                addText: "Ajouter une vérification",
 
-                    ElementLayout: {
-                        innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
-                    },
-
-                    ElementLabel: {
-                        wrapper: "text-xl text-primary py-1.5",
-                        container_lg: "!pb-0",
-                    },
-                },
                 columns: {
-                    default: {container: 12, label: 12, wrapper: 12},
-                    sm: {container: 12, label: 12, wrapper: 12},
-                    md: {container: 12, label: 12, wrapper: 12},
                     lg: {container: 12, label: 12, wrapper: 12},
                 },
-                schema: {
-                    verificationLevel: {
-                        type: "text",
-                        label: "Niveau de vérification",
-                    },
-                    verificationDate: {
-                        type: "date",
-                        label: "Date de vérification",
-                    },
-                    verifier: {
-                        type: "object",
-                        columns: {
-                            lg: {container: 12, label: 12, wrapper: 12},
+
+                element: {
+                    type: 'object',
+                    addClasses: {
+                        ElementLayout: {
+                            innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
                         },
-                        schema: {
-                            name: {
-                                type: 'text', default: '',
-                                label: 'Nom',
+
+                        ElementLabel: {
+                            wrapper: "text-xl text-primary py-1.5",
+                            container_lg: "!pb-0",
+                        },
+                    },
+                    columns: {
+                        lg: {container: 12, label: 12, wrapper: 12},
+                    },
+                    schema: {
+                        verificationLevel: {
+                            type: "text",
+                            label: "Niveau de vérification",
+                        },
+                        verificationDate: {
+                            type: "date",
+                            label: "Date de vérification",
+                        },
+                        verifier: {
+                            type: "object",
+                            columns: {
+                                lg: {container: 12, label: 12, wrapper: 12},
                             },
-                            organization: {
-                                type: "text",
-                                label: "Organisation",
+                            schema: {
+                                name: {
+                                    type: 'text', default: '',
+                                    label: 'Nom',
+                                },
+                                organization: {
+                                    type: "text",
+                                    label: "Organisation",
+                                }
                             }
-                        }
-                    },
-                    verificationReportReference: {
-                        type: "file",
-                        label: "Rapport de vérification",
-                        columns: {
-                            default: {container: 12, label: 12, wrapper: 12},
-                            sm: {container: 12, label: 12, wrapper: 12},
-                            md: {container: 12, label: 12, wrapper: 12},
-                            lg: {container: 12, label: 12, wrapper: 12},
                         },
-                        drop: true
+                        verificationReportReference: {
+                            type: "file",
+                            label: "Rapport de vérification",
+                            columns: {
+                                default: {container: 12, label: 12, wrapper: 12},
+                                sm: {container: 12, label: 12, wrapper: 12},
+                                md: {container: 12, label: 12, wrapper: 12},
+                                lg: {container: 12, label: 12, wrapper: 12},
+                            },
+                            drop: true
+                        }
                     }
                 }
             },
