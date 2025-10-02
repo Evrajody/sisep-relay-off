@@ -39,6 +39,7 @@ export const useCreateTypeProject = ( refreshTypeProjets: () => void ) => {
                 type: 'text',
                 label: "Intitulé du type de projet",
                 description: "Formuler un institulé pour le type de projet",
+                placeholder: "Ex: Infrastructure hydraulique, Éducation environnementale",
                 columns: {
                     default: { container: 12, label: 12, wrapper: 12 },
                     sm: { container: 12, label: 12, wrapper: 12 },
@@ -51,6 +52,7 @@ export const useCreateTypeProject = ( refreshTypeProjets: () => void ) => {
                 type: 'textarea',
                 label: "Description du type de projet",
                 description: "Décrivez le type projet",
+                placeholder: "Ex: Ce type de projet concerne la mise en place d'infrastructures pour améliorer l'accès à l'eau potable dans les zones rurales...",
                 columns: {
                     default: { container: 12, label: 12, wrapper: 12 },
                     sm: { container: 12, label: 12, wrapper: 12 },

@@ -9,7 +9,7 @@ import ConventionCard from "~/components/Home/ConventionCard.vue";
 // Hero carousel state
 const slides = reactive([
   {
-    title: "Données clés sur le cadre de vie",
+    title: "Données clés sur le cadre de vies",
     subtitle: "Faits et informations pour orienter l'action publique",
     image: "cadre_world.webp",
     cta: { label: "Explorer les données", href: "/" }

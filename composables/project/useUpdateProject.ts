@@ -1,85 +1,127 @@
+import { transformProjectToPayload, transformPayloadToAPI, cleanPayload } from '~/utils/transformProjectToPayload';
+import { transformTmpPayload } from '~/utils/transformTmpPayload';
 
-import { transformTmpPayload } from '~/utils/transformTmpPayload'
+export const useUpdateProject = (projectRef: any) => {
 
+    const { $sisepApi } = useNuxtApp();
+    const router = useRouter();
 
-export const useCreateProject = () => {
+    /**
+     * Met à jour un projet existant
+     */
+    const updateProject = async (data: any) => {
+        try {
+            const projectId = projectRef.value?.id;
 
-    const {$sisepApi} = useNuxtApp()
+            if (!projectId) {
+                throw new Error('ID du projet manquant');
+            }
 
-    const createProject = async (data: any) => {
+            const response = await $sisepApi(`projects/${projectId}`, {
+                method: 'PUT',
+                body: data,
 
-        const response = await $sisepApi('projects', {
+                onResponse: ({ response }) => {
+                    console.log('Update response:', response);
 
-            method: 'POST',
-            body: data,
+                    if (response.status === 200 || response.status === 201) {
+                        makeAlert({
+                            type: "success",
+                            title: "Projet mis à jour !",
+                            message: `Le projet ${response._data.title} a été modifié avec succès`,
+                        });
 
-            onResponse: ({response}) => {
+                        // Redirection vers la page de détail
+                        navigateTo(`/project-module/${projectId}`);
+                    }
 
-                console.log(response);
+                    if (response.status === 400) {
+                        makeAlert({
+                            type: "error",
+                            title: "OUPS ERREUR !",
+                            message: `Erreur sur la clé ${response?._data?.errors[0]?.path}, ${response?._data?.errors[0]?.message}`,
+                            extraClass: "bg-red-500",
+                        });
+                    }
 
-                if (response.status === 201 || response.status === 200) {
+                    if (response.status === 404) {
+                        makeAlert({
+                            type: "error",
+                            title: "Projet introuvable !",
+                            message: `Le projet que vous essayez de modifier n'existe pas`,
+                            extraClass: "bg-red-500",
+                        });
+                    }
+                },
+            });
 
-                    // redirection vers la liste
-                    // alert('Projet créé avec succès')
-                    makeAlert({
-                        type: "success",
-                        title: "Nouveau projet créé !",
-                        message: `Le projet ${response._data.title} a été créé avec succès`,
-                    })
+            return response;
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour du projet:', error);
+            throw error;
+        }
+    };
 
-                    navigateTo({name: 'project-module', params: {id: response._data.id}})
+    const updateProjectFormEl = ref(null);
 
-                }
+    /**
+     * Transforme le projet en données de formulaire
+     */
+    const getFormDefaults = () => {
+        if (!projectRef.value) {
+            return {};
+        }
 
-                if (response.status === 400) {
+        const formData = transformProjectToPayload(projectRef.value);
+        console.log('Données transformées pour le formulaire:', formData);
+        return formData;
+    };
 
-                    makeAlert({
-                        type: "error",
-                        title: "OUPS ERREUR !",
-                        message: `Erreur sur la cle ${response?._data?.errors[0]?.path}, ${response?._data?.errors[0]?.message}`,
-                        extraClass: "bg-red-500",
-                    })
-
-                }
-            },
-
-        })
-    }
-
-    const createProjectFormEl = ref(null)
-
-    const createProjectForm = computed(() => ({
+    /**
+     * Génère la configuration du formulaire de modification
+     * Utilise la même structure que le formulaire de création
+     */
+    const updateProjectForm = computed(() => ({
         scrollOnNext: true,
-        id: "createProjetForm",
+        id: "updateProjetForm",
         addClass: "max-w-full",
         displayErrors: true,
         showRequired: ["label"],
 
+        // Chargement automatique des données du projet
+        default: getFormDefaults(),
+
         endpoint: async (form: any, payload: any) => {
-            // Build the request object to match the expected API structure
-            const d = payload.requestData || {}
+            const formData = payload.requestData || {};
 
-            // console.log(JSON.stringify(req))
-
+            // Transformation du payload avec gestion de la location
             let payloadProject = {
-                ...d,
+                ...formData,
                 location: {
-                    ...d.location,
-                    location: (d.location.location.latitude && d.location.location.longitude) ? {
-                        ...d.location.location,
-                        coordinates:   [[d.location.location.latitude, d.location.location.longitude]]
+                    ...formData.location,
+                    location: (formData.location?.location?.latitude && formData.location?.location?.longitude) ? {
+                        type: 'point',
+                        coordinates: [[formData.location.location.latitude, formData.location.location.longitude]]
                     } : null,
                 }
-            }
+            };
 
-            const transformedPayload = transformTmpPayload(payloadProject)
+            // Nettoyage et transformation des champs tmp
+            const transformedPayload = transformTmpPayload(payloadProject);
 
-            console.log(JSON.stringify(transformedPayload))
+            // Transformation vers le format API
+            const apiPayload = transformPayloadToAPI(transformedPayload);
 
-            await createProject(transformedPayload)
+            // Nettoyage des champs vides
+            const cleanedPayload = cleanPayload(apiPayload);
 
+            console.log('Payload final envoyé:', JSON.stringify(cleanedPayload, null, 2));
+
+            await updateProject(cleanedPayload);
         },
 
+        // Réutilisation de la même structure de tabs que le formulaire de création
+        // (copier depuis useCreateProject)
         tabs: {
             info_project: {
                 label: "Informations Générales",
@@ -100,66 +142,46 @@ export const useCreateProject = () => {
 
             indicateurs: {
                 label: "Indicateurs",
-                elements: [
-                    "indicators",
-                ],
+                elements: ["indicators"],
             },
 
             actions: {
                 label: "Actions",
-                elements: [
-                    "actions",
-                ],
+                elements: ["actions"],
             },
 
             partenaires: {
                 label: "Partenaires",
-                elements: [
-                    "partners",
-                ],
+                elements: ["partners"],
             },
 
             targets: {
                 label: "Cibles",
-                elements: [
-                    "targets",
-                ],
+                elements: ["targets"],
             },
 
             filesAssocieted: {
                 label: "Fichiers associés",
-                elements: [
-                    "files"
-                ]
+                elements: ["files"]
             },
-
 
             financement: {
                 label: "Financements",
-                elements: [
-                    // "budget",
-                    "finances",
-                ],
+                elements: ["finances"],
             },
 
             territoire: {
                 label: "Territoire",
-                elements: [
-                    "location",
-                    "region",
-                    "city"
-                ],
+                elements: ["location", "region", "city"],
             },
 
             verification: {
                 label: "Verification",
-                elements: [
-                    "verifications",
-                ],
+                elements: ["verifications"],
             },
-
         },
 
+        // Schema identique à celui de création
         schema: {
 
             title: {
@@ -222,13 +244,12 @@ export const useCreateProject = () => {
                 type: 'object',
                 label: 'Leçons apprises',
                 schema: {
-                    lesson:
-                        {
-                            type: 'editor',
-                            columns: {
-                                lg: {container: 12, label: 12, wrapper: 12},
-                            },
-                        }
+                    lesson: {
+                        type: 'editor',
+                        columns: {
+                            lg: {container: 12, label: 12, wrapper: 12},
+                        },
+                    }
                 }
             },
 
@@ -255,13 +276,10 @@ export const useCreateProject = () => {
                     {value: 'PUBLISHED', label: 'Publié'},
                     {value: 'ARCHIVED', label: 'Archivé'},
                 ],
-
                 native: false,
             },
 
-
             indicators: {
-
                 type: "list",
                 initial: 0,
                 addText: "Ajouter un nouvel indicateur",
@@ -270,15 +288,13 @@ export const useCreateProject = () => {
                 },
 
                 element: {
-
                     type: "object",
-                    label: (el$) => `Indicateur ${parseInt(el$.dataPath.replace('indicators.', '')) + 1}`,
+                    label: (el$: any) => `Indicateur ${parseInt(el$.dataPath.replace('indicators.', '')) + 1}`,
 
                     addClasses: {
                         ElementLayout: {
                             innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
                         },
-
                         ElementLabel: {
                             wrapper: "text-xl text-primary py-1.5",
                             container_lg: "!pb-0",
@@ -290,26 +306,10 @@ export const useCreateProject = () => {
                     },
 
                     schema: {
-
-                        // activate_select_indicators: {
-                        //     type: "toggle",
-                        //     text: "Activer la selection d'un indicateur",
-                        // },
-
-                        // separator: {
-                        //     type: "static",
-                        //     tag: "hr",
-                        //     columns: {
-                        //         lg: {container: 12, label: 12, wrapper: 12},
-                        //     },
-                        // },
-
                         indicatorId: {
-
                             label: "Indicateur associable au projet",
                             type: "select",
                             description: "Sélectionnez un indicateur existant associé au projet",
-                            // conditions: [["indicators.*.activate_select_indicators", true]], //
                             search: true,
                             native: true,
                             inputType: "search",
@@ -321,31 +321,26 @@ export const useCreateProject = () => {
                             columns: {
                                 lg: {container: 12, label: 12, wrapper: 12},
                             },
-
                             addClasses: {
                                 dropdown: "max-h-60 overflow-y-auto",
                                 ElementDescription: {
                                     container_lg: "!text-gray-400 font-medium",
                                 },
                             },
-
                             items: [
                                 'indicatoris 01',
                                 'indicatoris 02',
                                 'indicatoris 03',
                             ],
-
                         },
 
                         create_indicator_stuff: {
-                            // conditions: [["indicators.*.activate_select_indicators", false]],
                             type: "group",
                             columns: {
                                 lg: {container: 12, label: 12, wrapper: 12},
                             },
 
                             schema: {
-
                                 indicatorName: {
                                     type: 'text', default: '',
                                     label: "Libelle de l'indicateur",
@@ -356,14 +351,12 @@ export const useCreateProject = () => {
                                         lg: {container: 12, label: 12, wrapper: 12},
                                     },
                                 },
-
                                 baselineYear: {
                                     type: 'date',
                                     label: "Année de base",
                                     rules: ["required"],
                                     info: "Formuler un libelle pour l'indicateur",
                                 },
-
                                 baselineValue: {
                                     type: 'text', default: '',
                                     label: "Valeur de base",
@@ -371,14 +364,12 @@ export const useCreateProject = () => {
                                     info: "Formuler un libelle pour l'indicateur",
                                     placeholder: "Ex: 45%",
                                 },
-
                                 targetYear: {
                                     type: 'date',
                                     label: "Année cible",
                                     rules: ["required"],
                                     info: "Formuler un libelle pour l'indicateur",
                                 },
-
                                 targetValue: {
                                     type: 'text', default: '',
                                     label: "Valeur cible",
@@ -386,14 +377,12 @@ export const useCreateProject = () => {
                                     info: "Formuler un libelle pour l'indicateur",
                                     placeholder: "Ex: 80%",
                                 },
-
                                 latestYear: {
                                     type: 'date',
                                     label: "Année la plus récente",
                                     rules: ["required"],
                                     info: "Formuler un libelle pour l'indicateur",
                                 },
-
                                 latestValue: {
                                     type: 'text', default: '',
                                     label: "Valeur la plus récente",
@@ -401,7 +390,6 @@ export const useCreateProject = () => {
                                     info: "Formuler un libelle pour l'indicateur",
                                     placeholder: "Ex: 65%",
                                 },
-
                                 methodologyReference: {
                                     type: 'object',
                                     columns: {
@@ -422,10 +410,8 @@ export const useCreateProject = () => {
                                 }
                             }
                         }
-
                     },
                 },
-
             },
 
             actions: {
@@ -437,19 +423,16 @@ export const useCreateProject = () => {
                 },
 
                 element: {
-
                     type: 'object',
-                    label: (el$) => `Action ${parseInt(el$.dataPath.replace('actions.', '')) + 1}`,
+                    label: (el$: any) => `Action ${parseInt(el$.dataPath.replace('actions.', '')) + 1}`,
                     columns: {
                         lg: {container: 12, label: 12, wrapper: 12},
                     },
 
                     addClasses: {
-
                         ElementLayout: {
                             innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
                         },
-
                         ElementLabel: {
                             wrapper: "text-xl text-primary py-1.5",
                             container_lg: "!pb-0",
@@ -457,7 +440,6 @@ export const useCreateProject = () => {
                     },
 
                     schema: {
-
                         type: {
                             type: 'text', default: '',
                             label: "Type de l'action",
@@ -465,14 +447,12 @@ export const useCreateProject = () => {
                             placeholder: "Ex: Formation, Sensibilisation, Construction",
                             rules: [],
                         },
-
                         status: {
                             type: 'text', default: '',
                             label: "Statut de l'action",
                             placeholder: "Ex: En cours, Terminée, Planifiée",
                             rules: [],
                         },
-
                         description: {
                             type: 'text', default: '',
                             label: "Description de l'action",
@@ -488,7 +468,6 @@ export const useCreateProject = () => {
             },
 
             partners: {
-
                 type: 'list',
                 initial: 0,
                 addText: "Ajouter un partenaire",
@@ -497,43 +476,36 @@ export const useCreateProject = () => {
                 },
 
                 element: {
-
                     type: 'object',
-                    label: (el$) => `Partenaire ${parseInt(el$.dataPath.replace('partners.', '')) + 1}`,
+                    label: (el$: any) => `Partenaire ${parseInt(el$.dataPath.replace('partners.', '')) + 1}`,
 
                     columns: {
                         lg: {container: 12, label: 12, wrapper: 12},
                     },
 
                     addClasses: {
-
                         ElementLayout: {
                             innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
                         },
-
                         ElementLabel: {
                             wrapper: "text-xl text-primary py-1.5",
                             container_lg: "!pb-0",
                         },
                     },
-                    schema: {
 
+                    schema: {
                         name: {
                             type: 'text', default: '',
                             label: 'Nom',
                             placeholder: "Ex: Ministère de l'Eau, ONG XYZ",
                         },
-
                         type: {
                             type: 'text', default: '',
                             label: 'Type de partenaire',
                             placeholder: "Ex: Technique, Financier, Institutionnel",
                         },
-
                         otherData: {
-
                             type: 'object',
-
                             columns: {
                                 lg: {container: 12, label: 12, wrapper: 12},
                             },
@@ -546,7 +518,6 @@ export const useCreateProject = () => {
                                         lg: {container: 12, label: 12, wrapper: 12},
                                     },
                                 },
-
                                 partnerImage: {
                                     type: 'file',
                                     accepted: ["image/jpeg", "image/jpg", "image/png"],
@@ -557,7 +528,6 @@ export const useCreateProject = () => {
                         }
                     }
                 }
-
             },
 
             coverImageId: {
@@ -576,55 +546,44 @@ export const useCreateProject = () => {
             },
 
             targets: {
-
                 type: 'list',
                 initial: 0,
                 addText: "Ajouter une cible",
-
                 columns: {
                     lg: {container: 12, label: 12, wrapper: 12},
                 },
 
                 element: {
-
                     type: 'object',
-                    label: (el$) => `Cible ${parseInt(el$.dataPath.replace('targets.', '')) + 1}`,
+                    label: (el$: any) => `Cible ${parseInt(el$.dataPath.replace('targets.', '')) + 1}`,
 
                     columns: {
                         lg: {container: 12, label: 12, wrapper: 12},
                     },
 
                     addClasses: {
-
                         ElementLayout: {
                             innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
                         },
-
                         ElementLabel: {
                             wrapper: "text-xl text-primary py-1.5",
                             container_lg: "!pb-0",
                         },
-
                     },
 
                     schema: {
-
                         name: {
                             type: 'text', default: '',
                             label: 'Nom',
                             placeholder: "Ex: Femmes rurales, Enfants de 5-15 ans",
                         },
-
                         description: {
                             type: 'text', default: '',
                             label: 'Description',
                             placeholder: "Ex: Population des zones rurales de 18 à 60 ans",
                         },
-
-
                     }
                 }
-
             },
 
             verifications: {
@@ -637,12 +596,11 @@ export const useCreateProject = () => {
 
                 element: {
                     type: 'object',
-                    label: (el$) => `Vérification ${parseInt(el$.dataPath.replace('verifications.', '')) + 1}`,
+                    label: (el$: any) => `Vérification ${parseInt(el$.dataPath.replace('verifications.', '')) + 1}`,
                     addClasses: {
                         ElementLayout: {
                             innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
                         },
-
                         ElementLabel: {
                             wrapper: "text-xl text-primary py-1.5",
                             container_lg: "!pb-0",
@@ -706,20 +664,16 @@ export const useCreateProject = () => {
                 },
 
                 element: {
-
                     type: 'object',
-                    //  label: (el$) => `Fichier ${parseInt(el$.dataPath.replace('finances.', '')) + 1}`,
 
                     columns: {
                         lg: {container: 12, label: 12, wrapper: 12},
                     },
 
                     addClasses: {
-
                         ElementLayout: {
                             innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
                         },
-
                         ElementLabel: {
                             wrapper: "text-xl text-primary py-1.5",
                             container_lg: "!pb-0",
@@ -736,7 +690,6 @@ export const useCreateProject = () => {
                             mask: 'number',
                             placeholder: "Ex: 50000000"
                         },
-
                         amountDisbursedCfa: {
                             type: 'text',
                             default: '',
@@ -744,7 +697,6 @@ export const useCreateProject = () => {
                             mask: 'number',
                             placeholder: "Ex: 25000000"
                         },
-
                         currency: {
                             type: 'select',
                             label: 'Devise',
@@ -755,7 +707,6 @@ export const useCreateProject = () => {
                                 {value: 'XOF', label: 'F CFA'},
                             ],
                         },
-
                         exchangeRateUsed: {
                             type: 'text',
                             mask: 'number',
@@ -778,32 +729,8 @@ export const useCreateProject = () => {
                             },
                         }
                     }
-
                 }
-
             },
-
-            // finances: {
-            //     type: 'object',
-            //     label: 'Finances',
-            //     addClasses: {
-            //
-            //         ElementLayout: {
-            //             innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
-            //         },
-            //
-            //         ElementLabel: {
-            //             wrapper: "text-xl text-primary py-1.5",
-            //             container_lg: "!pb-0",
-            //         },
-            //     },
-            //     columns: {
-            //         default: {container: 12, label: 12, wrapper: 12},
-            //         sm: {container: 12, label: 12, wrapper: 12},
-            //         md: {container: 12, label: 12, wrapper: 12},
-            //         lg: {container: 12, label: 12, wrapper: 12},
-            //     },
-            // },
 
             files: {
                 type: 'list',
@@ -814,20 +741,17 @@ export const useCreateProject = () => {
                 },
 
                 element: {
-
                     type: 'object',
-                    label: (el$) => `Fichier ${parseInt(el$.dataPath.replace('files.', '')) + 1}`,
+                    label: (el$: any) => `Fichier ${parseInt(el$.dataPath.replace('files.', '')) + 1}`,
 
                     columns: {
                         lg: {container: 12, label: 12, wrapper: 12},
                     },
 
                     addClasses: {
-
                         ElementLayout: {
                             innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
                         },
-
                         ElementLabel: {
                             wrapper: "text-xl text-primary py-1.5",
                             container_lg: "!pb-0",
@@ -835,7 +759,6 @@ export const useCreateProject = () => {
                     },
 
                     schema: {
-
                         fileTypeId: {
                             type: 'select',
                             label: "Type de fichier",
@@ -850,15 +773,12 @@ export const useCreateProject = () => {
                             inputType: "search",
                             autocomplete: "off",
                         },
-
                         fileId: {
                             type: 'file',
                             label: 'Fichier',
                         },
-
                     }
                 }
-
             },
 
             location: {
@@ -867,7 +787,6 @@ export const useCreateProject = () => {
                     ElementLayout: {
                         innerContainer: "border border-gray-200 bg-gray-50 px-3 px-2 py-5",
                     },
-
                     ElementLabel: {
                         wrapper: "text-lg py-1.5",
                         container_lg: "!pb-0",
@@ -891,7 +810,6 @@ export const useCreateProject = () => {
                         inputType: "search",
                         autocomplete: "off",
                     },
-
                     city: {
                         label: "Villes (Communes)",
                         type: "select",
@@ -907,7 +825,6 @@ export const useCreateProject = () => {
                         inputType: "search",
                         autocomplete: "off",
                     },
-
                     location: {
                         type: "object",
                         schema: {
@@ -961,16 +878,13 @@ export const useCreateProject = () => {
                     }
                 }
             },
-
         }
-
-    }))
+    }));
 
     return {
-        createProject,
-        createProjectFormEl,
-        createProjectForm,
-    }
-
-
-}
+        updateProject,
+        updateProjectFormEl,
+        updateProjectForm,
+        getFormDefaults,
+    };
+};

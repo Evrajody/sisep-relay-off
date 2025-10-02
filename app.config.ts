@@ -24,7 +24,7 @@ export default defineAppConfig({
             th: { base: "w-fit" },
             td: { base: "!py-2.5 w-fit" },
             default: { checkbox: { color: "primary" as any } },
-            base: "divide-y overflow-scroll border-2 divide-gray-200 dark:divide-gray-700",
+            base: "divide-y overflow-scroll border-t border-x-none divide-gray-200 dark:divide-gray-700",
             body: {
                 base: "divide-y-2 divide-gray-200 dark:divide-gray-700",
             },

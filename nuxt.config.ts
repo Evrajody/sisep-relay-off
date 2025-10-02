@@ -10,6 +10,38 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
 
+  vite: {
+    server: {
+      hmr: {
+        protocol: 'ws',
+        host: 'localhost',
+      },
+      watch: {
+        usePolling: false,
+        interval: 100,
+      },
+    },
+    clearScreen: false,
+    optimizeDeps: {
+      include: ['vue', 'vue-router', '@vueuse/core'],
+    },
+  },
+
+  nitro: {
+    devProxy: {
+      '/api': {
+        target: process.env.NUXT_PUBLIC_SISEB_API_BASE_URL,
+        changeOrigin: true,
+      },
+    },
+  },
+
+  experimental: {
+    payloadExtraction: false,
+    renderJsonPayloads: true,
+    typedPages: true,
+  },
+
   tailwindcss: {
     exposeConfig: true,
     viewer: true,

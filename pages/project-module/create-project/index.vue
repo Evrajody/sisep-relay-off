@@ -29,7 +29,6 @@ const { createProjectForm, createProjectFormEl } = useCreateProject();
   <div class="max-w-7xl w-full py-5 mx-auto">
 
     <UDashboardCard
-
         v-loading="createProjectFormEl?.submitting"
         element-loading-text="Loading..."
         element-loading-svg-view-box="-10, -10, 50, 50"

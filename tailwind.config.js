@@ -34,7 +34,6 @@ export default {
                 "sisep-tornado": "linear-gradient(180deg, #008751 79.16%, #0D6535 100%)",
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
                 "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-                "sisep-hit": "linear-gradient(105.27deg, rgba(22, 34, 51, 1) 1.84%, rgba(17, 132, 90, 1) 110.21%)"
             },
 
             colors: {
@@ -46,6 +45,7 @@ export default {
                 tahiti: "#3ab7bf",
                 bermuda: "#78dcca",
                 "main-green": "#008751",
+                "sisep-hit": "#1e3a42",
 
                 niagara: {
                     50: "#f1fcf9",

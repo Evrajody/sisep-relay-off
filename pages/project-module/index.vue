@@ -55,7 +55,7 @@ const getActions = (row: Project) => [
   {
     label: 'Modifier',
     icon: 'i-heroicons-pencil-square',
-    click: () => navigateTo(`/project-module/${row.id}/edit`)
+    click: () => navigateTo(`/project-module/edit-project/${row.id}`)
   },
   {
     label: 'Supprimer',
@@ -174,47 +174,82 @@ const getDaysRemaining = (endDate: string) => {
 
   <div class="max-w-[95vw] w-full py-5 mx-auto px-4">
 
-
-<!--  <pre>-->
-<!--    {{ projectList }}-->
-<!--  </pre>-->
-
     <UDashboardCard
       :ui="{
         divide: 'divide-x divide-gray-200 dark:divide-gray-700',
-        title: 'text-gray-900 dark:text-white font-semibold',
-        wrapper: 'border border-gray-200 dark:border-gray-800 rounded-lg',
+        title: 'text-gray-900 dark:text-white font-semibold text-lg',
+        description: 'text-sm text-gray-600 dark:text-gray-400 mt-1',
+        wrapper: ' !border-none  border-gray-200 dark:border-gray-800 rounded-none shadow-md',
         header: {
-          wrapper: 'border-b border-gray-200 dark:border-gray-800',
+          wrapper: 'bg-primary-50 dark:bg-primary-900/20 border-none',
+          padding: '!px-2 py-2',
+        },
+        body: {
+          padding: '!p-0 !border-none',
         },
       }"
     >
-      <!-- En-tête avec titre et filtres -->
+      <template #title>
+        Liste des projets
+      </template>
+
+      <template #description>
+        <span class="font-semibold text-gray-900 dark:text-white">{{ pagination.totalItems }}</span> projet(s) au total
+      </template>
+
+      <!-- En-tête avec filtres -->
       <template #header>
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 gap-4">
-          <div>
-            <h3 class="text-lg font-semibold">Liste des projets</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {{ pagination.totalItems }} projet(s) au total
-            </p>
-          </div>
-          <div class="flex flex-col sm:flex-row items-end sm:items-center gap-3 w-full sm:w-auto">
-            <USelectMenu 
-              v-model="selectedStatus"
-              :options="statuses" 
-              option-attribute="label"
-              placeholder="Filtrer par statut"
-              class="w-full sm:w-48"
-              size="sm"
-              @update:modelValue="refreshProjectList"
-            />
-            <UInput 
-              v-model="search" 
+        <div class="flex  w-full flex-col gap-4">
+          <!-- Filtres -->
+          <div class="flex flex-col lg:flex-row gap-4">
+            <UInput
+              v-model="search"
               icon="i-heroicons-magnifying-glass"
-              placeholder="Rechercher un projet..." 
-              class="w-full sm:w-64"
-              size="sm"
+              placeholder="Rechercher par titre, type ou description..."
+              class="flex-1"
+              size="lg"
+              :ui="{
+                icon: { trailing: { pointer: '' } },
+                size: { lg: 'text-base' }
+              }"
               @keyup.enter="refreshProjectList"
+            >
+              <template #trailing>
+                <UButton
+                  v-if="search"
+                  color="gray"
+                  variant="ghost"
+                  icon="i-heroicons-x-mark"
+                  size="xs"
+                  @click="search = ''; refreshProjectList()"
+                />
+              </template>
+            </UInput>
+
+            <USelectMenu
+              v-model="selectedStatus"
+              :options="statuses"
+              option-attribute="label"
+              placeholder="Tous les statuts"
+              size="lg"
+              class="w-full lg:w-72"
+              :ui="{
+                size: { lg: 'text-base' }
+              }"
+              @update:modelValue="refreshProjectList"
+            >
+              <template #leading>
+                <UIcon name="i-heroicons-funnel" class="h-5 w-5" />
+              </template>
+            </USelectMenu>
+
+            <UButton
+              to="/project-module/create-project"
+              color="primary"
+              icon="i-heroicons-plus"
+              label="Nouveau projet"
+              size="lg"
+              class="w-full lg:w-auto"
             />
           </div>
         </div>
@@ -340,7 +375,7 @@ const getDaysRemaining = (endDate: string) => {
 
       <!-- Pied de tableau avec pagination -->
       <template #footer>
-        <div class="flex flex-col sm:flex-row items-center justify-between px-6 py-3 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex flex-col sm:flex-row items-center justify-between  border-gray-200 dark:border-gray-700">
           <div class="text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-0">
             Affichage de <span class="font-medium">{{ pagination.pageFrom }}</span> à 
             <span class="font-medium">{{ pagination.pageTo }}</span> sur

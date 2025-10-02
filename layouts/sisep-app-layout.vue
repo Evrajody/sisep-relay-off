@@ -115,7 +115,7 @@ const changModuleForm = computed(() => ({
               wrapper: 'bg-sisep-hit  dark:bg-gray-900',
               body: 'gap-y-6 py-2',
               container: 'py-0 pt-3',
-              footer: 'bg-gray-50 py-3 border-t border-gray-200 dark:bg-gray-900',
+              footer: ' py-3 text-white border-gray-200 dark:bg-gray-900',
             }"
           >
             <div class="w-full">
