@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useProjects } from "~/composables/project/useProjects";
+import { useProjectDelete } from "~/composables/project/useProjectDelete";
 import type { Project } from '~/types';
 
 const router = useRouter();
@@ -36,6 +37,9 @@ const {
   selectedStatus
 } = useProjects();
 
+// Gestion de la suppression
+const { deleteProject, isDeleting } = useProjectDelete();
+
 // Options de statut pour le filtre
 const statuses = [
   { value: 'all', label: 'Tous les statuts' },
@@ -44,6 +48,14 @@ const statuses = [
   { value: 'PUBLISHED', label: 'Publié' },
   { value: 'REJECTED', label: 'Rejeté' },
 ];
+
+// Fonction de suppression d'un projet
+const handleDeleteProject = async (row: Project) => {
+  const success = await deleteProject(row.id, row.title);
+  if (success) {
+    await refreshProjectList();
+  }
+};
 
 // Actions disponibles pour chaque projet
 const getActions = (row: Project) => [
@@ -60,12 +72,7 @@ const getActions = (row: Project) => [
   {
     label: 'Supprimer',
     icon: 'i-heroicons-trash',
-    click: async () => {
-      if (confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
-        // Implémentez la logique de suppression ici
-        await refreshProjectList();
-      }
-    }
+    click: () => handleDeleteProject(row)
   }
 ];
 

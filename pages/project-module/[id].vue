@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
-import type {Project} from '~/types';
 import useProjectDetail from '~/composables/project/useProjectDetail';
+import { useProjectDelete } from '~/composables/project/useProjectDelete';
 import { useLoading } from '~/composables/useLoading';
 import { useToast } from '~/composables/useToast';
 import { useFileDisplay } from '~/composables/useFileDisplay';
@@ -20,7 +20,7 @@ const {
   getStatusBadge,
 } = useProjectDetail();
 
-const activeTab = ref(1);
+const activeTab = ref(0);
 const showActionModal = ref(false);
 const selectedAction = ref<string>('');
 const assignFocalPointModal = ref(false);
@@ -33,29 +33,14 @@ const { getFileDisplayUrl, getFileIcon, getFileType, downloadFile, openFileInNew
 const filePreviewModal = ref(false);
 const previewFile = ref<any>(null);
 
+// Gestion de la suppression
+const { deleteProject: deleteProjectComposable } = useProjectDelete();
+
 // Actions du projet
 const deleteProject = async () => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
-    try {
-      useLoading().start('Suppression du projet...');
-      // Implémentez la logique de suppression ici
-      useToast().add({
-        title: 'Projet supprimé',
-        description: 'Le projet a été supprimé avec succès.',
-        icon: 'i-heroicons-check-circle',
-        color: 'green'
-      });
-      navigateTo('/project-module');
-    } catch (err) {
-      useToast().add({
-        title: 'Erreur',
-        description: 'Impossible de supprimer le projet.',
-        icon: 'i-heroicons-exclamation-circle',
-        color: 'red'
-      });
-    } finally {
-      useLoading().finish();
-    }
+  const success = await deleteProjectComposable(projectId, project.value?.title);
+  if (success) {
+    navigateTo('/project-module');
   }
 };
 
@@ -130,12 +115,13 @@ const submitForValidation = async () => {
 };
 
 // Actions disponibles
+
 const projectActions = computed(() => [
   [
     {
       label: 'Modifier',
       icon: 'i-heroicons-pencil-square',
-      click: () => navigateTo(`/project-module/${projectId}/edit`)
+      click: () => navigateTo(`/project-module/edit-project/${projectId}`)
     },
     {
       label: 'Affecter un point focal',
@@ -267,7 +253,7 @@ definePageMeta({
                 color="white"
                 variant="solid"
                 icon="i-heroicons-pencil-square"
-                @click="navigateTo(`/project-module/${projectId}/edit`)"
+                @click="navigateTo(`/project-module/edit-project/${projectId}`)"
               >
                 Modifier
               </UButton>

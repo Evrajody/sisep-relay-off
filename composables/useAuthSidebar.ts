@@ -67,11 +67,45 @@ export const useAuthSidebar = () => {
         },
 
         {
-            id: "problemes",
-            label: "Suggestions",
-            icon: "heroicons-outline:rectangle-stack",
-            tooltip: {text: "Liste des suggestions"},
-            to: "#",
+            id: "categories",
+            label: "Catégories",
+            icon: "i-heroicons-square-3-stack-3d",
+            to: { name: "project-module-categories" },
+        },
+
+        {
+            id: "subcategories",
+            label: "Sous-catégories",
+            icon: "i-heroicons-queue-list",
+            to: { name: "project-module-subcategories" },
+        },
+
+        {
+            id: "indicators",
+            label: "Indicateurs",
+            icon: "i-heroicons-chart-bar-square",
+            to: { name: "project-module-indicators" },
+        },
+
+        {
+            id: "structures",
+            label: "Structures",
+            icon: "i-heroicons-building-office-2",
+            to: { name: "project-module-structures" },
+        },
+
+        {
+            id: "agents",
+            label: "Agents",
+            icon: "i-heroicons-users",
+            to: { name: "project-module-agents" },
+        },
+
+        {
+            id: "conventions",
+            label: "Conventions",
+            icon: "i-heroicons-document-text",
+            to: { name: "project-module-conventions" },
         },
     ]);
 

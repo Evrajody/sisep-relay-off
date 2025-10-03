@@ -48,8 +48,10 @@ export const useProjectDetail = () => {
     isLoading.value = true;
     error.value = null;
 
+
+
     try {
-      const response = await $sisepApi(`/projects/${projectId}/status`, {
+      const response = await $sisepApi(`/projects/${projectId}/update-status`, {
         method: 'PATCH',
         body: { status }
       });

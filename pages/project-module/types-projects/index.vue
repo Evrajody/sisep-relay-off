@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useCreateTypeProject } from "~/composables/type-projets/useCreateTypeProject";
 import { useTypeProjects } from "~/composables/type-projets/useTypeProjects";
+import type { TypeProject } from "~/types";
 
 definePageMeta({
     layout: "sisep-app-layout",
@@ -8,178 +9,306 @@ definePageMeta({
 
 const links = [
     {
-        label: "Liste des types projets",
-        icon: "i-heroicons-user-circle",
+        label: "Types de projets",
+        icon: "i-heroicons-tag",
     },
 ];
 
 useHead({
-    title: "Liste des types projets",
+    title: "Liste des types de projets",
 });
 
-// chargement de la liste des types de projets
-const { search, current_page, columns, typeProjets, pagination, error, typeProjetsStatus, refreshTypeProjets } =
-    useTypeProjects();
+// Chargement de la liste des types de projets
+const {
+    search,
+    current_page,
+    columns,
+    typeProjets,
+    pagination,
+    error,
+    typeProjetsStatus,
+    refreshTypeProjets
+} = useTypeProjects();
 
-// logique de création de types de projets
-const { createTypeProjectForm, createTypeProjectFormEl, isModalCreateTypeProjectOpen, toogleModalCreateTypeProject } = useCreateTypeProject(refreshTypeProjets);
+// Logique de création de types de projets
+const {
+    createTypeProjectForm,
+    createTypeProjectFormEl,
+    isModalCreateTypeProjectOpen,
+    toogleModalCreateTypeProject
+} = useCreateTypeProject(refreshTypeProjets);
 
 const page = ref(1);
+const pageCount = ref(10);
+const sort = ref({ column: 'name', direction: 'asc' as const });
+
+// Gestion du changement de page
+const onPageChange = (newPage: number) => {
+    page.value = newPage;
+    current_page.value = newPage;
+};
+
+// Gestion du tri
+const onSort = (e: { column: string; direction: 'asc' | 'desc' }) => {
+    sort.value = e;
+};
+
+// Actions disponibles pour chaque type
+const getActions = (row: TypeProject) => [
+    {
+        label: 'Modifier',
+        icon: 'i-heroicons-pencil-square',
+        click: () => {
+            // Logique de modification
+            console.log('Modifier', row);
+        }
+    },
+    {
+        label: 'Supprimer',
+        icon: 'i-heroicons-trash',
+        click: async () => {
+            // Logique de suppression
+            console.log('Supprimer', row);
+        }
+    }
+];
 </script>
 
 <template>
-    <UDashboardToolbar :ui="{ wrapper: 'bg-white dark:bg-gray-900' }" class="py-0 px-1.5 overflow-x-auto">
+    <UDashboardToolbar
+        :ui="{ wrapper: 'bg-white dark:bg-gray-900' }"
+        class="py-0 px-1.5 overflow-x-auto"
+    >
         <UHorizontalNavigation :links="links" />
+        <template #right>
+            <UButton
+                color="primary"
+                icon="i-heroicons-plus"
+                label="Nouveau type"
+                size="sm"
+                @click="toogleModalCreateTypeProject"
+            />
+        </template>
     </UDashboardToolbar>
 
-    <div class="max-w-[70vw] w-full py-5 mx-auto">
-        <UDashboardCard :ui="{
-            divide: 'divide-x divide-gray-200 dark:divide-gray-700',
-            title: 'text-gray-900 dark:text-white font-semibold',
-            wrapper: ' border-gray-100',
-            header: {
-                wrapper: ' border-gray-100 py-5',
-            },
-        }">
+    <div class="max-w-[95vw] w-full py-5 mx-auto px-4">
+        <UDashboardCard
+            :ui="{
+                divide: 'divide-x divide-gray-200 dark:divide-gray-700',
+                title: 'text-gray-900 dark:text-white font-semibold text-lg',
+                description: 'text-sm text-gray-600 dark:text-gray-400 mt-1',
+                wrapper: ' !border-none  border-gray-200 dark:border-gray-800 rounded-none shadow-md',
+                header: {
+                    wrapper: 'bg-primary-50 dark:bg-primary-900/20 border-none',
+                    padding: '!px-2 py-2',
+                },
+                body: {
+                    padding: '!p-0 !border-none',
+                },
+            }"
+        >
             <template #title>
-                <div class="flex flex-row justify-between">
-                    <h3 class="text-lg font-semibold">Liste des types projets</h3>
-                </div>
+                Types de projets
             </template>
 
-            <template #links>
-                <button
-                @click="toogleModalCreateTypeProject"
-                    class="text-md bg-primary px-4 py-3 text-white font-medium rounded-lg hover:scale-95 shadow-md transition-all">
-                    Ajouter un type de projet
-                </button>
+            <template #description>
+                <span class="font-semibold text-gray-900 dark:text-white">{{ pagination.totalItems }}</span> type(s) au total
             </template>
 
-            <div class="">
-                <!-- Filters -->
-                <div class="flex items-center justify-between gap-3">
-                    <UInput v-model="search" class="w-[500px]" icon="i-heroicons-magnifying-glass-20-solid"
-                        placeholder="Filter les types projets..." size="lg" />
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-sm leading-5">Element par page:</span>
-                        <USelect :options="[3, 5, 10, 20, 30]" class="me-2 w-[100px]" size="lg" />
+            <!-- En-tête avec filtres -->
+            <template #header>
+                <div class="flex w-full flex-col gap-4">
+                    <!-- Filtres -->
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <UInput
+                            v-model="search"
+                            icon="i-heroicons-magnifying-glass"
+                            placeholder="Rechercher un type de projet..."
+                            class="flex-1"
+                            size="lg"
+                            :ui="{
+                                icon: { trailing: { pointer: '' } },
+                                size: { lg: 'text-base' }
+                            }"
+                        >
+                            <template #trailing>
+                                <UButton
+                                    v-if="search"
+                                    color="gray"
+                                    variant="ghost"
+                                    icon="i-heroicons-x-mark"
+                                    size="xs"
+                                    @click="search = ''"
+                                />
+                            </template>
+                        </UInput>
+
+                        <UButton
+                            color="primary"
+                            icon="i-heroicons-plus"
+                            label="Nouveau type"
+                            size="lg"
+                            class="w-full lg:w-auto"
+                            @click="toogleModalCreateTypeProject"
+                        />
                     </div>
                 </div>
+            </template>
 
-                <!-- ACTIONS BUTTONS -->
-                <div class="flex justify-between items-center w-full px-4 py-3"></div>
-
-                <!-- TABLES -->
-                <UTable :columns="columns" :loading="typeProjetsStatus === 'pending'" :rows="typeProjets?.data"
-                    class="w-full" @select="null">
-                    <template #title-data="{ row }">
-                        <div class="flex gap-3 space-y-2">
-                            <NuxtImg class="rounded-md" width="200" height="200"
-                                src="https://images.pexels.com/photos/545068/pexels-photo-545068.jpeg" />
-
-                            <div class="flex">
-                                <p class="font-extrabold text-lg">{{ row.title }}</p>
+            <!-- Contenu principal du tableau -->
+            <div class="overflow-x-auto">
+                <UTable
+                    :columns="[
+                        { key: 'name', label: 'Nom', sortable: true },
+                        { key: 'description', label: 'Description', sortable: true },
+                        { key: 'projectCount', label: 'Nb projets' },
+                        { key: 'actions', label: 'Actions' }
+                    ]"
+                    :rows="typeProjets?.data || []"
+                    :loading="typeProjetsStatus === 'pending'"
+                    :loading-state="{ icon: 'i-heroicons-arrow-path-20-solid', label: 'Chargement...' }"
+                    :empty-state="{
+                        icon: 'i-heroicons-tag',
+                        label: 'Aucun type trouvé',
+                        description: 'Essayez de modifier vos critères de recherche',
+                    }"
+                    class="w-full"
+                    :ui="{
+                        td: { base: 'whitespace-nowrap' },
+                        th: { base: 'whitespace-nowrap' }
+                    }"
+                    v-model:sort="sort"
+                    @update:sort="onSort"
+                >
+                    <!-- Colonne Nom -->
+                    <template #name-data="{ row }">
+                        <div class="flex items-center gap-3 min-w-[200px]">
+                            <div class="p-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                                <UIcon name="i-heroicons-tag" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-medium text-gray-900 dark:text-white">
+                                    {{ row.name || 'Sans nom' }}
+                                </p>
                             </div>
                         </div>
                     </template>
 
-                    <template #empty-state>
-                        <div class="flex flex-col items-center gap-5 justify-center py-12">
-                            <div class="size-10">
-                                <svg class="size-10 text-gray-500" viewBox="0 0 16 16"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M7.628 1.099a.75.75 0 0 1 .744 0l5.25 3a.75.75 0 0 1 0 1.302l-5.25 3a.75.75 0 0 1-.744 0l-5.25-3a.75.75 0 0 1 0-1.302z"
-                                        fill="currentColor" />
-                                    <path
-                                        d="m2.57 7.24l-.192.11a.75.75 0 0 0 0 1.302l5.25 3a.75.75 0 0 0 .744 0l5.25-3a.75.75 0 0 0 0-1.303l-.192-.11l-4.314 2.465a2.25 2.25 0 0 1-2.232 0z"
-                                        fill="currentColor" />
-                                    <path
-                                        d="m2.378 10.6l.192-.11l4.314 2.464a2.25 2.25 0 0 0 2.232 0l4.314-2.465l.192.11a.75.75 0 0 1 0 1.303l-5.25 3a.75.75 0 0 1-.744 0l-5.25-3a.75.75 0 0 1 0-1.303"
-                                        fill="currentColor" />
-                                </svg>
-                            </div>
-                            <span class="text-sm"> Aucune donnée </span>
+                    <!-- Colonne Description -->
+                    <template #description-data="{ row }">
+                        <div class="max-w-md">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                {{ row.description || 'Aucune description' }}
+                            </p>
                         </div>
                     </template>
 
-                    <template #loading-state>
-                        <div class="flex flex-col items-center gap-5 justify-center py-12">
-                            <div class="size-10">
-                                <svg class="size-10" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 3c4.97 0 9 4.03 9 9" fill="none" stroke="currentColor"
-                                        stroke-dasharray="16" stroke-dashoffset="16" stroke-linecap="round"
-                                        stroke-linejoin="round" stroke-width="2">
-                                        <animate attributeName="stroke-dashoffset" dur="0.2s" fill="freeze"
-                                            values="16;0" />
-                                        <animateTransform attributeName="transform" dur=".5s" repeatCount="indefinite"
-                                            type="rotate" values="0 12 12;360 12 12" />
-                                    </path>
-                                </svg>
-                            </div>
-                            <span class="text-sm"> Chargement des données... </span>
-                        </div>
+                    <!-- Colonne Nombre de projets -->
+                    <template #projectCount-data="{ row }">
+                        <UBadge
+                            color="blue"
+                            variant="subtle"
+                            size="sm"
+                        >
+                            {{ row.projectCount || 0 }} projet(s)
+                        </UBadge>
+                    </template>
+
+                    <!-- Colonne Actions -->
+                    <template #actions-data="{ row }">
+                        <UDropdown :items="[getActions(row)]" :popper="{ placement: 'bottom-start' }">
+                            <UButton
+                                color="gray"
+                                variant="ghost"
+                                icon="i-heroicons-ellipsis-vertical"
+                                :loading="typeProjetsStatus === 'pending'"
+                            />
+
+                            <template #item="{ item: actionItem }">
+                                <div class="flex items-center gap-2" @click="actionItem.click">
+                                    <UIcon :name="actionItem.icon" class="h-4 w-4" />
+                                    <span>{{ actionItem.label }}</span>
+                                </div>
+                            </template>
+                        </UDropdown>
                     </template>
                 </UTable>
-
-
             </div>
 
+            <!-- Pied de tableau avec pagination -->
             <template #footer>
-                <div class="flex flex-wrap justify-between items-center">
-                    <div>
-                        <span class="text-sm leading-5">
-                            Affichage
-                            <span class="font-medium">{{ pagination?.pageFrom }}</span>
-                            à
-                            <span class="font-medium">{{ pagination?.pageTo }}</span>
-                            sur
-                            <span class="font-medium">{{ pagination?.totalItems }}</span>
-                            élement(s)
-                        </span>
+                <div class="flex flex-col sm:flex-row items-center justify-between border-gray-200 dark:border-gray-700">
+                    <div class="text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-0">
+                        Affichage de <span class="font-medium">{{ pagination.pageFrom }}</span> à
+                        <span class="font-medium">{{ pagination.pageTo }}</span> sur
+                        <span class="font-medium">{{ pagination.totalItems }}</span> type(s)
                     </div>
 
-                    <UPagination v-model="page" :page-count="10" :total="typeProjets?.data.length" :ui="{
-                        wrapper: 'flex items-center gap-1',
-                        rounded: '!rounded-full min-w-[32px] justify-center',
-                        default: {
-                            activeButton: {
-                                variant: 'outline',
-                            },
-                        },
-                    }" />
+                    <UPagination
+                        v-model="page"
+                        :page-count="pageCount"
+                        :total="typeProjets?.data?.length || 0"
+                        :ui="{
+                            wrapper: 'flex items-center gap-1',
+                            rounded: '!rounded-full min-w-[32px] justify-center',
+                            default: {
+                                activeButton: {
+                                    variant: 'outline'
+                                }
+                            }
+                        }"
+                        @update:modelValue="onPageChange"
+                    />
                 </div>
             </template>
         </UDashboardCard>
 
-        <UDashboardModal v-model="isModalCreateTypeProjectOpen"
-            title="Création d'un nouveau type de project" :ui="{
-                rounded: 'rounded-none',
+        <!-- Modal de création -->
+        <UDashboardModal
+            v-model="isModalCreateTypeProjectOpen"
+            title="Création d'un nouveau type de projet"
+            :ui="{
+                rounded: 'rounded-lg',
                 base: 'py-0',
-                icon: { base: 'text-red-500 dark:text-red-400' },
-                overlay: { background: 'bg-gray-900/20  backdrop-blur-sm' },
-                footer: { base: 'bg-gray-100' },
+                icon: { base: 'text-primary-500 dark:text-primary-400' },
+                overlay: { background: 'bg-gray-900/50 backdrop-blur-sm' },
+                footer: { base: 'bg-gray-50 dark:bg-gray-800' },
                 width: 'w-full sm:max-w-4xl',
                 header: {
-                    base: 'bg-gray-100 border-b  border-gray-200',
+                    base: 'bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700',
                     inner: 'py-0 h-full',
-                    padding: 'py-2',
+                    padding: 'py-4',
                 },
-            }" description="Merci de renseigner les champs obligatoires" icon="i-heroicons-check-circle-16-solid"
-            prevent-close>
-            <div class="w-full">
+            }"
+            description="Merci de renseigner les champs obligatoires"
+            icon="i-heroicons-tag"
+            prevent-close
+        >
+            <div class="w-full p-4">
                 <Vueform ref="createTypeProjectFormEl" v-bind="createTypeProjectForm" />
             </div>
 
             <template #footer>
-                <UButton class="rounded-none" color="red" icon="i-heroicons-x-circle-solid" label="Annuler" size="lg"
-                    @click.prevent="toogleModalCreateTypeProject" />
-                <UButton :class="{ 'cursor-not-allowed': createTypeProjectFormEl?.submitting }"
-                    :disabled="createTypeProjectFormEl?.submitting" :label="createTypeProjectFormEl?.submitting
-                            ? 'Creation en cours...'
-                            : 'Enregister'
-                        " :loading="createTypeProjectFormEl?.submitting" class="rounded-none shadow bg-primary font-medium"
-                    icon="i-heroicons-check-solid" size="lg" @click.prevent="createTypeProjectFormEl?.submit()" />
+                <div class="flex justify-end gap-3 p-4">
+                    <UButton
+                        color="gray"
+                        variant="ghost"
+                        icon="i-heroicons-x-mark"
+                        label="Annuler"
+                        size="lg"
+                        @click.prevent="toogleModalCreateTypeProject"
+                    />
+                    <UButton
+                        :class="{ 'cursor-not-allowed': createTypeProjectFormEl?.submitting }"
+                        :disabled="createTypeProjectFormEl?.submitting"
+                        :label="createTypeProjectFormEl?.submitting ? 'Création en cours...' : 'Enregistrer'"
+                        :loading="createTypeProjectFormEl?.submitting"
+                        color="primary"
+                        icon="i-heroicons-check"
+                        size="lg"
+                        @click.prevent="createTypeProjectFormEl?.submit()"
+                    />
+                </div>
             </template>
         </UDashboardModal>
     </div>

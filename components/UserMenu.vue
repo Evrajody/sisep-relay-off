@@ -22,7 +22,14 @@ const items = computed(() => [
       label: "Profil",
       icon: "i-lucide-user",
       click: () => {
-
+        navigateTo('/profil');
+      },
+    },
+    {
+      label: "Paramètres",
+      icon: "i-heroicons-cog-6-tooth",
+      click: () => {
+        navigateTo('/profil?tab=preferences');
       },
     },
   ],
