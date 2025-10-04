@@ -247,73 +247,91 @@ const map = ref(null) as any;
 
 <template>
   <main class="">
-    <!-- SECTION BANNER PRINCIPAL-->
-    <header class="h-[40dvh] bg-gray-100 relative top-0">
-
-      <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
+    <!-- SECTION BANNER PRINCIPAL - Redesigné -->
+    <header class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+      <!-- Background image avec effet parallax -->
+      <div class="absolute inset-0">
+        <img alt="Projets en cours" class="w-full h-full object-cover opacity-30"
            src="~/assets/images/media_travaux.jpeg"/>
+        <div class="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-transparent"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),transparent_70%)]"></div>
+      </div>
 
-      <div class="bg-black/80 absolute opacity-60 inset-0"></div>
-
-      <div
-          class="h-fit mx-auto absolute top-7 rounded-lg shadow-lg left-0 right-0 z-20 lg:max-w-[90vw] bg-sisep-hit">
-        <div class="flex gap-12 justify-start items-center pr-10">
-          <div class="img-box flex rounded-l-lg bg-white w-fit">
-            <div class="w-[300px]">
-              <a href="">
-                <img class="" src="~/assets/images/logo_cadre_vie.png"/>
+      <!-- Top nav bar - Glassmorphism -->
+      <div class="h-fit mx-auto absolute top-2 md:top-4 lg:top-7 rounded-2xl shadow-2xl left-0 right-0 z-20 max-w-[95vw] md:max-w-[90vw] bg-white/10 backdrop-blur-xl border border-white/20">
+        <div class="flex flex-col md:flex-row gap-2 md:gap-6 justify-between md:justify-start items-center p-2 md:pr-6">
+          <div class="img-box flex rounded-xl md:rounded-l-xl bg-gradient-to-br from-white to-gray-50 w-full md:w-fit shadow-inner">
+            <div class="w-full md:w-[250px] lg:w-[300px] p-3 md:p-2">
+              <a href="/" class="block">
+                <img class="h-12 md:h-auto w-auto mx-auto transition-transform duration-300 hover:scale-105" src="~/assets/images/logo_cadre_vie.png" alt="Logo"/>
               </a>
             </div>
           </div>
-
-          <!-- Navbar -->
-          <Navbar/>
+          <Navbar class="w-full md:w-auto"/>
         </div>
       </div>
 
-      <div class="container inset-0 absolute h-full mx-auto mt-20">
-        <div class="grid h-full place-items-center justify-start">
-          <div class="group space-y-6 text-start">
-            <h1 class="text-6xl text-white  text-start font-bold">
-              Les projets
-            </h1>
-
-            <div class="font-medium text-white">
-              Faits et informations sur les secteurs d'activité liés au cadre de
-              vie et au développement durable.
-            </div>
+      <!-- Hero content -->
+      <div class="relative container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20 md:pt-40 md:pb-24">
+        <div class="max-w-4xl">
+          <div class="inline-block px-4 py-1.5 bg-sisep-hit/20 backdrop-blur-sm rounded-full mb-6 motion-preset-fade">
+            <span class="text-white font-semibold text-sm uppercase tracking-wider">Nos Réalisations</span>
           </div>
+          <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white font-bold leading-tight mb-6 motion-preset-slide-up motion-delay-100">
+            Les <span class="text-transparent bg-clip-text bg-gradient-to-r from-sisep-hit to-red-600">projets</span>
+          </h1>
+          <p class="text-lg sm:text-xl text-white/90 max-w-2xl motion-preset-slide-up motion-delay-200">
+            Faits et informations sur les secteurs d'activité liés au cadre de vie et au développement durable.
+          </p>
         </div>
       </div>
     </header>
 
-    <section class="py-8  sm:py-14 lg:py-16">
+    <section class="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-50 to-white">
 
       <div class="mx-auto max-w-[90vw]">
-        <div class="flex flex-row gap-x-4 justify-end items-end mr-14 ">
-          <button :class="isList ? 'border-2 border-gray-400 text-lg text-black rounded-md px-4 py-2' : 'bg-primary text-white px-4 text-lg py-2 rounded-md'"
-                  @click="toogle(false)">
-            Mode cartographie
-          </button>
-          <button :class="isList ? 'bg-primary text-white px-4 text-lg py-2 rounded-md' : 'border-2 border-gray-400 text-lg text-black rounded-md px-4 py-2'"
-                  @click="toogle(true)">
-            Mode liste
-          </button>
+        <!-- Toggle view buttons - Redesigné -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center mb-8 motion-preset-slide-up">
+          <div>
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              Explorez nos <span class="text-transparent bg-clip-text bg-gradient-to-r from-sisep-hit to-red-600">projets</span>
+            </h2>
+            <p class="text-gray-600">{{ projects.length }} projets en cours de réalisation</p>
+          </div>
+          <div class="inline-flex gap-2 bg-white rounded-xl p-1.5 shadow-lg border border-gray-200">
+            <button
+              :class="isList ? 'bg-gradient-to-r from-sisep-hit to-red-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300"
+              @click="toogle(true)">
+              <UIcon name="i-heroicons-squares-2x2" class="w-4 h-4"/>
+              <span class="hidden sm:inline">Grille</span>
+            </button>
+            <button
+              :class="!isList ? 'bg-gradient-to-r from-sisep-hit to-red-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300"
+              @click="toogle(false)">
+              <UIcon name="i-heroicons-map" class="w-4 h-4"/>
+              <span class="hidden sm:inline">Carte</span>
+            </button>
+          </div>
         </div>
-        <div class="flex flex-row  gap-x-3 gap-y-10 my-10">
 
-          <!-- left column -->
-          <div class="col-span-1 lg:px-5  lg:w-1/4 ">
-            <!-- Wrapper sticky -->
-            <div class="lg:sticky lg:top-5">
-              <div class="bg-slate-100 shadow-lg h-auto rounded">
+        <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
+
+          <!-- left column - Sidebar Filtres Redesigné -->
+          <div class="lg:w-80 flex-shrink-0">
+            <div class="lg:sticky lg:top-24">
+              <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden motion-preset-blur">
                 <!-- Header -->
-
-                <div class="p-5 flex flex-row bg-sisep-hit text-white  ">
-                  <UIcon class="text-2xl" name="fe-filter" size="28"/>
-                  <h3 class="text-lg font-semibold">Filtres des projets </h3>
+                <div class="p-6 bg-gradient-to-r from-sisep-hit to-red-600 text-white">
+                  <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                      <UIcon name="i-heroicons-funnel" class="w-5 h-5"/>
+                    </div>
+                    <h3 class="text-lg font-bold">Filtres</h3>
+                  </div>
                 </div>
-                <div class="p-4">
+                <div class="p-6">
                   <ClientOnly>
                     <Vueform ref="filterFormEl" v-bind="filterForm"/>
                   </ClientOnly>
@@ -322,37 +340,70 @@ const map = ref(null) as any;
             </div>
           </div>
 
-          <!-- right column -->
+          <!-- right column - Content Area -->
+          <div class="flex-1 min-w-0">
+            <!-- Grid View -->
+            <div v-if="isList">
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10">
+                <div v-for="(project, idx) in projects" :key="idx" :style="{ transitionDelay: `${idx * 80}ms` }">
+                  <ProjectCard :project="project" />
+                </div>
+              </div>
 
-          <div v-if="isList" class="col-span-2 w-full lg:w-3/4 text-sm/relaxed md:text-base/relaxed lg:pr-8 ">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-              <div v-for="(project, idx) in projects" :key="idx" :style="{ transitionDelay: `${idx * 80}ms` }">
-                <ProjectCard :project="project" />
+              <!-- Pagination Redesignée -->
+              <div class="flex justify-center mt-12">
+                <div class="bg-white rounded-xl p-2 shadow-lg border border-gray-200">
+                  <UPagination v-model="page" :page-count="5" :total="100" size="lg"/>
+                </div>
               </div>
             </div>
-            <div class="flex items-end justify-end w-full my-10 ">
-              <UPagination v-model="page" :page-count="5" :total="100" class="text-end" size="xl"/>
+
+            <!-- Map View -->
+            <div v-else class="motion-preset-fade">
+              <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                <ClientOnly>
+                  <LMap :ref="map" :center="[9.30769, 2.315834]" :max-zoom="10" :use-global-leaflet="false" :zoom="7"
+                        style="height: 75vh; border-radius: 1rem;">
+                    <LTileLayer attribution="&copy; <a href='https://www.openstreetmap.org/'>OpenStreetMap</a> contributors"
+                                layer-type="base"
+                                name="OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+                    <LMarker v-for="project in projects" :key="project.title" :lat-lng="[project.coords[0], project.coords[1]]">
+                      <LTooltip style="background-color: transparent !important ; padding: 0 !important;">
+                        <div class="max-w-[20vw]">
+                          <ProjectCard :project="project" />
+                        </div>
+                      </LTooltip>
+                    </LMarker>
+                  </LMap>
+                </ClientOnly>
+              </div>
+
+              <!-- Map Legend -->
+              <div class="mt-6 bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <UIcon name="i-heroicons-information-circle" class="w-5 h-5 text-sisep-hit"/>
+                  Légende de la carte
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="text-sm text-gray-600">En cours</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <span class="text-sm text-gray-600">Planifié</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-purple-500"></div>
+                    <span class="text-sm text-gray-600">Terminé</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-gray-400"></div>
+                    <span class="text-sm text-gray-600">Suspendu</span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div v-else class="w-full lg:w-3/4">
-            <ClientOnly>
-              <LMap :ref="map" :center="[9.30769, 2.315834]" :max-zoom="10" :use-global-leaflet="false" :zoom="7"
-                    style="height: 70dvh">
-                <LTileLayer attribution="&amp;copy; <a href=&quot;https://www.openstreetmap.org/&quot;>OpenStreetMap</a> contributors"
-                            layer-type="base"
-                            name="OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
-                <LMarker v-for="project in projects" :key="project.title" :lat-lng="[project.coords[0], project.coords[1]]">
-                  <LTooltip style="background-color: transparent !important ; padding: 0 !important;">
-                    <div class="max-w-[20vw]">
-                      <ProjectCard :project="project" />
-
-                    </div>
-                  </LTooltip>
-                </LMarker>
-
-              </LMap>
-            </ClientOnly>
           </div>
         </div>
 

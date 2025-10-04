@@ -547,7 +547,7 @@ export const useCreateProject = () => {
                                     },
                                 },
 
-                                partnerImage: {
+                                coverageFileId: {
                                     type: 'file',
                                     accepted: ["image/jpeg", "image/jpg", "image/png"],
                                     label: "Image du partenaire",
