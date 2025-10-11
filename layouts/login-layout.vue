@@ -3,7 +3,7 @@
 </script>
 
 <template>
-    <slot />
+  <NuxtPage :key="$router.currentRoute?.href"/>
 </template>
 
 <style scoped>

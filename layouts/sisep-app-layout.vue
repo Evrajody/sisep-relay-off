@@ -75,15 +75,15 @@ const changModuleForm = computed(() => ({
 </script>
 
 <template>
+
   <NuxtLoadingIndicator :height="5" color="#19474b"/>
 
   <client-only>
 
     <div class="font-Manrope">
 
-      <UDashboardLayout
-          :ui="{ wrapper: 'min-h-screen bg-gray-100 dark:bg-gray-900' }"
-      >
+      <UDashboardLayout :ui="{ wrapper: 'min-h-screen bg-gray-100 dark:bg-gray-900' }">
+
         <UDashboardPanel
             v-model="isOpen"
             :resizable="{ min: 200, max: 500 }"
@@ -132,12 +132,14 @@ const changModuleForm = computed(() => ({
                   active: 'text-slate-900 dark:text-white before:bg-gray-100 dark:before:bg-gray-800',
                   label: 'text-base truncate relative'
                 }"
-            />
-            <template #footer>
-              <UserMenu/>
+            ></UDashboardSidebarLinks>
 
+            <template #footer>
+              --
             </template>
+
           </UDashboardSidebar>
+
         </UDashboardPanel>
 
         <UDashboardPage>
@@ -168,7 +170,7 @@ const changModuleForm = computed(() => ({
             <UDashboardPanelContent :ui="{
                wrapper: '!p-0 flex-1 flex flex-col overflow-y-auto'
             }">
-              <slot :key="$router.currentRoute?.href"/>
+              <NuxtPage :key="$router.currentRoute?.href"/>
             </UDashboardPanelContent>
           </UDashboardPanel>
         </UDashboardPage>

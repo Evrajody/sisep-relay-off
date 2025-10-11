@@ -170,7 +170,7 @@ const getDaysRemaining = (endDate: string) => {
     <UHorizontalNavigation :links="links" />
     <template #right>
       <UButton
-        to="/project-module/create-project"
+        to="/admin/project-module/create-project"
         color="primary"
         icon="i-heroicons-plus"
         label="Nouveau projet"

@@ -7,10 +7,10 @@ export const useAuthSidebar = () => {
     const router = useRouter();
 
     const featureChecker = (
-        features,
+        features : any,
         authorizedFeatures: string[],
     ) => {
-        return features.filter((el) => {
+        return features.filter((el: any) => {
             if (authorizedFeatures.includes(el.id)) {
                 if (el.children) {
                     el.children = el.children.filter((child) =>
@@ -116,102 +116,6 @@ export const useAuthSidebar = () => {
     // GENERE LA SIDEBAR ASSOCIE AU PROFILE ACTUEL
 
     const sidebarAuthorized = computed(() => {
-
-        // let sidebarElement = [...sidebarElements.value];
-
-        // switch (data.value?.user?.role.libelle) {
-        //   // PROFILE ADMIN
-        //   case PermisRoles.admin:
-        //     const authorizedFeatures = [
-        //       "dashboard",
-        //       "demandes",
-        //       "permis-visites",
-        //       "permis-communiquer",
-        //       "laisser-passer",
-        //       "agrements",
-        //       "autorisation-acces",
-        //       "autorisation-visite",
-        //       "badge",
-        //       "utilisateurs",
-        //       "huissier",
-        //       "avocats",
-        //       "problemes",
-        //     ];
-        //
-        //     sidebarElement = featureChecker(sidebarElement, authorizedFeatures);
-        //
-        //     break;
-        //
-        //   // PROFILE GARDE DES SCEAUX SUPREME DE LA PLATEFORME
-        //
-        //   case PermisRoles.gs:
-        //     sidebarElement = featureChecker(sidebarElement, [
-        //       "dashboard",
-        //       "demandes",
-        //       "permis-visites",
-        //       "permis-communiquer",
-        //       "laisser-passer",
-        //       "agrements",
-        //       "autorisation-acces",
-        //       "autorisation-visite",
-        //       "badge",
-        //       "liste-rouges",
-        //       "list-red-items",
-        //       "demandes-visas",
-        //       "emissions",
-        //       "emit-permis-communiquer",
-        //     ]);
-        //
-        //     break;
-        //
-        //   // PROFILE DGAPB SUPREME DE LA PLATEFORME
-        //
-        //   case PermisRoles.dgapb:
-        //     sidebarElement = featureChecker(sidebarElement, [
-        //       "dashboard",
-        //       "demandes",
-        //       "permis-visites",
-        //       "permis-communiquer",
-        //       "laisser-passer",
-        //       "agrements",
-        //       "autorisation-acces",
-        //       "autorisation-visite",
-        //       "badge",
-        //     ]);
-        //
-        //     break;
-        //
-        //   case PermisRoles.proc:
-        //     sidebarElement = featureChecker(sidebarElement, [
-        //       "dashboard",
-        //       "demandes",
-        //       "permis-visites",
-        //       "permis-communiquer",
-        //       "liste-rouges",
-        //       "list-red-items",
-        //       "demandes-visas",
-        //       "emissions",
-        //       "emit-permis-communiquer",
-        //     ]);
-        //
-        //     break;
-        //
-        //   // PROFILE REGISSEUR DE LA PLATEFORME
-        //
-        //   case PermisRoles.regisseur:
-        //     sidebarElement = featureChecker(sidebarElement, [
-        //       "dashboard",
-        //       "demandes",
-        //       "permis-visites",
-        //       "permis-communiquer",
-        //       "laisser-passer",
-        //       "autorisation-acces",
-        //       "autorisation-visite",
-        //       "badge",
-        //     ]);
-        //
-        //     break;
-        // }
 
         return sidebarElements;
     });

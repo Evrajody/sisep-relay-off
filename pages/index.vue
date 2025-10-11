@@ -6,6 +6,11 @@ import Navbar from "~/components/Home/Navbar.vue";
 import ProjectCard from "~/components/Home/ProjectCard.vue";
 import ConventionCard from "~/components/Home/ConventionCard.vue";
 
+// Définir le layout spécifique pour la page d'accueil
+definePageMeta({
+  layout: "home",
+});
+
 // Hero carousel state
 const slides = reactive([
   {

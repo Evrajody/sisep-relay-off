@@ -40,6 +40,7 @@
     "@unovis/vue": "^1.5.1",
     "@vueform/nuxt": "^1.10.0",
     "@vueform/plugin-mask": "^1.0.7",
+    "@vueform/vueform": "^1.13.3",
     "@vueuse/nuxt": "^12.7.0",
     "date-fns": "^4.1.0",
     "eslint": "^9.24.0",

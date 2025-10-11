@@ -30,7 +30,7 @@ const loginPermisForm = ref({
   showRequired: ["label"],
 
   endpoint: async (form: any, payload: any) => {
-    navigateTo({name: 'project-module-dashboard'})
+    navigateTo({name: 'admin-project-module-dashboard'})
   },
 
   schema: {
