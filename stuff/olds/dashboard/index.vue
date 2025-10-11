@@ -12,12 +12,12 @@
                 <!-- Navigation -->
                 <nav class="flex-1 ">
                     <ul class="px-4 py-2 my-14">
-                        <a href="/olds/dashboard" class="bg-[#1498DA] text-white px-4 py-2 rounded mb-2 flex items-center">
+                        <a href="/stuff/olds/dashboard" class="bg-[#1498DA] text-white px-4 py-2 rounded mb-2 flex items-center">
                             <i class="fas fa-table mr-2"></i>
                             Tableau de bord
                         </a>
 
-                        <a href="/olds/dashboard/projets" class="px-4 py-2 text-green-200 flex items-center">
+                        <a href="/stuff/olds/dashboard/projets" class="px-4 py-2 text-green-200 flex items-center">
                             <i class="fas fa-folder mr-2"></i>
                             Projets
                         </a>
@@ -149,8 +149,8 @@
                                         class="relative transition-transform duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg w-[22vw] min-h-[25dvh] max-h-[25dvh] bg-white">
                                         <div class="bg-[#ECC916] text-xs px-2 py-1 rounded absolute top-2 right-3 z-10">
                                             22-04-2015</div>
-                                        <img src="~/assets/images/bill_director.jpg" alt="Project"
-                                            class="w-full h-[90%] object-cover">
+                                        <img src="../../../assets/images/bill_director.jpg" alt="Project"
+                                             class="w-full h-[90%] object-cover">
                                         <div
                                             class="bg-white w-[19vw] text-xs rounded-lg px-2 py-1 absolute bottom-0 left-5 justify-between gap-y-2 flex flex-col items-start">
                                             <span
@@ -170,8 +170,8 @@
                                         class="relative transition-transform duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg w-[22vw] min-h-[25dvh] max-h-[25dvh] bg-white">
                                         <div class="bg-[#ECC916] text-xs px-2 py-1 rounded absolute top-2 right-3 z-10">
                                             22-04-2015</div>
-                                        <img src="~/assets/images/bill_director.jpg" alt="Project"
-                                            class="w-full h-[90%] object-cover">
+                                        <img src="../../../assets/images/bill_director.jpg" alt="Project"
+                                             class="w-full h-[90%] object-cover">
                                         <div
                                             class="bg-white w-[19vw] text-xs rounded-lg px-2 py-1 absolute bottom-0 left-5 justify-between gap-y-2 flex flex-col items-start">
                                             <span
@@ -191,8 +191,8 @@
                                         class="relative transition-transform duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg w-[22vw] min-h-[25dvh] max-h-[25dvh] bg-white">
                                         <div class="bg-[#ECC916] text-xs px-2 py-1 rounded absolute top-2 right-3 z-10">
                                             22-04-2015</div>
-                                        <img src="~/assets/images/bill_director.jpg" alt="Project"
-                                            class="w-full h-[90%] object-cover">
+                                        <img src="../../../assets/images/bill_director.jpg" alt="Project"
+                                             class="w-full h-[90%] object-cover">
                                         <div
                                             class="bg-white w-[19vw] text-xs rounded-lg px-2 py-1 absolute bottom-0 left-5 justify-between gap-y-2 flex flex-col items-start">
                                             <span
@@ -212,8 +212,8 @@
                                         class="relative transition-transform duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg w-[22vw] min-h-[25dvh] max-h-[25dvh] bg-white">
                                         <div class="bg-[#ECC916] text-xs px-2 py-1 rounded absolute top-2 right-3 z-10">
                                             22-04-2015</div>
-                                        <img src="~/assets/images/bill_director.jpg" alt="Project"
-                                            class="w-full h-[90%] object-cover">
+                                        <img src="../../../assets/images/bill_director.jpg" alt="Project"
+                                             class="w-full h-[90%] object-cover">
                                         <div
                                             class="bg-white w-[19vw] text-xs rounded-lg px-2 py-1 absolute bottom-0 left-5 justify-between gap-y-2 flex flex-col items-start">
                                             <span

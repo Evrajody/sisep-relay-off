@@ -5,7 +5,7 @@
             <!-- Background image avec effet parallax -->
             <div class="absolute inset-0">
                 <img alt="Conventions internationales" class="w-full h-full object-cover opacity-30"
-                    src="~/assets/images/img-odds.png" />
+                    src="../../assets/images/img-odds.png" />
                 <div class="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-transparent"></div>
                 <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),transparent_70%)]"></div>
             </div>
@@ -15,8 +15,8 @@
                 <div class="flex flex-col md:flex-row gap-2 md:gap-6 justify-between md:justify-start items-center p-2 md:pr-6">
                     <div class="img-box flex rounded-xl md:rounded-l-xl bg-gradient-to-br from-white to-gray-50 w-full md:w-fit shadow-inner">
                         <div class="w-full md:w-[250px] lg:w-[300px] p-3 md:p-2">
-                            <a href="/" class="block">
-                                <img class="h-12 md:h-auto w-auto mx-auto transition-transform duration-300 hover:scale-105" src="~/assets/images/logo_cadre_vie.png" alt="Logo" />
+                            <a href="/public" class="block">
+                                <img class="h-12 md:h-auto w-auto mx-auto transition-transform duration-300 hover:scale-105" src="../../assets/images/logo_cadre_vie.png" alt="Logo" />
                             </a>
                         </div>
                     </div>
@@ -201,6 +201,7 @@ const conventions = ref([
   //   coords: [6.37029, 2.39124] // Cotonou (approx.)
   // },
   {
+    id: '1',
     title: 'Protocole de Kyoto',
     type: 'Multilatérale',
     status: 'Ratifiée',
@@ -211,6 +212,7 @@ const conventions = ref([
     coords: [6.49646, 2.60359] // Porto-Novo
   },
   {
+    id: '2',
     title: 'Accord de Paris sur le climat',
     type: 'Multilatérale',
     status: 'En vigueur',
@@ -221,6 +223,7 @@ const conventions = ref([
     coords: [9.33716, 2.63031] // Parakou
   },
   {
+    id: '3',
     title: 'Convention de Ramsar sur les zones humides',
     type: 'Multilatérale',
     status: 'Signée',
@@ -231,6 +234,7 @@ const conventions = ref([
     coords: [6.36307, 2.08506] // Ouidah
   },
   {
+    id: '4',
     title: 'Convention sur le commerce international des espèces de faune et de flore sauvages menacées d\'extinction (CITES)',
     type: 'Multilatérale',
     status: 'Ratifiée',
@@ -241,6 +245,7 @@ const conventions = ref([
     coords: [7.17826, 2.0667] // Bohicon
   },
   {
+    id: '5',
     title: 'Convention de Stockholm sur les polluants organiques persistants',
     type: 'Multilatérale',
     status: 'En vigueur',
@@ -251,6 +256,7 @@ const conventions = ref([
     coords: [6.63869, 1.71674] // Lokossa
   },
   {
+    id: '6',
     title: 'Accord de coopération environnementale Bénin-Ghana',
     type: 'Bilatérale',
     status: 'Signée',
@@ -271,6 +277,7 @@ const conventions = ref([
   //   coords: [10.30416, 1.37962] // Natitingou
   // },
   {
+    id: '7',
     title: 'Convention sur la protection des forêts tropicales',
     type: 'Multilatérale',
     status: 'En vigueur',

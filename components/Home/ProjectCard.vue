@@ -1,5 +1,6 @@
 <script setup lang="ts">
  const props = defineProps<{ project?: {
+   id?: string
    image?: string
    status?: string
    category?: string
@@ -96,11 +97,13 @@
                     </div>
                 </div>
 
-                <button class="group/btn relative inline-flex items-center gap-2 bg-gradient-to-r from-sisep-hit to-red-600 hover:from-red-600 hover:to-sisep-hit text-white rounded-lg px-4 py-2.5 text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 overflow-hidden">
+                <NuxtLink
+                    :to="props.project?.id ? `/project/single/${props.project.id}` : '#'"
+                    class="group/btn relative inline-flex items-center gap-2 bg-gradient-to-r from-sisep-hit to-red-600 hover:from-red-600 hover:to-sisep-hit text-white rounded-lg px-4 py-2.5 text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 overflow-hidden">
                     <span class="relative z-10">Détails</span>
                     <UIcon name="i-heroicons-arrow-right" class="relative z-10 w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
                     <span class="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></span>
-                </button>
+                </NuxtLink>
             </div>
         </div>
     </div>

@@ -3,7 +3,7 @@
         <!-- SECTION BANNER PRINCIPAL-->
         <header class="h-[40dvh] relative bg-gray-100">
             <img alt="" class="absolute inset-0 w-full h-full object-center object-cover"
-                src="~/assets/images/cadre_world.jpg" />
+                src="../../assets/images/cadre_world.jpg" />
 
             <div class="bg-black/80 absolute opacity-60 inset-0"></div>
 
@@ -13,7 +13,7 @@
                     <div class="img-box flex rounded-l-lg bg-white w-fit">
                         <div class="w-[300px]">
                             <a href="">
-                                <img class="" src="~/assets/images/logo_cadre_vie.png" />
+                                <img class="" src="../../assets/images/logo_cadre_vie.png" />
                             </a>
                         </div>
                     </div>
@@ -42,7 +42,7 @@
         <section class="min-h-[100dvh] bg-[#F2F7F7] ">
             <div class="container w-full relative">
                 <img alt="" class="absolute w-full h-full opacity-5 object-center object-cover"
-                    src="~/assets/images/cadre_world.jpg">
+                    src="../../assets/images/cadre_world.jpg">
                 <div class="flex mx-auto justify-center w-[60%] items-center gap-2 p-4 bg-gray-50">
                     <!-- Select catégories -->
                     <div class="relative my-10 ">

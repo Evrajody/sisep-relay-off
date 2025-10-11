@@ -98,3 +98,49 @@ export interface Project {
   }>
 }
 
+export interface Convention {
+  id: string
+  title: string
+  description: string
+  functionalGroup: string
+  adoptionDate: string
+  effectiveDate: string
+  status: 'DRAFT' | 'ACTIVE' | 'SUSPENDED' | 'TERMINATED'
+  isPublished: boolean
+  type?: string
+  category?: string
+  ratificationDate?: string
+  signatories?: number
+  articles?: Array<{
+    id: string
+    number: string
+    title: string
+    content: string
+  }>
+  objectives?: Array<string>
+  documents?: Array<{
+    id: string
+    name: string
+    url: string
+    type: string
+    size: number
+  }>
+  implementations?: Array<{
+    id: string
+    year: string
+    title: string
+    description: string
+  }>
+  relatedConventions?: Array<{
+    id: string
+    title: string
+    category: string
+    status: string
+  }>
+  coverImage?: {
+    url: string
+    alt?: string
+  }
+  createdAt: string
+  updatedAt: string
+}

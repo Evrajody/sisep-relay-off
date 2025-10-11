@@ -125,6 +125,7 @@ const locations = [
 
 const projects = [
   {
+    id: '1',
     title: 'Parc Solaire de Cotonou',
     category: 'Énergie',
     status: 'En cours',
@@ -136,6 +137,7 @@ const projects = [
     coords: [6.379448, 2.451324],
   },
   {
+    id: '2',
     title: 'Rénovation du Marché Central de Porto-Novo',
     category: 'Infrastructures',
     status: 'Planifié',
@@ -147,6 +149,7 @@ const projects = [
     coords: [6.49646, 2.60359],
   },
   {
+    id: '3',
     title: 'Centre de Formation Agro-écologique',
     category: 'Agriculture',
     status: 'En cours',
@@ -169,6 +172,7 @@ const projects = [
   //   coords: [6.44852, 2.35566],
   // },
   {
+    id: '4',
     title: 'Réseau Hydraulique Rural',
     category: 'Eau',
     status: 'En cours',
@@ -180,6 +184,7 @@ const projects = [
     coords: [9.70853, 1.66598],
   },
   {
+    id: '5',
     title: 'Parc Agricole Innovant',
     category: 'Agriculture',
     status: 'Terminé',
@@ -191,6 +196,7 @@ const projects = [
     coords: [8.88649, 2.59753],
   },
   {
+    id: '6',
     title: 'Tourisme Patrimonial de Natitingou',
     category: 'Tourisme',
     status: 'En cours',
@@ -202,6 +208,7 @@ const projects = [
     coords: [10.30416, 1.37962],
   },
   {
+    id: '7',
     title: 'Marché Numérique de Bohicon',
     category: 'Numérique',
     status: 'Planifié',
@@ -213,6 +220,7 @@ const projects = [
     coords: [7.17826, 2.0667],
   },
   {
+    id: '8',
     title: 'Promenade culturelle de Ouidah',
     category: 'Culture',
     status: 'En cours',
@@ -224,6 +232,7 @@ const projects = [
     coords: [6.36307, 2.08506],
   },
   {
+    id: '9',
     title: 'Programme E-santé Lokossa',
     category: 'Santé',
     status: 'En cours',
@@ -252,7 +261,7 @@ const map = ref(null) as any;
       <!-- Background image avec effet parallax -->
       <div class="absolute inset-0">
         <img alt="Projets en cours" class="w-full h-full object-cover opacity-30"
-           src="~/assets/images/media_travaux.jpeg"/>
+           src="../../assets/images/media_travaux.jpeg"/>
         <div class="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-transparent"></div>
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),transparent_70%)]"></div>
       </div>
@@ -262,8 +271,8 @@ const map = ref(null) as any;
         <div class="flex flex-col md:flex-row gap-2 md:gap-6 justify-between md:justify-start items-center p-2 md:pr-6">
           <div class="img-box flex rounded-xl md:rounded-l-xl bg-gradient-to-br from-white to-gray-50 w-full md:w-fit shadow-inner">
             <div class="w-full md:w-[250px] lg:w-[300px] p-3 md:p-2">
-              <a href="/" class="block">
-                <img class="h-12 md:h-auto w-auto mx-auto transition-transform duration-300 hover:scale-105" src="~/assets/images/logo_cadre_vie.png" alt="Logo"/>
+              <a href="/public" class="block">
+                <img class="h-12 md:h-auto w-auto mx-auto transition-transform duration-300 hover:scale-105" src="../../assets/images/logo_cadre_vie.png" alt="Logo"/>
               </a>
             </div>
           </div>

@@ -29,7 +29,7 @@ export const useAuthSidebar = () => {
             id: "dashboard",
             label: "Tableau de bord",
             icon: "i-heroicons-rectangle-group-20-solid",
-            to: {name: 'project-module-dashboard'},
+            to: {name: 'admin-project-module-dashboard'},
             tooltip: {
                 text: "Consulter les statistiques",
             },
@@ -45,7 +45,7 @@ export const useAuthSidebar = () => {
                 {
                     id: "listes-project",
                     label: "Projets",
-                    to: {name: 'project-module'},
+                    to: {name: 'admin-project-module'},
                     tooltip: {text: "Liste des projets"},
                 },
 
@@ -53,7 +53,7 @@ export const useAuthSidebar = () => {
                     id: "new-project",
                     label: "Nouveau projet",
                     tooltip: {text: "Creer un nouveau projet"},
-                    to: { name: "project-module-create-project" },
+                    to: { name: "admin-project-module-create-project" },
                 },
 
             ],
@@ -63,49 +63,49 @@ export const useAuthSidebar = () => {
             id: "types-projet",
             label: "Type de projets",
             icon: "i-heroicons-megaphone",
-            to: { name: "project-module-types-projects" },
+            to: { name: "admin-project-module-types-projects" },
         },
 
         {
             id: "categories",
             label: "Catégories",
             icon: "i-heroicons-square-3-stack-3d",
-            to: { name: "project-module-categories" },
+            to: { name: "admin-project-module-categories" },
         },
 
         {
             id: "subcategories",
             label: "Sous-catégories",
             icon: "i-heroicons-queue-list",
-            to: { name: "project-module-subcategories" },
+            to: { name: "admin-project-module-subcategories" },
         },
 
         {
             id: "indicators",
             label: "Indicateurs",
             icon: "i-heroicons-chart-bar-square",
-            to: { name: "project-module-indicators" },
+            to: { name: "admin-project-module-indicators" },
         },
 
         {
             id: "structures",
             label: "Structures",
             icon: "i-heroicons-building-office-2",
-            to: { name: "project-module-structures" },
+            to: { name: "admin-project-module-structures" },
         },
 
         {
             id: "agents",
             label: "Agents",
             icon: "i-heroicons-users",
-            to: { name: "project-module-agents" },
+            to: { name: "admin-project-module-agents" },
         },
 
         {
             id: "conventions",
             label: "Conventions",
             icon: "i-heroicons-document-text",
-            to: { name: "project-module-conventions" },
+            to: { name: "admin-project-module-conventions" },
         },
     ]);
 

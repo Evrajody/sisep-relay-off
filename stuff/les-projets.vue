@@ -104,7 +104,7 @@ const filterForm = ref({
 
     <header class=" bg-gray-100">
 
-      <img alt="" class="absolute inset-0 w-full h-full object-center object-cover" src="~/assets/images/cadre_world.webp"/>
+      <img alt="" class="absolute inset-0 w-full h-full object-center object-cover" src="../assets/images/cadre_world.webp"/>
 
       <div class="bg-black/80 absolute opacity-60 inset-0"></div>
 
@@ -114,7 +114,7 @@ const filterForm = ref({
           <div class="img-box flex rounded-l-lg bg-white w-fit">
             <div class="w-[300px]">
               <a href="">
-                <img class="" src="~/assets/images/logo_cadre_vie.png"/>
+                <img class="" src="../assets/images/logo_cadre_vie.png"/>
               </a>
             </div>
           </div>
