@@ -4,8 +4,8 @@ import {useRoute} from 'vue-router';
 import useProjectDetail from '~/composables/project/useProjectDetail';
 import { useProjectDelete } from '~/composables/project/useProjectDelete';
 import { useLoading } from '~/composables/useLoading';
-import { useToast } from '~/composables/useToast';
 import { useFileDisplay } from '~/composables/useFileDisplay';
+import { useAffectProject } from '~/composables/project/useAffectProject';
 
 const route = useRoute();
 const projectId = route.params.id as string;
@@ -24,7 +24,7 @@ const activeTab = ref(0);
 const showActionModal = ref(false);
 const selectedAction = ref<string>('');
 const assignFocalPointModal = ref(false);
-const focalPointName = ref('');
+const selectedStructure = ref<any>(null);
 
 // Composable pour l'affichage des fichiers
 const { getFileDisplayUrl, getFileIcon, getFileType, downloadFile, openFileInNewTab } = useFileDisplay();
@@ -36,6 +36,9 @@ const previewFile = ref<any>(null);
 // Gestion de la suppression
 const { deleteProject: deleteProjectComposable } = useProjectDelete();
 
+// Composable pour l'affectation de projet
+const { structuresList, structuresStatus, affectProject } = useAffectProject();
+
 // Actions du projet
 const deleteProject = async () => {
   const success = await deleteProjectComposable(projectId, project.value?.title);
@@ -45,33 +48,34 @@ const deleteProject = async () => {
 };
 
 const assignFocalPoint = async () => {
-  if (!focalPointName.value) {
-    useToast().add({
-      title: 'Erreur',
-      description: 'Veuillez sélectionner un point focal.',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'orange'
+  if (!selectedStructure.value) {
+    makeAlert({
+      type: "warning",
+      title: "Attention !",
+      message: "Veuillez sélectionner une structure avant d'affecter le projet.",
+      extraClass: "bg-orange-500",
     });
     return;
   }
 
   try {
-    useLoading().start('Affectation du point focal...');
-    // Implémentez la logique d'affectation ici
-    useToast().add({
-      title: 'Point focal affecté',
-      description: `Le projet a été affecté à ${focalPointName.value}.`,
-      icon: 'i-heroicons-check-circle',
-      color: 'green'
-    });
-    assignFocalPointModal.value = false;
-    focalPointName.value = '';
+    useLoading().start('Affectation du projet à la structure...');
+
+    const result = await affectProject(projectId, selectedStructure.value);
+
+    if (result) {
+      assignFocalPointModal.value = false;
+      selectedStructure.value = null;
+      // Recharger les détails du projet après l'affectation
+      await fetchProject(projectId);
+    }
   } catch (err) {
-    useToast().add({
-      title: 'Erreur',
-      description: 'Impossible d\'affecter le point focal.',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'red'
+    console.error('Erreur lors de l\'affectation:', err);
+    makeAlert({
+      type: "error",
+      title: "Erreur !",
+      message: "Une erreur inattendue s'est produite lors de l'affectation du projet.",
+      extraClass: "bg-red-500",
     });
   } finally {
     useLoading().finish();
@@ -121,7 +125,7 @@ const projectActions = computed(() => [
     {
       label: 'Modifier',
       icon: 'i-heroicons-pencil-square',
-      click: () => navigateTo(`/project-module/edit-project/${projectId}`)
+      click: () => navigateTo(`/admin/project-module/edit-project/${projectId}`)
     },
     {
       label: 'Affecter un point focal',
@@ -253,7 +257,7 @@ definePageMeta({
                 color="white"
                 variant="solid"
                 icon="i-heroicons-pencil-square"
-                @click="navigateTo(`/project-module/edit-project/${projectId}`)"
+                @click="navigateTo(`/admin/project-module/edit-project/${projectId}`)"
               >
                 Modifier
               </UButton>
@@ -706,29 +710,63 @@ definePageMeta({
       </div>
     </div>
 
-    <!-- Modal - Affecter un point focal -->
+    <!-- Modal - Affecter le projet à une structure -->
     <UModal v-model="assignFocalPointModal">
       <UCard>
         <template #header>
-          <h3 class="text-lg font-semibold">Affecter un point focal</h3>
+          <h3 class="text-lg font-semibold">Affecter le projet à une structure</h3>
         </template>
 
         <div class="space-y-4">
-          <UFormGroup label="Point focal" required>
-            <UInput
-              v-model="focalPointName"
-              placeholder="Nom du point focal"
-              icon="i-heroicons-user"
-            />
+          <UFormGroup label="Structure" required>
+            <USelectMenu
+              v-model="selectedStructure"
+              :options="structuresList?.data || []"
+              option-attribute="label"
+              value-attribute="id"
+              placeholder="Sélectionnez une structure"
+              :loading="structuresStatus === 'pending'"
+              searchable
+              searchable-placeholder="Rechercher une structure..."
+            >
+              <template #label>
+                <span v-if="selectedStructure">
+                  {{ structuresList?.data?.find((s: any) => s.id === selectedStructure)?.label || 'Sélectionnez une structure' }}
+                </span>
+                <span v-else class="text-gray-400">Sélectionnez une structure</span>
+              </template>
+
+              <template #option="{ option }">
+                <div class="flex flex-col">
+                  <span class="font-medium">{{ option.label }}</span>
+                  <span class="text-xs text-gray-500">{{ option.abbreviation || 'Pas d\'abréviation' }}</span>
+                </div>
+              </template>
+            </USelectMenu>
           </UFormGroup>
+
+          <div v-if="selectedStructure" class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <p class="text-sm text-blue-800 dark:text-blue-200">
+              <UIcon name="i-heroicons-information-circle" class="mr-1" />
+              Le projet sera affecté au point focal de la structure sélectionnée.
+            </p>
+          </div>
         </div>
 
         <template #footer>
           <div class="flex justify-end gap-2">
-            <UButton color="gray" variant="ghost" @click="assignFocalPointModal = false">
+            <UButton
+              color="gray"
+              variant="ghost"
+              @click="assignFocalPointModal = false; selectedStructure = null"
+            >
               Annuler
             </UButton>
-            <UButton color="primary" @click="assignFocalPoint">
+            <UButton
+              color="primary"
+              @click="assignFocalPoint"
+              :disabled="!selectedStructure || structuresStatus === 'pending'"
+            >
               Affecter
             </UButton>
           </div>

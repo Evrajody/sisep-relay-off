@@ -20,6 +20,8 @@ useHead({
     title: "Liste des indicateurs",
 });
 
+const {$sisepStatsApi } = useNuxtApp()
+
 // Chargement de la liste des indicateurs
 const {
     search,
@@ -78,7 +80,7 @@ const coverages = [
 
 // Chargement des catégories pour le filtre
 const { data: categories } = await useAsyncData('categories-filter-ind', () =>
-    $fetch('/api/categories')
+    $sisepStatsApi('categories')
 );
 
 const categoryFilterOptions = computed(() => {
@@ -95,7 +97,7 @@ const categoryFilterOptions = computed(() => {
 
 // Chargement des sous-catégories pour le filtre
 const { data: subCategories } = await useAsyncData('subcategories-filter-ind', () =>
-    $fetch('/api/subcategories')
+    $sisepStatsApi('subcategories')
 );
 
 const subCategoryFilterOptions = computed(() => {
@@ -368,7 +370,7 @@ const exportToExcel = () => {
                         { key: 'status', label: 'Statut', sortable: true },
                         { key: 'actions', label: 'Actions' }
                     ]"
-                    :rows="indicatorList?.data || []"
+                    :rows="indicatorList?.indicators || []"
                     :loading="indicatorListStatus === 'pending'"
                     :loading-state="{ icon: 'i-heroicons-arrow-path-20-solid', label: 'Chargement...' }"
                     :empty-state="{

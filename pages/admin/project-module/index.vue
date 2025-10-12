@@ -62,12 +62,12 @@ const getActions = (row: Project) => [
   {
     label: 'Voir les détails',
     icon: 'i-heroicons-eye',
-    click: () => navigateTo(`/project-module/${row.id}`)
+    click: () => navigateTo(`/admin/project-module/${row.id}`)
   },
   {
     label: 'Modifier',
     icon: 'i-heroicons-pencil-square',
-    click: () => navigateTo(`/project-module/edit-project/${row.id}`)
+    click: () => navigateTo(`/admin/project-module/edit-project/${row.id}`)
   },
   {
     label: 'Supprimer',
@@ -251,7 +251,7 @@ const getDaysRemaining = (endDate: string) => {
             </USelectMenu>
 
             <UButton
-              to="/project-module/create-project"
+              to="/admin/project-module/create-project"
               color="primary"
               icon="i-heroicons-plus"
               label="Nouveau projet"

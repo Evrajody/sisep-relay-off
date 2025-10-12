@@ -24,10 +24,10 @@ export const useCreateProject = () => {
                     makeAlert({
                         type: "success",
                         title: "Nouveau projet créé !",
-                        message: `Le projet ${response._data.title} a été créé avec succès`,
+                        message: `Le projet ${response._data.data.title} a été créé avec succès`,
                     })
 
-                    navigateTo({name: 'project-module', params: {id: response._data.id}})
+                    navigateTo({name: 'admin-project-module', params: {id: response._data.id}})
 
                 }
 
@@ -245,19 +245,22 @@ export const useCreateProject = () => {
                 native: true,
                 inputType: "search",
                 autocomplete: "off",
+                columns: {
+                    lg: {container: 12, label: 12, wrapper: 12},
+                },
             },
 
-            status: {
-                type: 'select',
-                label: "Statut du projet",
-                items: [
-                    {value: 'DRAFT', label: 'Brouillon'},
-                    {value: 'PUBLISHED', label: 'Publié'},
-                    {value: 'ARCHIVED', label: 'Archivé'},
-                ],
-
-                native: false,
-            },
+            // status: {
+            //     type: 'select',
+            //     label: "Statut du projet",
+            //     items: [
+            //         {value: 'DRAFT', label: 'Brouillon'},
+            //         {value: 'PUBLISHED', label: 'Publié'},
+            //         {value: 'ARCHIVED', label: 'Archivé'},
+            //     ],
+            //
+            //     native: false,
+            // },
 
 
             indicators: {
@@ -727,8 +730,18 @@ export const useCreateProject = () => {
                     },
 
                     schema: {
-                        reportingYear: {type: 'date', label: 'Date du rapport'},
-                        instrumentType: {type: 'text', default: '', label: 'Type d\'instrument', placeholder: "Ex: Subvention, Prêt, Don"},
+
+                        reportingYear: {
+                            type: 'date',
+                            label: 'Date du rapport',
+                            default: ''
+                        },
+                        instrumentType: {
+                            type: 'text',
+                            default: '',
+                            label: 'Type d\'instrument',
+                            placeholder: "Ex: Subvention, Prêt, Don"
+                        },
                         amountCommitedCfa: {
                             type: 'text',
                             default: '',
@@ -749,6 +762,7 @@ export const useCreateProject = () => {
                             type: 'select',
                             label: 'Devise',
                             native: false,
+                            default: 'XOF',
                             items: [
                                 {value: 'EUR', label: 'Euros'},
                                 {value: 'US', label: 'Dollar'},
@@ -957,8 +971,11 @@ export const useCreateProject = () => {
                         type: 'text',
                         default: '',
                         label: 'Site web',
-                        placeholder: "Ex: https://www.projet-exemple.bj"
-                    }
+                        placeholder: "Ex: https://www.projet-exemple.bj",
+                        columns: {
+                            lg: {container: 12, label: 12, wrapper: 12},
+                        },
+                    },
                 }
             },
 

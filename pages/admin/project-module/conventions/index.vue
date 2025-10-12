@@ -215,7 +215,7 @@ const exportAllToCSV = () => {
         <UHorizontalNavigation :links="links" />
         <template #right>
             <UButton
-                to="/project-module/conventions/create"
+                to="/admin/project-module/conventions/create"
                 color="primary"
                 icon="i-heroicons-plus"
                 label="Nouvelle convention"
@@ -278,7 +278,7 @@ const exportAllToCSV = () => {
                         </UInput>
 
                         <UButton
-                            to="/project-module/conventions/create"
+                            to="/admin/project-module/conventions/create"
                             color="primary"
                             icon="i-heroicons-plus"
                             label="Nouvelle convention"

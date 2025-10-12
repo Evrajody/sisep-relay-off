@@ -81,6 +81,20 @@ export const useAuthSidebar = () => {
         },
 
         {
+            id: "sectors",
+            label: "Secteurs",
+            icon: "i-heroicons-squares-plus",
+            to: { name: "admin-project-module-sectors" },
+        },
+
+        {
+            id: "locations",
+            label: "Localisations",
+            icon: "i-heroicons-map-pin",
+            to: { name: "admin-project-module-locations" },
+        },
+
+        {
             id: "indicators",
             label: "Indicateurs",
             icon: "i-heroicons-chart-bar-square",

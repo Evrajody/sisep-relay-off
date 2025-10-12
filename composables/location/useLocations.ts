@@ -1,12 +1,22 @@
-import type { SisebResponseType, Category } from "~/types"
+import type { SisebResponseType } from "~/types"
 
-export const useCategories = () => {
+export interface Location {
+    id: string
+    name: string
+    level: string
+    code: string
+    parentCode?: string
+    description?: string
+    parentId?: string
+}
+
+export const useLocations = () => {
 
     const { $sisepStatsApi } = useNuxtApp()
 
     const search = ref('')
     const current_page = ref(1)
-    const selectedStatus = ref({ value: 'all', label: 'Tous les statuts' })
+    const selectedLevel = ref({ value: 'all', label: 'Tous les niveaux' })
 
     const columns = ref([
         {
@@ -15,18 +25,19 @@ export const useCategories = () => {
             sortable: true
         },
         {
-            key: 'description',
-            label: 'DESCRIPTION',
+            key: 'code',
+            label: 'CODE',
             sortable: true
         },
         {
-            key: 'status',
-            label: 'STATUT',
+            key: 'level',
+            label: 'NIVEAU',
             sortable: true
         },
         {
-            key: 'projectCount',
-            label: 'PROJETS'
+            key: 'parentCode',
+            label: 'CODE PARENT',
+            sortable: true
         },
         {
             key: 'actions',
@@ -44,27 +55,27 @@ export const useCategories = () => {
         Math.min(page.value * pageCount.value, totalItems.value)
     )
 
-    const { data: categoryList, error, status: categoryListStatus, refresh: refreshCategoryList } = useAsyncData<SisebResponseType<Category>>('categories', () => {
+    const { data: locationList, error, status: locationListStatus, refresh: refreshLocationList } = useAsyncData<SisebResponseType<Location>>('locations', () => {
 
         const params: any = {
             search: search.value,
             page: current_page.value,
         }
 
-        if (selectedStatus.value.value !== 'all') {
-            params.status = selectedStatus.value.value
+        if (selectedLevel.value.value !== 'all') {
+            params.level = selectedLevel.value.value
         }
 
-        return $sisepStatsApi('categories', {
+        return $sisepStatsApi('locations', {
             query: params
         })
     }, {
         deep: false,
-        watch: [search, current_page, selectedStatus]
+        watch: [search, current_page, selectedLevel]
     })
 
     // Mise à jour de la pagination
-    watch(categoryList, (newData) => {
+    watch(locationList, (newData) => {
         if (newData) {
             totalItems.value = newData.totalItems || newData.data?.length || 0
             pageTotal.value = newData.totalPages || Math.ceil(totalItems.value / pageCount.value)
@@ -74,12 +85,12 @@ export const useCategories = () => {
     return {
         search,
         current_page,
-        selectedStatus,
+        selectedLevel,
         columns,
-        categoryList,
+        locationList,
         error,
-        refreshCategoryList,
-        categoryListStatus,
+        refreshLocationList,
+        locationListStatus,
         pagination: {
             page,
             pageTotal,

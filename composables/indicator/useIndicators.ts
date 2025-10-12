@@ -2,7 +2,7 @@ import type { SisebResponseType, Indicator } from "~/types"
 
 export const useIndicators = () => {
 
-    const { $sisepApi } = useNuxtApp()
+    const { $sisepStatsApi } = useNuxtApp()
 
     const search = ref('')
     const current_page = ref(1)
@@ -81,7 +81,7 @@ export const useIndicators = () => {
             params.coverage = selectedCoverage.value.value
         }
 
-        return $sisepApi('indicators', {
+        return $sisepStatsApi('indicators', {
             query: params
         })
     }, {

@@ -224,7 +224,7 @@ onMounted(() => {
           </p>
         </div>
         <UButton
-          to="/project-module/create-project"
+          to="/admin/project-module/create-project"
           color="primary"
           icon="i-heroicons-plus"
           size="lg"
@@ -411,7 +411,7 @@ onMounted(() => {
             v-for="project in recentProjects"
             :key="project.id"
             class="p-5 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"
-            @click="navigateTo(`/project-module/${project.id}`)"
+            @click="navigateTo(`/admin/project-module/${project.id}`)"
           >
             <div class="flex items-start gap-4">
               <!-- Avatar/Image -->

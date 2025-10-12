@@ -2,7 +2,7 @@ import type { SisebResponseType, Structure } from "~/types"
 
 export const useStructures = () => {
 
-    const { $sisepApi } = useNuxtApp()
+    const { $sisepStatsApi } = useNuxtApp()
 
     const search = ref('')
     const current_page = ref(1)
@@ -56,7 +56,7 @@ export const useStructures = () => {
             params.status = selectedStatus.value.value
         }
 
-        return $sisepApi('structures', {
+        return $sisepStatsApi('organisations', {
             query: params
         })
     }, {

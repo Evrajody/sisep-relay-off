@@ -11,7 +11,7 @@ const links = [
     {
         label: "Agents",
         icon: "i-heroicons-users",
-        to: "/project-module/agents"
+        to: "/admin/project-module/agents"
     },
     {
         label: "Créer un agent",

@@ -84,8 +84,8 @@ const props = withDefaults(defineProps<{ apps?: AppItem[]; maxDefault?: number }
   apps: () => [
     { label: 'Accueil', href: '/', icon: 'i-heroicons-home' },
     { label: 'Projets', href: '/project-module', icon: 'i-heroicons-rectangle-stack' },
-    { label: 'Créer un projet', href: '/project-module/create-project', icon: 'i-heroicons-plus-circle' },
-    { label: 'Tableau de bord', href: '/project-module/dashboard', icon: 'i-heroicons-chart-bar' },
+    { label: 'Créer un projet', href: '/admin/project-module/create-project', icon: 'i-heroicons-plus-circle' },
+    { label: 'Tableau de bord', href: '/admin/project-module/dashboard', icon: 'i-heroicons-chart-bar' },
     { label: 'Conventions', href: '/conventions', icon: 'i-heroicons-rectangle-group' },
     { label: 'Espace admin', href: '/admin/login', icon: 'i-heroicons-cog-6-tooth' },
   ],

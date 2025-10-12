@@ -66,7 +66,7 @@ onMounted(() => {
       <UHorizontalNavigation :links="links"/>
       <template #right>
         <UButton
-          :to="`/project-module/${projectId}`"
+          :to="`/admin/project-module/${projectId}`"
           color="gray"
           icon="i-heroicons-arrow-left"
           label="Retour"
@@ -121,7 +121,7 @@ onMounted(() => {
               label="Annuler"
               size="lg"
               :disabled="updateProjectFormEl?.submitting || isLoadingProject"
-              @click="navigateTo(`/project-module/${projectId}`)"
+              @click="navigateTo(`/admin/project-module/${projectId}`)"
             />
             <UButton
               class="rounded-md shadow bg-primary font-medium"

@@ -1,4 +1,32 @@
 /**
+ * Formate une date au format YYYY-MM-DD
+ * @param date - La date à formater (Date, string, ou null/undefined)
+ * @returns La date formatée en YYYY-MM-DD ou null si invalide
+ */
+function formatDateToYYYYMMDD(date: any): string | null {
+  if (!date) {
+    return null;
+  }
+
+  try {
+    const dateObj = date instanceof Date ? date : new Date(date);
+
+    // Vérifier si la date est valide
+    if (isNaN(dateObj.getTime())) {
+      return null;
+    }
+
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
  * Transforme un projet récupéré de l'API en payload pour modification
  * Convertit la structure de données de réponse en structure attendue par le formulaire
  *
@@ -16,8 +44,8 @@ export function transformProjectToPayload(project: any): any {
     title: project.title || '',
     typeId: project.typeId || null,
     status: project.status || null,
-    startDate: project.startDate || null,
-    endDate: project.endDate || null,
+    startDate: formatDateToYYYYMMDD(project.startDate),
+    endDate: formatDateToYYYYMMDD(project.endDate),
     description: project.description || '',
 
     // Objectifs et résultats
@@ -110,7 +138,7 @@ export function transformProjectToPayload(project: any): any {
     // Vérifications
     verifications: (project.verifications || []).map((verification: any) => ({
       verificationLevel: verification.verificationLevel || null,
-      verificationDate: verification.verificationDate || null,
+      verificationDate: formatDateToYYYYMMDD(verification.verificationDate),
       verifier: verification.verifier || {
         name: '',
         organization: null
@@ -137,8 +165,8 @@ export function transformPayloadToAPI(formData: any): any {
     title: formData.title,
     typeId: formData.typeId,
     status: formData.status,
-    startDate: formData.startDate,
-    endDate: formData.endDate,
+    startDate: formatDateToYYYYMMDD(formData.startDate),
+    endDate: formatDateToYYYYMMDD(formData.endDate),
     description: formData.description,
     objective: formData.objective,
     expectedResults: formData.expectedResults,
@@ -196,15 +224,19 @@ export function transformPayloadToAPI(formData: any): any {
     payload.finances = formData.finances.map((finance: any) => ({
       reportingYear: finance.reportingYear,
       instrumentType: finance.instrumentType,
-      amountCommitedCfa: parseFloat(finance.amountCommitedCfa) || 0,
-      amountDisbursedCfa: parseFloat(finance.amountDisbursedCfa) || 0,
+      amountCommitedCfa: parseFloat(finance.amountCommitedCfa)?.toString() || '',
+      amountDisbursedCfa: parseFloat(finance.amountDisbursedCfa)?.toString()  || '',
       currency: finance.currency,
-      exchangeRateUsed: parseFloat(finance.exchangeRateUsed) || 0,
+      exchangeRateUsed: parseFloat(finance.exchangeRateUsed)?.toString()  || '',
       fundingSource: finance.fundingSource,
     }));
   }
 
-  payload.verifications = formData.verifications || [];
+  // Transformation des vérifications avec formatage des dates
+  payload.verifications = (formData.verifications || []).map((verification: any) => ({
+    ...verification,
+    verificationDate: formatDateToYYYYMMDD(verification.verificationDate),
+  }));
 
   return payload;
 }

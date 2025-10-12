@@ -28,11 +28,11 @@ export const useUpdateProject = (projectRef: any) => {
                         makeAlert({
                             type: "success",
                             title: "Projet mis à jour !",
-                            message: `Le projet ${response._data.title} a été modifié avec succès`,
+                            message: `Le projet ${response._data.data.title} a été modifié avec succès`,
                         });
 
                         // Redirection vers la page de détail
-                        navigateTo(`/project-module/${projectId}`);
+                        navigateTo(`/admin/project-module/${projectId}`);
                     }
 
                     if (response.status === 400) {
@@ -129,7 +129,6 @@ export const useUpdateProject = (projectRef: any) => {
                     "coverImageId",
                     "title",
                     "typeId",
-                    "status",
                     "startDate",
                     "endDate",
                     "description",
@@ -266,18 +265,21 @@ export const useUpdateProject = (projectRef: any) => {
                 native: true,
                 inputType: "search",
                 autocomplete: "off",
+                columns: {
+                    lg: {container: 12, label: 12, wrapper: 12},
+                },
             },
 
-            status: {
-                type: 'select',
-                label: "Statut du projet",
-                items: [
-                    {value: 'DRAFT', label: 'Brouillon'},
-                    {value: 'PUBLISHED', label: 'Publié'},
-                    {value: 'ARCHIVED', label: 'Archivé'},
-                ],
-                native: false,
-            },
+            // status: {
+            //     type: 'select',
+            //     label: "Statut du projet",
+            //     items: [
+            //         {value: 'DRAFT', label: 'Brouillon'},
+            //         {value: 'PUBLISHED', label: 'Publié'},
+            //         {value: 'ARCHIVED', label: 'Archivé'},
+            //     ],
+            //     native: false,
+            // },
 
             indicators: {
                 type: "list",
@@ -681,20 +683,18 @@ export const useUpdateProject = (projectRef: any) => {
                     },
 
                     schema: {
-                        reportingYear: {type: 'date', label: 'Date du rapport'},
+                        reportingYear: {type: 'date', label: 'Date du rapport',  default: '',},
                         instrumentType: {type: 'text', default: '', label: 'Type d\'instrument', placeholder: "Ex: Subvention, Prêt, Don"},
                         amountCommitedCfa: {
                             type: 'text',
                             default: '',
                             label: 'Montant engagé',
-                            mask: 'number',
                             placeholder: "Ex: 50000000"
                         },
                         amountDisbursedCfa: {
                             type: 'text',
                             default: '',
                             label: 'Montant distribué',
-                            mask: 'number',
                             placeholder: "Ex: 25000000"
                         },
                         currency: {
@@ -874,7 +874,10 @@ export const useUpdateProject = (projectRef: any) => {
                         type: 'text',
                         default: '',
                         label: 'Site web',
-                        placeholder: "Ex: https://www.projet-exemple.bj"
+                        placeholder: "Ex: https://www.projet-exemple.bj",
+                        columns: {
+                            lg: {container: 12, label: 12, wrapper: 12},
+                        },
                     }
                 }
             },
