@@ -721,8 +721,8 @@ definePageMeta({
           <UFormGroup label="Structure" required>
             <USelectMenu
               v-model="selectedStructure"
-              :options="structuresList?.data || []"
-              option-attribute="label"
+              :options="structuresList?.categories || []"
+              option-attribute="artefact.nameJson.fr"
               value-attribute="id"
               placeholder="Sélectionnez une structure"
               :loading="structuresStatus === 'pending'"

@@ -2,7 +2,7 @@ import type { SisebResponseType, Structure } from "~/types"
 
 export const useAffectProject = () => {
 
-    const { $sisepStatsApi } = useNuxtApp()
+    const { $sisepStatsApi, $sisepApi } = useNuxtApp()
 
     /**
      * Récupère la liste des structures pour l'affectation
