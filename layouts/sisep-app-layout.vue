@@ -4,6 +4,8 @@ const isOpen = ref(true);
 
 const {sidebarAuthorized} = useAuthSidebar();
 
+const {loadAccessibleModules} = useSisebHelper()
+
 const changModuleFormEl = ref(null);
 
 const changModuleForm = computed(() => ({
@@ -41,26 +43,11 @@ const changModuleForm = computed(() => ({
         },
       },
 
-      rules: ["required"],
-
-      items: [
-        {
-          code: "project",
-          label: "Module de gestion des projets"
-        },
-
-        {
-          code: "oddd",
-          label: "Modules de gestion des ODD"
-        },
-
-        {
-          code: "global",
-          label: "Modules globales sisep"
-        }
-      ],
-      labelProp: "label",
-      valueProp: "code",
+      items: async (query: string) => {
+        return await loadAccessibleModules(query);
+      },
+      labelProp: "name",
+      valueProp: "id",
       search: true,
       native: true,
       default: 23,
@@ -135,7 +122,7 @@ const changModuleForm = computed(() => ({
             ></UDashboardSidebarLinks>
 
             <template #footer>
-              --
+              <UserDropdown />
             </template>
 
           </UDashboardSidebar>
@@ -163,6 +150,12 @@ const changModuleForm = computed(() => ({
                   <div class="bg-green-800 w-fit text-lg text-white font-extrabold">
                     <span>-- Module de gestion des projets -- </span>
                   </div>
+                </div>
+              </template>
+
+              <template #right>
+                <div class="flex items-center gap-4">
+                  <UserDropdown :compact="false" variant="navbar" />
                 </div>
               </template>
             </UDashboardNavbar>

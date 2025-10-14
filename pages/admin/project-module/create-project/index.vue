@@ -4,6 +4,8 @@ import { useCreateProject } from '~/composables/project/useCreateProject';
 
 definePageMeta({
   layout: "sisep-app-layout",
+  middleware: ["sidebase-auth"],
+  requiredPermissions: ["menu_list_roles", "menu_list_permissions"],
 });
 
 const links = [{

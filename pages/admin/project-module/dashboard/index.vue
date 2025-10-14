@@ -3,11 +3,16 @@ import { ref, computed, onMounted } from 'vue';
 
 definePageMeta({
   layout: "sisep-app-layout",
+  middleware: ["sidebase-auth"],
+  requiredPermissions: ["menu_list_roles", "menu_list_permissions"],
 });
 
 useHead({
   title: "Tableau de bord - Projets",
 });
+
+
+const { data: authUser } = useAuth();
 
 // Données des indicateurs clés (à remplacer par les vraies données de l'API)
 const stats = ref([
@@ -211,6 +216,10 @@ onMounted(() => {
         </div>
       </template>
     </UDashboardToolbar>
+
+    <pre>
+      {{authUser}}
+    </pre>
 
     <div class="max-w-[95vw] mx-auto px-4 py-6 space-y-6">
       <!-- En-tête du dashboard -->

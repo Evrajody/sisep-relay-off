@@ -2,6 +2,16 @@ export const useSisebHelper = () => {
 
     const { $sisepApi } = useNuxtApp()
 
+    const loadAccessibleModules = async (query: string) => {
+        const modulesRequestData = await $sisepApi("modules", {
+            method: "GET",
+            query: {
+                search: query,
+            },
+        });
+        return modulesRequestData?.data.modules;
+    };
+
     /* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
     /**
      * Upload a file to the backend
@@ -27,19 +37,7 @@ export const useSisebHelper = () => {
 
 
     return {
-
+        loadAccessibleModules,
+        uploadFileDocument,
     }
 }
-
-
-// {
-//     "savedFile": {
-//     "id": "f58b5bb2-a9da-4a78-886f-bf19b25cf935",
-//         "storageName": "52c5a459-f83b-4adb-a68d-caf34b907077.png",
-//         "storageBucket": "projects",
-//         "extension": ".png",
-//         "size": 55749,
-//         "createdAt": "2025-10-01T21:22:14.532Z",
-//         "deletedAt": null
-// }
-// }

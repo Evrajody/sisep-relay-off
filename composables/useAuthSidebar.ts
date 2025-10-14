@@ -3,7 +3,7 @@ export const useAuthSidebar = () => {
     // CONFIGURATION
     const runtimeConfig = useRuntimeConfig();
 
-    //ROUTER
+    // ROUTER
     const router = useRouter();
 
     const featureChecker = (
@@ -37,14 +37,14 @@ export const useAuthSidebar = () => {
 
         {
             id: "projects",
-            label: "Projets",
+            label: "Gestion des projets",
             chip: "-",
             icon: "i-heroicons-document-duplicate-solid",
             children: [
 
                 {
                     id: "listes-project",
-                    label: "Projets",
+                    label: "Liste des projets",
                     to: {name: 'admin-project-module'},
                     tooltip: {text: "Liste des projets"},
                 },
@@ -59,68 +59,68 @@ export const useAuthSidebar = () => {
             ],
         },
 
-        {
-            id: "types-projet",
-            label: "Type de projets",
-            icon: "i-heroicons-megaphone",
-            to: { name: "admin-project-module-types-projects" },
-        },
-
-        {
-            id: "categories",
-            label: "Catégories",
-            icon: "i-heroicons-square-3-stack-3d",
-            to: { name: "admin-project-module-categories" },
-        },
-
-        {
-            id: "subcategories",
-            label: "Sous-catégories",
-            icon: "i-heroicons-queue-list",
-            to: { name: "admin-project-module-subcategories" },
-        },
-
-        {
-            id: "sectors",
-            label: "Secteurs",
-            icon: "i-heroicons-squares-plus",
-            to: { name: "admin-project-module-sectors" },
-        },
-
-        {
-            id: "locations",
-            label: "Localisations",
-            icon: "i-heroicons-map-pin",
-            to: { name: "admin-project-module-locations" },
-        },
-
-        {
-            id: "indicators",
-            label: "Indicateurs",
-            icon: "i-heroicons-chart-bar-square",
-            to: { name: "admin-project-module-indicators" },
-        },
-
-        {
-            id: "structures",
-            label: "Structures",
-            icon: "i-heroicons-building-office-2",
-            to: { name: "admin-project-module-structures" },
-        },
-
-        {
-            id: "agents",
-            label: "Agents",
-            icon: "i-heroicons-users",
-            to: { name: "admin-project-module-agents" },
-        },
-
-        {
-            id: "conventions",
-            label: "Conventions",
-            icon: "i-heroicons-document-text",
-            to: { name: "admin-project-module-conventions" },
-        },
+        // {
+        //     id: "types-projet",
+        //     label: "Type de projets",
+        //     icon: "i-heroicons-megaphone",
+        //     to: { name: "admin-project-module-types-projects" },
+        // },
+        //
+        // {
+        //     id: "categories",
+        //     label: "Catégories",
+        //     icon: "i-heroicons-square-3-stack-3d",
+        //     to: { name: "admin-project-module-categories" },
+        // },
+        //
+        // {
+        //     id: "subcategories",
+        //     label: "Sous-catégories",
+        //     icon: "i-heroicons-queue-list",
+        //     to: { name: "admin-project-module-subcategories" },
+        // },
+        //
+        // {
+        //     id: "sectors",
+        //     label: "Secteurs",
+        //     icon: "i-heroicons-squares-plus",
+        //     to: { name: "admin-project-module-sectors" },
+        // },
+        //
+        // {
+        //     id: "locations",
+        //     label: "Localisations",
+        //     icon: "i-heroicons-map-pin",
+        //     to: { name: "admin-project-module-locations" },
+        // },
+        //
+        // {
+        //     id: "indicators",
+        //     label: "Indicateurs",
+        //     icon: "i-heroicons-chart-bar-square",
+        //     to: { name: "admin-project-module-indicators" },
+        // },
+        //
+        // {
+        //     id: "structures",
+        //     label: "Structures",
+        //     icon: "i-heroicons-building-office-2",
+        //     to: { name: "admin-project-module-structures" },
+        // },
+        //
+        // {
+        //     id: "agents",
+        //     label: "Agents",
+        //     icon: "i-heroicons-users",
+        //     to: { name: "admin-project-module-agents" },
+        // },
+        //
+        // {
+        //     id: "conventions",
+        //     label: "Conventions",
+        //     icon: "i-heroicons-document-text",
+        //     to: { name: "admin-project-module-conventions" },
+        // },
     ]);
 
     // RECUPERE UTILISATEUR EN COURS
@@ -130,7 +130,6 @@ export const useAuthSidebar = () => {
     // GENERE LA SIDEBAR ASSOCIE AU PROFILE ACTUEL
 
     const sidebarAuthorized = computed(() => {
-
         return sidebarElements;
     });
 
