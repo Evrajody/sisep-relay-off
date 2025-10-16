@@ -146,13 +146,8 @@ const loginPermisForm = ref({
             <div class=" space-y-3">
               <NuxtLink
                   class="relative inline-flex cursor-pointer items-center bg-blue-400 justify-center w-full px-4 py-4 text-base font-semibold  transition-all duration-200 text-white shadow rounded-md hover:bg-blue-100 focus:bg-blue-100 hover:text-black focus:text-black focus:outline-none"
-                  type="button"
                   @click.prevent="
-                  signIn('keycloak', {
-                    callbackUrl: '/admin/project-module/dashboard',
-                    external: true,
-                  })"
-              >
+                  signIn('keycloak')">
                 <div class="absolute inset-y-0 left-0 p-4">
                   <svg
                       class="w-6 h-6 text-blue-500"

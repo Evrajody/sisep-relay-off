@@ -497,6 +497,7 @@ const statsImg = reactive([
 
         <div class="bg-white absolute opacity-90 inset-0"></div>
 
+
         <div class="relative max-w-7xl mx-auto">
 
           <div class="flex flex-col items-center justify-center h-full inset-0  gap-8">

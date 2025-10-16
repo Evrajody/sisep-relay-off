@@ -70,7 +70,14 @@
 
         <!-- Simple link (no sections) -->
         <template v-else>
-          <NuxtLink :to="item.href" class="text-lg font-bold text-white uppercase">
+          <button
+            v-if="item.onClick"
+            @click="item.onClick"
+            class="text-lg font-bold text-white uppercase cursor-pointer hover:opacity-80 transition-opacity"
+          >
+            <span>{{ item.label }}</span>
+          </button>
+          <NuxtLink v-else :to="item.href" class="text-lg font-bold text-white uppercase">
             <span>{{ item.label }}</span>
           </NuxtLink>
         </template>
@@ -91,6 +98,8 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 const openIndex = ref<number | null>(null)
 const isMobileMenuOpen = ref(false)
 const isMobile = ref(false)
+
+const { signIn, data } = useAuth();
 
 // Vérifier la taille de l'écran au chargement
 const checkScreenSize = () => {
@@ -182,6 +191,9 @@ const navMenuElements = reactive([
   {
     label: 'Espace',
     href: '/admin/login',
+    onClick: () => {
+      signIn('keycloak')
+    }
   },
 ])
 </script>

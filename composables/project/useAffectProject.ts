@@ -1,8 +1,66 @@
 import type { SisebResponseType, Structure } from "~/types"
+import {transformTmpPayload} from "~/utils/transformTmpPayload";
 
 export const useAffectProject = () => {
 
     const { $sisepStatsApi, $sisepApi } = useNuxtApp()
+
+
+    // FORMULAIRE DE GESTION AFFECTATION DE PROJET
+
+    const affectProjectFormEl = ref(null)
+
+    const affectProjectForm = computed(() => ({
+        scrollOnNext: true,
+        id: "affectProjectFormEl",
+        addClass: "max-w-full",
+        displayErrors: true,
+        showRequired: ["label"],
+
+        endpoint: async (form: any, payload: any) => {
+
+        },
+
+        schema: {
+
+
+            structureId: {
+                type: 'select',
+                label: "Structure",
+                info: "Structure d'affectation",
+                rules: [
+                    'required',
+                ],
+                items: async (query: string) => {
+
+                },
+                dataKey: "data",
+                labelProp: "name",
+                valueProp: "id",
+                search: true,
+                native: true,
+                inputType: "search",
+                autocomplete: "off",
+                columns: {
+                    lg: {container: 12, label: 12, wrapper: 12},
+                },
+            },
+
+
+            description: {
+                type: 'editor',
+                default: '',
+                rows: 7,
+                label: "Commentaire",
+                info: "Indiquer un commentaire",
+                rules: [],
+            },
+
+
+        }
+
+    }))
+
 
     /**
      * Récupère la liste des structures pour l'affectation

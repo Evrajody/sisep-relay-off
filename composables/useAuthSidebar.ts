@@ -59,12 +59,13 @@ export const useAuthSidebar = () => {
             ],
         },
 
-        // {
-        //     id: "types-projet",
-        //     label: "Type de projets",
-        //     icon: "i-heroicons-megaphone",
-        //     to: { name: "admin-project-module-types-projects" },
-        // },
+        {
+            id: "types-projet",
+            label: "Type de projets",
+            icon: "i-heroicons-megaphone",
+            to: { name: "admin-project-module-types-projects" },
+        },
+
         //
         // {
         //     id: "categories",
