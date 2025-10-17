@@ -7,7 +7,7 @@ export default defineNuxtConfig({
             sisebApiStatsUrl: process.env.NUXT_PUBLIC_SISEB_API_STATS_BASE_URL,
             keycloakRealm: "siseb",
             keycloakClientId: "siseb-front",
-            keycloakUrl: "https://siseb-refonte.emes.bj/keycloak",
+            keycloakUrl: "https://keycloack.emes.bj",
             // keycloakUrl: "https://keycloack.emes.bj/realms/siseb/account",
         }
     },
