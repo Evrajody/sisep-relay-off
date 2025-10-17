@@ -7,13 +7,6 @@ services:
       context: ../..
       dockerfile: docker/dockerfiles/Dockerfile@pprod
       tags: ['siseb-frontend-pprod']
-    extra_hosts:
-      - "keycloack.emes.bj:173.249.45.104"
-    environment:
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
-      - NUXT_AUTH_ORIGIN=https://siseb-refonte.emes.bj
-      - NUXT_PUBLIC_SISEB_API_BASE_URL=https://siseb-refonte.emes.bj/api
-      - NUXT_PUBLIC_SISEB_API_STATS_BASE_URL=https://siseb-refonte.emes.bj/stat-module/api
     networks:
       - siseb
 

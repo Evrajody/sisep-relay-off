@@ -22,6 +22,7 @@ export default NuxtAuthHandler({
     callbacks: {
 
         async jwt({ token, account, user, trigger, session }) {
+
             if (user && user?.auth_provider == "local" && trigger === "signIn") {
                 token.name = `${user.userToSend.user.nom} ${user.userToSend.user.prenoms}`;
                 token.email = user.userToSend.user.email;
@@ -63,7 +64,9 @@ export default NuxtAuthHandler({
             console.log("FROM SERVER", token);
 
             try {
+
                 if (token && token?.auth_provider == "local") {
+
                     const realSession = await $fetch("api/auth/session/local", {
                         method: "GET",
                         key: "siseb-users-local",
