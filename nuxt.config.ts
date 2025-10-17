@@ -32,12 +32,6 @@ export default defineNuxtConfig({
         },
     },
 
-    nitro: {
-        routeRules: {
-            '/local/auth/**': { cors: true }
-        }
-    },
-
     experimental: {
         payloadExtraction: false,
         renderJsonPayloads: true,
@@ -66,7 +60,7 @@ export default defineNuxtConfig({
         globalAppMiddleware: false,
         isEnabled: true,
         originEnvKey: "AUTH_ORIGIN",
-        baseURL: `${process.env.NUXT_AUTH_ORIGIN}/local/auth`,
+        baseURL: `${process.env.NUXT_AUTH_ORIGIN}/auth`,
         sessionRefresh: {
             enablePeriodically: true,
             enableOnWindowFocus: true,
