@@ -32,14 +32,14 @@ export default defineNuxtConfig({
         },
     },
 
-    nitro: {
-        devProxy: {
-            '/api': {
-                target: process.env.NUXT_PUBLIC_SISEB_API_BASE_URL,
-                changeOrigin: true,
-            },
-        },
-    },
+    // nitro: {
+    //     devProxy: {
+    //         '/api': {
+    //             target: process.env.NUXT_PUBLIC_SISEB_API_BASE_URL,
+    //             changeOrigin: true,
+    //         },
+    //     },
+    // },
 
     experimental: {
         payloadExtraction: false,
