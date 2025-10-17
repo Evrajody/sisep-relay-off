@@ -6,6 +6,9 @@ export const useUpdateProject = (projectRef: any) => {
     const { $sisepApi } = useNuxtApp();
     const router = useRouter();
 
+
+    const { loadIndicators,    loadVilles,  loadDepartements, } = useSisebHelper()
+
     /**
      * Met à jour un projet existant
      */
@@ -18,10 +21,12 @@ export const useUpdateProject = (projectRef: any) => {
             }
 
             const response = await $sisepApi(`projects/${projectId}`, {
+
                 method: 'PUT',
                 body: data,
 
                 onResponse: ({ response }) => {
+
                     console.log('Update response:', response);
 
                     if (response.status === 200 || response.status === 201) {
@@ -92,17 +97,34 @@ export const useUpdateProject = (projectRef: any) => {
         default: getFormDefaults(),
 
         endpoint: async (form: any, payload: any) => {
+
             const formData = payload.requestData || {};
+
+            // Normaliser les indicateurs: extraire l'id et la denomination
+            const normalizedIndicators = formData.indicators?.map((indicator: any) => {
+                // Si indicatorId est un objet avec id et denomination
+                if (indicator.indicatorId && typeof indicator.indicatorId === 'object') {
+                    return {
+                        ...indicator,
+                        indicatorId: indicator.indicatorId.id, // Remplacer l'objet par juste l'ID
+                        indicatorName: indicator.indicatorId.denomination || indicator.indicatorName // Utiliser la denomination de l'objet
+                    };
+                }
+                // Sinon retourner l'indicateur tel quel
+                return indicator;
+            }) || [];
+
 
             // Transformation du payload avec gestion de la location
             let payloadProject = {
                 ...formData,
+                indicators: normalizedIndicators, // Utiliser les indicateurs normalisés
                 location: {
                     ...formData.location,
                     location: (formData.location?.location?.latitude && formData.location?.location?.longitude) ? {
                         type: 'point',
                         coordinates: [[formData.location.location.latitude, formData.location.location.longitude]]
-                    } : null,
+                    } : { },
                 }
             };
 
@@ -113,11 +135,11 @@ export const useUpdateProject = (projectRef: any) => {
             const apiPayload = transformPayloadToAPI(transformedPayload);
 
             // Nettoyage des champs vides
-            const cleanedPayload = cleanPayload(apiPayload);
+            // const cleanedPayload = cleanPayload(apiPayload);
 
-            console.log('Payload final envoyé:', JSON.stringify(cleanedPayload, null, 2));
+            console.log('Payload final envoyé:', JSON.stringify(apiPayload, null, 2));
 
-            await updateProject(cleanedPayload);
+            await updateProject(apiPayload);
         },
 
         // Réutilisation de la même structure de tabs que le formulaire de création
@@ -188,10 +210,10 @@ export const useUpdateProject = (projectRef: any) => {
                 label: "Intitulé du projet",
                 info: "Fournisseur un titre génériques pour le projet",
                 placeholder: "Ex: Projet d'amélioration de l'accès à l'eau potable",
+                rules: ['required'],
                 columns: {
                     lg: {container: 12, label: 12, wrapper: 12},
                 },
-                rules: [],
             },
 
             startDate: {
@@ -256,8 +278,8 @@ export const useUpdateProject = (projectRef: any) => {
                 type: 'select',
                 label: "Type de projet",
                 info: "Type de projet",
-                rules: [],
                 items: "project-types",
+                rules: ['required'],
                 dataKey: "data",
                 labelProp: "name",
                 valueProp: "id",
@@ -270,16 +292,6 @@ export const useUpdateProject = (projectRef: any) => {
                 },
             },
 
-            // status: {
-            //     type: 'select',
-            //     label: "Statut du projet",
-            //     items: [
-            //         {value: 'DRAFT', label: 'Brouillon'},
-            //         {value: 'PUBLISHED', label: 'Publié'},
-            //         {value: 'ARCHIVED', label: 'Archivé'},
-            //     ],
-            //     native: false,
-            // },
 
             indicators: {
                 type: "list",
@@ -316,8 +328,14 @@ export const useUpdateProject = (projectRef: any) => {
                             native: true,
                             inputType: "search",
                             searchParam: "search",
+                            object: true,
                             valueProp: "id",
-                            labelProp: "nom",
+                            rules: ['required'],
+                            labelProp: "denomination",
+                            items: async (query: string) => {
+                                let data = await loadIndicators(query);
+                                return data
+                            },
                             delay: 1,
                             autocomplete: "off",
                             columns: {
@@ -329,11 +347,7 @@ export const useUpdateProject = (projectRef: any) => {
                                     container_lg: "!text-gray-400 font-medium",
                                 },
                             },
-                            items: [
-                                'indicatoris 01',
-                                'indicatoris 02',
-                                'indicatoris 03',
-                            ],
+
                         },
 
                         create_indicator_stuff: {
@@ -344,9 +358,9 @@ export const useUpdateProject = (projectRef: any) => {
 
                             schema: {
                                 indicatorName: {
-                                    type: 'text', default: '',
+                                    type: 'text',
+                                    default: '',
                                     label: "Libelle de l'indicateur",
-                                    rules: ["required"],
                                     info: "Formuler un libelle pour l'indicateur",
                                     placeholder: "Ex: Taux d'accès à l'eau potable",
                                     columns: {
@@ -447,7 +461,7 @@ export const useUpdateProject = (projectRef: any) => {
                             label: "Type de l'action",
                             description: "Nature de l'action",
                             placeholder: "Ex: Formation, Sensibilisation, Construction",
-                            rules: [],
+                            rules: ['required'],
                         },
                         status: {
                             type: 'text', default: '',
@@ -500,10 +514,12 @@ export const useUpdateProject = (projectRef: any) => {
                             type: 'text', default: '',
                             label: 'Nom',
                             placeholder: "Ex: Ministère de l'Eau, ONG XYZ",
+                            rules: ['required'],
                         },
                         type: {
                             type: 'text', default: '',
                             label: 'Type de partenaire',
+                            rules: ['required'],
                             placeholder: "Ex: Technique, Financier, Institutionnel",
                         },
                         otherData: {
@@ -577,6 +593,7 @@ export const useUpdateProject = (projectRef: any) => {
                         name: {
                             type: 'text', default: '',
                             label: 'Nom',
+                            rules: ['required'],
                             placeholder: "Ex: Femmes rurales, Enfants de 5-15 ans",
                         },
                         description: {
@@ -615,14 +632,17 @@ export const useUpdateProject = (projectRef: any) => {
                         verificationLevel: {
                             type: "text",
                             label: "Niveau de vérification",
+                            rules: ['required'],
                             placeholder: "Ex: Niveau 1, Niveau 2, Audit complet",
                         },
                         verificationDate: {
                             type: "date",
+                            rules: ['required'],
                             label: "Date de vérification",
                         },
                         verifier: {
                             type: "object",
+
                             columns: {
                                 lg: {container: 12, label: 12, wrapper: 12},
                             },
@@ -630,11 +650,13 @@ export const useUpdateProject = (projectRef: any) => {
                                 name: {
                                     type: 'text', default: '',
                                     label: 'Nom',
+                                    rules: ['required'],
                                     placeholder: "Ex: Jean Dupont",
                                 },
                                 organization: {
                                     type: "text",
                                     label: "Organisation",
+                                    rules: ['required'],
                                     placeholder: "Ex: Bureau d'Audit National",
                                 }
                             }
@@ -657,10 +679,8 @@ export const useUpdateProject = (projectRef: any) => {
             finances: {
                 type: 'list',
                 initial: 1,
-                canAdd: false,
-                canRemove: false,
-                min: 1,
-                max: 1,
+                addText: "Ajouter des données de financements",
+
                 columns: {
                     lg: {container: 12, label: 12, wrapper: 12},
                 },
@@ -683,24 +703,35 @@ export const useUpdateProject = (projectRef: any) => {
                     },
 
                     schema: {
-                        reportingYear: {type: 'date', label: 'Date du rapport',  default: '',},
-                        instrumentType: {type: 'text', default: '', label: 'Type d\'instrument', placeholder: "Ex: Subvention, Prêt, Don"},
+                        reportingYear: {
+                            type: 'date',
+                            label: 'Date du rapport',
+                            default: '',
+                            rules: ['required'],
+                        },
+                        instrumentType: {
+                            type: 'text',
+                            rules: ['required'],
+                            default: '', label: 'Type d\'instrument', placeholder: "Ex: Subvention, Prêt, Don"},
                         amountCommitedCfa: {
                             type: 'text',
                             default: '',
                             label: 'Montant engagé',
-                            placeholder: "Ex: 50000000"
+                            placeholder: "Ex: 50000000",
+                            rules: ['required'],
                         },
                         amountDisbursedCfa: {
                             type: 'text',
                             default: '',
                             label: 'Montant distribué',
-                            placeholder: "Ex: 25000000"
+                            placeholder: "Ex: 25000000",
+                            rules: ['required'],
                         },
                         currency: {
                             type: 'select',
                             label: 'Devise',
                             native: false,
+                            rules: ['required'],
                             items: [
                                 {value: 'EUR', label: 'Euros'},
                                 {value: 'US', label: 'Dollar'},
@@ -712,11 +743,13 @@ export const useUpdateProject = (projectRef: any) => {
                             mask: 'number',
                             default: '',
                             label: 'Taux de change utilisé',
+                            rules: ['required'],
                             placeholder: "Ex: 655.957"
                         },
                         fundingSource: {
                             type: 'object',
                             label: 'Source de financement',
+
                             columns: {
                                 default: {container: 12, label: 12, wrapper: 12},
                                 sm: {container: 12, label: 12, wrapper: 12},
@@ -724,8 +757,8 @@ export const useUpdateProject = (projectRef: any) => {
                                 lg: {container: 12, label: 12, wrapper: 12},
                             },
                             schema: {
-                                donor: {type: 'text', default: '', label: 'Donateur', placeholder: "Ex: Banque Mondiale, UE, AFD"},
-                                program: {type: 'text', default: '', label: 'Programme', placeholder: "Ex: Programme de développement rural"},
+                                donor: {type: 'text', default: '',  rules: ['required'], label: 'Donateur', placeholder: "Ex: Banque Mondiale, UE, AFD"},
+                                program: {type: 'text', default: '',  rules: ['required'], label: 'Programme', placeholder: "Ex: Programme de développement rural"},
                             },
                         }
                     }
@@ -763,7 +796,7 @@ export const useUpdateProject = (projectRef: any) => {
                             type: 'select',
                             label: "Type de fichier",
                             info: "Nature du fichier par rapport au projet",
-                            rules: [],
+                            rules: ['required'],
                             items: "file-types",
                             dataKey: "fileTypes",
                             labelProp: "name",
@@ -776,12 +809,14 @@ export const useUpdateProject = (projectRef: any) => {
                         fileId: {
                             type: 'file',
                             label: 'Fichier',
+                            rules: ['required'],
                         },
                     }
                 }
             },
 
             location: {
+
                 type: "object",
                 addClasses: {
                     ElementLayout: {
@@ -799,12 +834,11 @@ export const useUpdateProject = (projectRef: any) => {
                     region: {
                         label: "Département",
                         type: "select",
-                        rules: [],
-                        items: [
-                            'cotonou',
-                            'calavi'
-                        ],
-                        valueProp: "id",
+                        items: async (query: string) => {
+                            return await loadDepartements(query)
+                        },
+                        valueProp: "name",
+                        labelProp: "name",
                         search: true,
                         native: true,
                         inputType: "search",
@@ -813,13 +847,11 @@ export const useUpdateProject = (projectRef: any) => {
                     city: {
                         label: "Villes (Communes)",
                         type: "select",
-                        rules: [],
-                        items: [
-                            'cotonou',
-                            'calavi'
-                        ],
+                        items: async (query: string) => {
+                            return await loadVilles(query)
+                        },
                         labelProp: "name",
-                        valueProp: "id",
+                        valueProp: "name",
                         search: true,
                         native: true,
                         inputType: "search",

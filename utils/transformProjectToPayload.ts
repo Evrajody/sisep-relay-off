@@ -61,7 +61,7 @@ export function transformProjectToPayload(project: any): any {
       // Si l'indicateur a un ID, c'est un indicateur existant
       indicatorId: indicator.id ? {
         id: indicator.id,
-        nom: indicator.name || indicator.indicatorName,
+        denomination: indicator.name || indicator.indicatorName,
       } : null,
 
       // Données de l'indicateur
@@ -178,6 +178,7 @@ export function transformPayloadToAPI(formData: any): any {
   if (formData.indicators && formData.indicators.length > 0) {
     payload.indicators = formData.indicators.map((indicator: any) => {
       const transformed: any = {
+        indicatorId: indicator.indicatorId,
         indicatorName: indicator.indicatorName,
         baselineYear: indicator.baselineYear,
         baselineValue: indicator.baselineValue,
@@ -187,11 +188,6 @@ export function transformPayloadToAPI(formData: any): any {
         latestValue: indicator.latestValue,
         methodologyReference: indicator.methodologyReference,
       };
-
-      // Si c'est un indicateur existant, ajouter l'ID
-      if (indicator.indicatorId?.id) {
-        transformed.id = indicator.indicatorId.id;
-      }
 
       return transformed;
     });
@@ -208,21 +204,25 @@ export function transformPayloadToAPI(formData: any): any {
     payload.location = {
       region: formData.location.region,
       city: formData.location.city,
+      location: {
+          type: formData.location.location.type || 'point',
+          coordinates: formData.location.location.coordinates,
+      }
     };
 
-    // Ajout des coordonnées si présentes
-    if (formData.location.location?.coordinates) {
-      payload.location.location = {
-        type: formData.location.location.type || 'point',
-        coordinates: formData.location.location.coordinates,
-      };
-    }
+      // // Ajout des coordonnées si présentes
+      // if (formData.location.location?.coordinates) {
+      //   payload.location.location = {
+      //     type: formData.location.location.type || 'point',
+      //     coordinates: formData.location.location.coordinates,
+      //   };
+      // }
   }
 
   // Transformation des finances (du tableau au format attendu)
   if (formData.finances && formData.finances.length > 0) {
     payload.finances = formData.finances.map((finance: any) => ({
-      reportingYear: finance.reportingYear,
+      reportingYear: finance.reportingYear || '',
       instrumentType: finance.instrumentType,
       amountCommitedCfa: parseFloat(finance.amountCommitedCfa)?.toString() || '',
       amountDisbursedCfa: parseFloat(finance.amountDisbursedCfa)?.toString()  || '',

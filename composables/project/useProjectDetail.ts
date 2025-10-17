@@ -52,7 +52,7 @@ export const useProjectDetail = () => {
 
     try {
       const response = await $sisepApi(`/projects/${projectId}/update-status`, {
-        method: 'PATCH',
+        method: 'PUT',
         body: { status }
       });
 
@@ -64,6 +64,35 @@ export const useProjectDetail = () => {
     } catch (err) {
       console.error('Erreur lors de la mise à jour du statut:', err);
       error.value = 'Impossible de mettre à jour le statut du projet';
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  // Soumettre un projet pour validation (endpoint spécifique)
+  const submitProject = async (projectId: string) => {
+    if (!projectId) {
+      error.value = 'ID du projet manquant';
+      return false;
+    }
+
+    isLoading.value = true;
+    error.value = null;
+
+    try {
+      const response = await $sisepApi(`/projects/${projectId}/submit`, {
+        method: 'POST'
+      });
+
+      if (response && project.value) {
+        project.value.status = 'SUBMITTED';
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('Erreur lors de la soumission du projet:', err);
+      error.value = 'Impossible de soumettre le projet pour validation';
       return false;
     } finally {
       isLoading.value = false;
@@ -115,9 +144,14 @@ export const useProjectDetail = () => {
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { color: string; label: string }> = {
       DRAFT: { color: 'gray', label: 'Brouillon' },
-      PENDING: { color: 'yellow', label: 'En attente' },
-      PUBLISHED: { color: 'green', label: 'Publié' },
+      SUBMITTED: { color: 'blue', label: 'Soumis' },
+      VALIDATED: { color: 'green', label: 'Validé' },
+      VALIDATED_BY_STRUCTURE: { color: 'emerald', label: 'Validé par la structure' },
       REJECTED: { color: 'red', label: 'Rejeté' },
+      REJECTED_BY_STRUCTURE: { color: 'orange', label: 'Rejeté par la structure' },
+      PUBLISHED: { color: 'green', label: 'Publié' },
+      UNPUBLISHED: { color: 'gray', label: 'Non publié' },
+      PENDING: { color: 'yellow', label: 'En attente' },
     };
 
     return statusMap[status] || { color: 'gray', label: 'Inconnu' };
@@ -129,6 +163,7 @@ export const useProjectDetail = () => {
     error,
     fetchProject,
     updateProjectStatus,
+    submitProject,
     formatDate,
     getProjectProgress,
     getDaysRemaining,

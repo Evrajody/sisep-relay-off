@@ -14,7 +14,7 @@ export const useFileDisplay = () => {
             console.warn('useFileDisplay: fileId est requis');
             return '';
         }
-        return `${baseUrl}files/display/${fileId}`;
+        return `${baseUrl}/files/display/${fileId}`;
     };
 
     /**
@@ -55,7 +55,7 @@ export const useFileDisplay = () => {
             console.warn('useFileDisplay: storageBucket et storageName sont requis');
             return '';
         }
-        return `${baseUrl}files/${storageBucket}/${storageName}`;
+        return `${baseUrl}/files/${storageBucket}/${storageName}`;
     };
 
     /**

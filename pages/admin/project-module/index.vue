@@ -3,12 +3,10 @@ import { useProjects } from "~/composables/project/useProjects";
 import { useProjectDelete } from "~/composables/project/useProjectDelete";
 import type { Project } from '~/types';
 
-const router = useRouter();
 
 definePageMeta({
   layout: "sisep-app-layout",
   middleware: ["sidebase-auth"],
-  requiredPermissions: ["menu_list_roles", "menu_list_permissions"],
 });
 
 const links = [

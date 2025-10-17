@@ -1,6 +1,6 @@
 export const useSisebHelper = () => {
 
-    const { $sisepApi } = useNuxtApp()
+    const { $sisepApi, $sisepStatsApi } = useNuxtApp()
 
     const loadAccessibleModules = async (query: string) => {
         const modulesRequestData = await $sisepApi("modules", {
@@ -10,6 +10,43 @@ export const useSisebHelper = () => {
             },
         });
         return modulesRequestData?.data.modules;
+    };
+
+   const loadIndicators = async (query: string) => {
+        const indicatorsRequest = await $sisepStatsApi("indicators", {
+            method: "GET",
+            query: {
+                search: query,
+                paginateData: false
+            },
+        });
+        return indicatorsRequest?.indicators.map(entry => ({
+            denomination: entry.artefact.nameJson.fr,
+            id: entry.id,
+        }));
+    };
+
+    const loadDepartements = async (query: string) => {
+        const departementsData = await $sisepStatsApi("locations", {
+            method: "GET",
+            query: {
+                search: query,
+                paginateData: false,
+                type: "department"
+            },
+        });
+        return departementsData?.locations;
+    };
+
+    const loadVilles = async (query: string) => {
+        const villesData = await $sisepStatsApi("locations", {
+            method: "GET",
+            query: {
+                search: query,
+                paginateData: false
+            },
+        });
+        return villesData?.locations;
     };
 
     /* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
@@ -39,5 +76,8 @@ export const useSisebHelper = () => {
     return {
         loadAccessibleModules,
         uploadFileDocument,
+        loadIndicators,
+        loadVilles,
+        loadDepartements,
     }
 }

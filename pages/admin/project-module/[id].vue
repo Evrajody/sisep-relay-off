@@ -16,6 +16,7 @@ const {
   error,
   fetchProject,
   updateProjectStatus,
+  submitProject,
   formatDate,
   getStatusBadge,
 } = useProjectDetail();
@@ -37,13 +38,13 @@ const previewFile = ref<any>(null);
 const { deleteProject: deleteProjectComposable } = useProjectDelete();
 
 // Composable pour l'affectation de projet
-const { structuresList, structuresStatus, affectProject } = useAffectProject();
+const { structuresList, structuresStatus, affectProject, affectProjectFormEl, affectProjectForm  } = useAffectProject(projectId);
 
 // Actions du projet
 const deleteProject = async () => {
   const success = await deleteProjectComposable(projectId, project.value?.title);
   if (success) {
-    navigateTo('/project-module');
+    navigateTo({name: 'admin-project-module'});
   }
 };
 
@@ -82,91 +83,342 @@ const assignFocalPoint = async () => {
   }
 };
 
-const validateProject = async () => {
-  if (confirm('Voulez-vous valider ce projet ?')) {
-    await updateProjectStatus('PUBLISHED');
-    useToast().add({
-      title: 'Projet validé',
-      description: 'Le projet a été validé avec succès.',
-      icon: 'i-heroicons-check-circle',
-      color: 'green'
-    });
+// ========== FONCTIONS DE CHANGEMENT DE STATUT ==========
+
+// Enregistrer comme brouillon
+const saveDraft = async () => {
+  const confirmed = await makeAlert({
+    type: 'info',
+    title: 'Enregistrer comme brouillon',
+    message: 'Voulez-vous enregistrer ce projet comme brouillon ?',
+    confirmText: 'Oui, enregistrer',
+    cancelText: 'Annuler',
+    requireConfirmation: true,
+  });
+
+  if (!confirmed) return;
+
+  const loading = useLoading();
+  try {
+    loading.start('Enregistrement du brouillon...');
+    const success = await updateProjectStatus(projectId, 'DRAFT');
+
+    if (success) {
+      makeAlert({
+        type: 'success',
+        title: 'Brouillon enregistré !',
+        message: 'Le projet a été enregistré comme brouillon.',
+      });
+      await fetchProject(projectId);
+    }
+  } finally {
+    loading.finish();
   }
 };
 
-const rejectProject = async () => {
-  if (confirm('Voulez-vous rejeter ce projet ?')) {
-    await updateProjectStatus('REJECTED');
-    useToast().add({
-      title: 'Projet rejeté',
-      description: 'Le projet a été rejeté.',
-      icon: 'i-heroicons-x-circle',
-      color: 'red'
-    });
-  }
-};
-
+// Soumettre pour validation
 const submitForValidation = async () => {
-  if (confirm('Soumettre ce projet pour validation ?')) {
-    await updateProjectStatus('PENDING');
-    useToast().add({
-      title: 'Projet soumis',
-      description: 'Le projet a été soumis pour validation.',
-      icon: 'i-heroicons-paper-airplane',
-      color: 'blue'
-    });
+  const confirmed = await makeAlert({
+    type: 'warning',
+    title: 'Soumettre le projet',
+    message: 'Êtes-vous sûr de vouloir soumettre ce projet pour validation ?',
+    confirmText: 'Oui, soumettre',
+    cancelText: 'Annuler',
+    requireConfirmation: true,
+  });
+
+  if (!confirmed) return;
+
+  const loading = useLoading();
+  try {
+    loading.start('Soumission du projet...');
+    const success = await submitProject(projectId);
+
+    if (success) {
+      makeAlert({
+        type: 'success',
+        title: 'Projet soumis !',
+        message: 'Le projet a été soumis pour validation avec succès.',
+      });
+      await fetchProject(projectId);
+    }
+  } finally {
+    loading.finish();
   }
 };
 
-// Actions disponibles
+// Valider le projet
+const validateProject = async () => {
+  const confirmed = await makeAlert({
+    type: 'warning',
+    title: 'Valider le projet',
+    message: 'Êtes-vous sûr de vouloir valider ce projet ?',
+    confirmText: 'Oui, valider',
+    cancelText: 'Annuler',
+    requireConfirmation: true,
+  });
 
-const projectActions = computed(() => [
-  [
-    {
-      label: 'Modifier',
-      icon: 'i-heroicons-pencil-square',
-      click: () => navigateTo(`/admin/project-module/edit-project/${projectId}`)
-    },
-    {
-      label: 'Affecter un point focal',
-      icon: 'i-heroicons-user-plus',
-      click: () => assignFocalPointModal.value = true
+  if (!confirmed) return;
+
+  const loading = useLoading();
+  try {
+    loading.start('Validation du projet...');
+    const success = await updateProjectStatus(projectId, 'VALIDATED');
+
+    if (success) {
+      makeAlert({
+        type: 'success',
+        title: 'Projet validé !',
+        message: 'Le projet a été validé avec succès.',
+      });
+      await fetchProject(projectId);
     }
-  ],
-  [
-    {
-      label: 'Soumettre pour validation',
-      icon: 'i-heroicons-paper-airplane',
-      click: submitForValidation,
-      disabled: project.value?.status === 'PENDING' || project.value?.status === 'PUBLISHED'
-    },
-    {
-      label: 'Valider',
-      icon: 'i-heroicons-check-circle',
-      click: validateProject,
-      disabled: project.value?.status === 'PUBLISHED'
-    },
-    {
-      label: 'Rejeter',
-      icon: 'i-heroicons-x-circle',
-      click: rejectProject,
-      disabled: project.value?.status === 'REJECTED'
+  } finally {
+    loading.finish();
+  }
+};
+
+// Valider par la structure
+const validateByStructure = async () => {
+  const confirmed = await makeAlert({
+    type: 'warning',
+    title: 'Validation par la structure',
+    message: 'Êtes-vous sûr de vouloir valider ce projet au nom de la structure ?',
+    confirmText: 'Oui, valider',
+    cancelText: 'Annuler',
+    requireConfirmation: true,
+  });
+
+  if (!confirmed) return;
+
+  const loading = useLoading();
+  try {
+    loading.start('Validation par la structure...');
+    const success = await updateProjectStatus(projectId, 'VALIDATED_BY_STRUCTURE');
+
+    if (success) {
+      makeAlert({
+        type: 'success',
+        title: 'Validation effectuée !',
+        message: 'Le projet a été validé par la structure avec succès.',
+      });
+      await fetchProject(projectId);
     }
-  ],
-  [
-    {
-      label: 'Exporter en PDF',
-      icon: 'i-heroicons-document-arrow-down',
-      click: () => alert('Export PDF en cours de développement')
-    },
-    {
-      label: 'Supprimer',
-      icon: 'i-heroicons-trash',
-      click: deleteProject,
-      class: 'text-red-600'
+  } finally {
+    loading.finish();
+  }
+};
+
+// Rejeter le projet
+const rejectProject = async () => {
+  const confirmed = await makeAlert({
+    type: 'error',
+    title: 'Rejeter le projet',
+    message: 'Êtes-vous sûr de vouloir rejeter ce projet ? Cette action nécessitera une nouvelle soumission.',
+    confirmText: 'Oui, rejeter',
+    cancelText: 'Annuler',
+    requireConfirmation: true,
+    extraClass: 'bg-red-500',
+  });
+
+  if (!confirmed) return;
+
+  const loading = useLoading();
+  try {
+    loading.start('Rejet du projet...');
+    const success = await updateProjectStatus(projectId, 'REJECTED');
+
+    if (success) {
+      makeAlert({
+        type: 'info',
+        title: 'Projet rejeté',
+        message: 'Le projet a été rejeté.',
+      });
+      await fetchProject(projectId);
     }
-  ]
-]);
+  } finally {
+    loading.finish();
+  }
+};
+
+// Rejeter par la structure
+const rejectByStructure = async () => {
+  const confirmed = await makeAlert({
+    type: 'error',
+    title: 'Rejet par la structure',
+    message: 'Êtes-vous sûr de vouloir rejeter ce projet au nom de la structure ?',
+    confirmText: 'Oui, rejeter',
+    cancelText: 'Annuler',
+    requireConfirmation: true,
+    extraClass: 'bg-red-500',
+  });
+
+  if (!confirmed) return;
+
+  const loading = useLoading();
+  try {
+    loading.start('Rejet par la structure...');
+    const success = await updateProjectStatus(projectId, 'REJECTED_BY_STRUCTURE');
+
+    if (success) {
+      makeAlert({
+        type: 'info',
+        title: 'Rejet effectué',
+        message: 'Le projet a été rejeté par la structure.',
+      });
+      await fetchProject(projectId);
+    }
+  } finally {
+    loading.finish();
+  }
+};
+
+// Publier le projet
+const publishProject = async () => {
+  const confirmed = await makeAlert({
+    type: 'warning',
+    title: 'Publier le projet',
+    message: 'Êtes-vous sûr de vouloir publier ce projet ? Il sera visible publiquement.',
+    confirmText: 'Oui, publier',
+    cancelText: 'Annuler',
+    requireConfirmation: true,
+  });
+
+  if (!confirmed) return;
+
+  const loading = useLoading();
+  try {
+    loading.start('Publication du projet...');
+    const success = await updateProjectStatus(projectId, 'PUBLISHED');
+
+    if (success) {
+      makeAlert({
+        type: 'success',
+        title: 'Projet publié !',
+        message: 'Le projet a été publié avec succès et est maintenant visible publiquement.',
+      });
+      await fetchProject(projectId);
+    }
+  } finally {
+    loading.finish();
+  }
+};
+
+// Dépublier le projet
+const unpublishProject = async () => {
+  const confirmed = await makeAlert({
+    type: 'warning',
+    title: 'Dépublier le projet',
+    message: 'Êtes-vous sûr de vouloir retirer ce projet de la publication ?',
+    confirmText: 'Oui, dépublier',
+    cancelText: 'Annuler',
+    requireConfirmation: true,
+  });
+
+  if (!confirmed) return;
+
+  const loading = useLoading();
+  try {
+    loading.start('Retrait de la publication...');
+    const success = await updateProjectStatus(projectId, 'UNPUBLISHED');
+
+    if (success) {
+      makeAlert({
+        type: 'success',
+        title: 'Projet dépublié',
+        message: 'Le projet n\'est plus visible publiquement.',
+      });
+      await fetchProject(projectId);
+    }
+  } finally {
+    loading.finish();
+  }
+};
+
+// Actions disponibles avec logique conditionnelle basée sur le statut
+
+const projectActions = computed(() => {
+  const currentStatus = project.value?.status;
+
+  return [
+    // Groupe 1: Actions de gestion
+    [
+      {
+        label: 'Modifier',
+        icon: 'i-heroicons-pencil-square',
+        click: () => navigateTo(`/admin/project-module/edit-project/${projectId}`)
+      },
+      {
+        label: 'Affecter',
+        icon: 'i-heroicons-user-plus',
+        click: () => assignFocalPointModal.value = true
+      }
+    ],
+    // Groupe 2: Actions de workflow
+    [
+      // {
+      //   label: 'Enregistrer comme brouillon',
+      //   icon: 'i-heroicons-document',
+      //   click: saveDraft,
+      //   // disabled: currentStatus === 'DRAFT'
+      // },
+      {
+        label: 'Soumettre',
+        icon: 'i-heroicons-paper-airplane',
+        click: submitForValidation,
+        // disabled: currentStatus === 'SUBMITTED' || currentStatus === 'VALIDATED' || currentStatus === 'VALIDATED_BY_STRUCTURE' || currentStatus === 'PUBLISHED'
+      },
+      {
+        label: 'Valider',
+        icon: 'i-heroicons-check-circle',
+        click: validateProject,
+        // disabled: currentStatus === 'VALIDATED' || currentStatus === 'VALIDATED_BY_STRUCTURE' || currentStatus === 'PUBLISHED'
+      },
+      {
+        label: 'Valider (Structure)',
+        icon: 'i-heroicons-building-office-2',
+        click: validateByStructure,
+        // disabled: currentStatus === 'VALIDATED_BY_STRUCTURE' || currentStatus === 'PUBLISHED'
+      },
+      {
+        label: 'Rejeter',
+        icon: 'i-heroicons-x-circle',
+        click: rejectProject,
+        // disabled: currentStatus === 'REJECTED' || currentStatus === 'DRAFT'
+      },
+      {
+        label: 'Rejeter (Structure)',
+        icon: 'i-heroicons-building-office',
+        click: rejectByStructure,
+        // disabled: currentStatus === 'REJECTED_BY_STRUCTURE' || currentStatus === 'DRAFT'
+      }
+    ],
+    // Groupe 3: Actions de publication
+    [
+      {
+        label: 'Publier',
+        icon: 'i-heroicons-globe-alt',
+        click: publishProject,
+        // disabled: currentStatus === 'PUBLISHED' || currentStatus === 'DRAFT' || currentStatus === 'SUBMITTED'
+      },
+      {
+        label: 'Dépublier',
+        icon: 'i-heroicons-eye-slash',
+        click: unpublishProject,
+        // disabled: currentStatus !== 'PUBLISHED'
+      }
+    ],
+    // Groupe 4: Actions dangereuses
+    [
+      {
+        label: 'Supprimer',
+        icon: 'i-heroicons-trash',
+        click: deleteProject,
+        class: 'text-red-600'
+      }
+    ]
+  ];
+});
 
 // Onglets
 const tabs = [
@@ -207,7 +459,6 @@ useHead({
 definePageMeta({
   layout: "sisep-app-layout",
   middleware: ["sidebase-auth"],
-  requiredPermissions: ["menu_list_roles", "menu_list_permissions"],
 });
 
 </script>
@@ -229,6 +480,7 @@ definePageMeta({
 <!--      <pre>-->
 <!--        {{ project }}-->
 <!--      </pre>-->
+
 
       <!-- Informations principales superposées -->
       <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent">
@@ -276,6 +528,7 @@ definePageMeta({
         </div>
       </div>
     </div>
+
 
     <!-- Contenu principal -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -720,32 +973,8 @@ definePageMeta({
         </template>
 
         <div class="space-y-4">
-          <UFormGroup label="Structure" required>
-            <USelectMenu
-              v-model="selectedStructure"
-              :options="structuresList?.categories || []"
-              option-attribute="artefact.nameJson.fr"
-              value-attribute="id"
-              placeholder="Sélectionnez une structure"
-              :loading="structuresStatus === 'pending'"
-              searchable
-              searchable-placeholder="Rechercher une structure..."
-            >
-              <template #label>
-                <span v-if="selectedStructure">
-                  {{ structuresList?.data?.find((s: any) => s.id === selectedStructure)?.label || 'Sélectionnez une structure' }}
-                </span>
-                <span v-else class="text-gray-400">Sélectionnez une structure</span>
-              </template>
 
-              <template #option="{ option }">
-                <div class="flex flex-col">
-                  <span class="font-medium">{{ option.label }}</span>
-                  <span class="text-xs text-gray-500">{{ option.abbreviation || 'Pas d\'abréviation' }}</span>
-                </div>
-              </template>
-            </USelectMenu>
-          </UFormGroup>
+          <Vueform ref="affectProjectFormEl" v-bind="affectProjectForm"></Vueform>
 
           <div v-if="selectedStructure" class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <p class="text-sm text-blue-800 dark:text-blue-200">
@@ -766,9 +995,7 @@ definePageMeta({
             </UButton>
             <UButton
               color="primary"
-              @click="assignFocalPoint"
-              :disabled="!selectedStructure || structuresStatus === 'pending'"
-            >
+              @click="affectProjectFormEl?.submit()">
               Affecter
             </UButton>
           </div>

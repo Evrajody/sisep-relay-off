@@ -98,6 +98,7 @@ onMounted(() => {
           Modifiez les informations du projet ci-dessous
         </template>
 
+
         <div v-if="!isLoadingProject && project">
           <Vueform
             v-bind="updateProjectForm"

@@ -1,11 +1,18 @@
 <script lang="ts" setup>
+
 import { useCreateTypeProject } from "~/composables/type-projets/useCreateTypeProject";
 import { useTypeProjects } from "~/composables/type-projets/useTypeProjects";
 import type { TypeProject } from "~/types";
 
 definePageMeta({
     layout: "sisep-app-layout",
+    middleware: ["sidebase-auth"],
 });
+
+useHead({
+  title: "Liste des types de projets",
+});
+
 
 const links = [
     {
@@ -13,10 +20,6 @@ const links = [
         icon: "i-heroicons-tag",
     },
 ];
-
-useHead({
-    title: "Liste des types de projets",
-});
 
 // Chargement de la liste des types de projets
 const {

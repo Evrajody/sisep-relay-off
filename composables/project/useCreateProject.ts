@@ -1,10 +1,12 @@
-
-import { transformTmpPayload } from '~/utils/transformTmpPayload'
+import {transformTmpPayload} from '~/utils/transformTmpPayload'
 
 
 export const useCreateProject = () => {
 
     const {$sisepApi} = useNuxtApp()
+
+
+    const {loadIndicators, loadVilles, loadDepartements,} = useSisebHelper()
 
     const createProject = async (data: any) => {
 
@@ -61,13 +63,28 @@ export const useCreateProject = () => {
 
             // console.log(JSON.stringify(req))
 
+            // Normaliser les indicateurs: extraire l'id et la denomination
+            const normalizedIndicators = d.indicators?.map((indicator: any) => {
+                // Si indicatorId est un objet avec id et denomination
+                if (indicator.indicatorId && typeof indicator.indicatorId === 'object') {
+                    return {
+                        ...indicator,
+                        indicatorId: indicator.indicatorId.id, // Remplacer l'objet par juste l'ID
+                        indicatorName: indicator.indicatorId.denomination || indicator.indicatorName // Utiliser la denomination de l'objet
+                    };
+                }
+                // Sinon retourner l'indicateur tel quel
+                return indicator;
+            }) || [];
+
             let payloadProject = {
                 ...d,
+                indicators: normalizedIndicators, // Utiliser les indicateurs normalisés
                 location: {
                     ...d.location,
                     location: (d.location.location.latitude && d.location.location.longitude) ? {
                         ...d.location.location,
-                        coordinates:   [[d.location.location.latitude, d.location.location.longitude]]
+                        coordinates: [[d.location.location.latitude, d.location.location.longitude]]
                     } : null,
                 }
             }
@@ -165,12 +182,12 @@ export const useCreateProject = () => {
             title: {
                 type: 'text', default: '',
                 label: "Intitulé du projet",
+                rules: ['required'],
                 info: "Fournisseur un titre génériques pour le projet",
                 placeholder: "Ex: Projet d'amélioration de l'accès à l'eau potable",
                 columns: {
                     lg: {container: 12, label: 12, wrapper: 12},
                 },
-                rules: [],
             },
 
             startDate: {
@@ -189,7 +206,6 @@ export const useCreateProject = () => {
                 rows: 7,
                 label: "Description du projet",
                 info: "Décrivez le projet",
-                rules: [],
             },
 
             objective: {
@@ -236,7 +252,7 @@ export const useCreateProject = () => {
                 type: 'select',
                 label: "Type de projet",
                 info: "Type de projet",
-                rules: [],
+                rules: ['required'],
                 items: "project-types",
                 dataKey: "data",
                 labelProp: "name",
@@ -250,19 +266,6 @@ export const useCreateProject = () => {
                 },
             },
 
-            // status: {
-            //     type: 'select',
-            //     label: "Statut du projet",
-            //     items: [
-            //         {value: 'DRAFT', label: 'Brouillon'},
-            //         {value: 'PUBLISHED', label: 'Publié'},
-            //         {value: 'ARCHIVED', label: 'Archivé'},
-            //     ],
-            //
-            //     native: false,
-            // },
-
-
             indicators: {
 
                 type: "list",
@@ -275,6 +278,7 @@ export const useCreateProject = () => {
                 element: {
 
                     type: "object",
+
                     label: (el$) => `Indicateur ${parseInt(el$.dataPath.replace('indicators.', '')) + 1}`,
 
                     addClasses: {
@@ -294,31 +298,23 @@ export const useCreateProject = () => {
 
                     schema: {
 
-                        // activate_select_indicators: {
-                        //     type: "toggle",
-                        //     text: "Activer la selection d'un indicateur",
-                        // },
-
-                        // separator: {
-                        //     type: "static",
-                        //     tag: "hr",
-                        //     columns: {
-                        //         lg: {container: 12, label: 12, wrapper: 12},
-                        //     },
-                        // },
-
                         indicatorId: {
 
                             label: "Indicateur associable au projet",
                             type: "select",
                             description: "Sélectionnez un indicateur existant associé au projet",
-                            // conditions: [["indicators.*.activate_select_indicators", true]], //
                             search: true,
                             native: true,
+                            object: true,
                             inputType: "search",
                             searchParam: "search",
                             valueProp: "id",
-                            labelProp: "nom",
+                            rules: ['required'],
+                            labelProp: "denomination",
+                            items: async (query: string) => {
+                                let data = await loadIndicators(query);
+                                return data
+                            },
                             delay: 1,
                             autocomplete: "off",
                             columns: {
@@ -332,16 +328,10 @@ export const useCreateProject = () => {
                                 },
                             },
 
-                            items: [
-                                'indicatoris 01',
-                                'indicatoris 02',
-                                'indicatoris 03',
-                            ],
 
                         },
 
                         create_indicator_stuff: {
-                            // conditions: [["indicators.*.activate_select_indicators", false]],
                             type: "group",
                             columns: {
                                 lg: {container: 12, label: 12, wrapper: 12},
@@ -352,7 +342,6 @@ export const useCreateProject = () => {
                                 indicatorName: {
                                     type: 'text', default: '',
                                     label: "Libelle de l'indicateur",
-                                    rules: ["required"],
                                     info: "Formuler un libelle pour l'indicateur",
                                     placeholder: "Ex: Taux d'accès à l'eau potable",
                                     columns: {
@@ -465,15 +454,15 @@ export const useCreateProject = () => {
                             type: 'text', default: '',
                             label: "Type de l'action",
                             description: "Nature de l'action",
+                            rules: ['required'],
                             placeholder: "Ex: Formation, Sensibilisation, Construction",
-                            rules: [],
                         },
 
                         status: {
                             type: 'text', default: '',
                             label: "Statut de l'action",
                             placeholder: "Ex: En cours, Terminée, Planifiée",
-                            rules: [],
+                            rules: ['required'],
                         },
 
                         description: {
@@ -481,7 +470,6 @@ export const useCreateProject = () => {
                             label: "Description de l'action",
                             description: "Décrivez l'action",
                             placeholder: "Ex: Formation de 50 agents sur les techniques de purification",
-                            rules: [],
                             columns: {
                                 lg: {container: 12, label: 12, wrapper: 12},
                             },
@@ -522,14 +510,17 @@ export const useCreateProject = () => {
                     schema: {
 
                         name: {
-                            type: 'text', default: '',
+                            type: 'text',
+                            default: '',
                             label: 'Nom',
+                            rules: ['required'],
                             placeholder: "Ex: Ministère de l'Eau, ONG XYZ",
                         },
 
                         type: {
                             type: 'text', default: '',
                             label: 'Type de partenaire',
+                            rules: ['required'],
                             placeholder: "Ex: Technique, Financier, Institutionnel",
                         },
 
@@ -574,7 +565,6 @@ export const useCreateProject = () => {
                     md: {container: 12, label: 12, wrapper: 12},
                     lg: {container: 12, label: 12, wrapper: 12},
                 },
-                rules: [],
                 drop: true
             },
 
@@ -615,6 +605,7 @@ export const useCreateProject = () => {
                         name: {
                             type: 'text', default: '',
                             label: 'Nom',
+                            rules: ['required'],
                             placeholder: "Ex: Femmes rurales, Enfants de 5-15 ans",
                         },
 
@@ -658,10 +649,12 @@ export const useCreateProject = () => {
                         verificationLevel: {
                             type: "text",
                             label: "Niveau de vérification",
+                            rules: ['required'],
                             placeholder: "Ex: Niveau 1, Niveau 2, Audit complet",
                         },
                         verificationDate: {
                             type: "date",
+                            rules: ['required'],
                             label: "Date de vérification",
                         },
                         verifier: {
@@ -673,11 +666,13 @@ export const useCreateProject = () => {
                                 name: {
                                     type: 'text', default: '',
                                     label: 'Nom',
+                                    rules: ['required'],
                                     placeholder: "Ex: Jean Dupont",
                                 },
                                 organization: {
                                     type: "text",
                                     label: "Organisation",
+                                    rules: ['required'],
                                     placeholder: "Ex: Bureau d'Audit National",
                                 }
                             }
@@ -699,11 +694,8 @@ export const useCreateProject = () => {
 
             finances: {
                 type: 'list',
-                initial: 1,
-                canAdd: false,
-                canRemove: false,
-                min: 1,
-                max: 1,
+                initial: 0,
+                addText: "Ajouter des données de financements",
                 columns: {
                     lg: {container: 12, label: 12, wrapper: 12},
                 },
@@ -711,7 +703,6 @@ export const useCreateProject = () => {
                 element: {
 
                     type: 'object',
-                    //  label: (el$) => `Fichier ${parseInt(el$.dataPath.replace('finances.', '')) + 1}`,
 
                     columns: {
                         lg: {container: 12, label: 12, wrapper: 12},
@@ -734,20 +725,23 @@ export const useCreateProject = () => {
                         reportingYear: {
                             type: 'date',
                             label: 'Date du rapport',
-                            default: ''
+                            default: '',
+                            rules: ['required'],
                         },
                         instrumentType: {
                             type: 'text',
                             default: '',
                             label: 'Type d\'instrument',
-                            placeholder: "Ex: Subvention, Prêt, Don"
+                            placeholder: "Ex: Subvention, Prêt, Don",
+                            rules: ['required'],
                         },
                         amountCommitedCfa: {
                             type: 'text',
                             default: '',
                             label: 'Montant engagé',
                             mask: 'number',
-                            placeholder: "Ex: 50000000"
+                            placeholder: "Ex: 50000000",
+                            rules: ['required'],
                         },
 
                         amountDisbursedCfa: {
@@ -755,7 +749,8 @@ export const useCreateProject = () => {
                             default: '',
                             label: 'Montant distribué',
                             mask: 'number',
-                            placeholder: "Ex: 25000000"
+                            placeholder: "Ex: 25000000",
+                            rules: ['required'],
                         },
 
                         currency: {
@@ -763,6 +758,7 @@ export const useCreateProject = () => {
                             label: 'Devise',
                             native: false,
                             default: 'XOF',
+                            rules: ['required'],
                             items: [
                                 {value: 'EUR', label: 'Euros'},
                                 {value: 'US', label: 'Dollar'},
@@ -775,7 +771,8 @@ export const useCreateProject = () => {
                             mask: 'number',
                             default: '',
                             label: 'Taux de change utilisé',
-                            placeholder: "Ex: 655.957"
+                            placeholder: "Ex: 655.957",
+                            rules: ['required'],
                         },
                         fundingSource: {
                             type: 'object',
@@ -787,8 +784,18 @@ export const useCreateProject = () => {
                                 lg: {container: 12, label: 12, wrapper: 12},
                             },
                             schema: {
-                                donor: {type: 'text', default: '', label: 'Donateur', placeholder: "Ex: Banque Mondiale, UE, AFD"},
-                                program: {type: 'text', default: '', label: 'Programme', placeholder: "Ex: Programme de développement rural"},
+                                donor: {
+                                    type: 'text',
+                                    default: '',
+                                    label: 'Donateur',
+                                    placeholder: "Ex: Banque Mondiale, UE, AFD"
+                                },
+                                program: {
+                                    type: 'text',
+                                    default: '',
+                                    label: 'Programme',
+                                    placeholder: "Ex: Programme de développement rural"
+                                },
                             },
                         }
                     }
@@ -797,27 +804,6 @@ export const useCreateProject = () => {
 
             },
 
-            // finances: {
-            //     type: 'object',
-            //     label: 'Finances',
-            //     addClasses: {
-            //
-            //         ElementLayout: {
-            //             innerContainer: "border border-gray-200 bg-gray-50 px-3 py-5",
-            //         },
-            //
-            //         ElementLabel: {
-            //             wrapper: "text-xl text-primary py-1.5",
-            //             container_lg: "!pb-0",
-            //         },
-            //     },
-            //     columns: {
-            //         default: {container: 12, label: 12, wrapper: 12},
-            //         sm: {container: 12, label: 12, wrapper: 12},
-            //         md: {container: 12, label: 12, wrapper: 12},
-            //         lg: {container: 12, label: 12, wrapper: 12},
-            //     },
-            // },
 
             files: {
                 type: 'list',
@@ -854,7 +840,7 @@ export const useCreateProject = () => {
                             type: 'select',
                             label: "Type de fichier",
                             info: "Nature du fichier par rapport au projet",
-                            rules: [],
+                            rules: ['required'],
                             items: "file-types",
                             dataKey: "fileTypes",
                             labelProp: "name",
@@ -868,6 +854,7 @@ export const useCreateProject = () => {
                         fileId: {
                             type: 'file',
                             label: 'Fichier',
+                            rules: ['required'],
                         },
 
                     }
@@ -895,10 +882,9 @@ export const useCreateProject = () => {
                         label: "Département",
                         type: "select",
                         rules: [],
-                        items: [
-                            'cotonou',
-                            'calavi'
-                        ],
+                        items: async (query: string) => {
+                            return await loadDepartements(query)
+                        },
                         valueProp: "id",
                         search: true,
                         native: true,
@@ -909,11 +895,9 @@ export const useCreateProject = () => {
                     city: {
                         label: "Villes (Communes)",
                         type: "select",
-                        rules: [],
-                        items: [
-                            'cotonou',
-                            'calavi'
-                        ],
+                        items: async (query: string) => {
+                            return await loadVilles(query)
+                        },
                         labelProp: "name",
                         valueProp: "id",
                         search: true,

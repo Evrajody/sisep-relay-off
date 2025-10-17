@@ -50,7 +50,6 @@ const changModuleForm = computed(() => ({
       valueProp: "id",
       search: true,
       native: true,
-      default: 23,
       inputType: "search",
       autocomplete: "off",
     }
