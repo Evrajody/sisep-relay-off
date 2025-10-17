@@ -14,7 +14,7 @@ export default NuxtAuthHandler({
         KeycloakProvider.default({
             name: "keycloak",
             clientId: useRuntimeConfig().public.keycloakClientId,
-            clientSecret: process.env.KEYCLOAK_SECRET || "siseb-front",
+            clientSecret: "u888uNvKz3Tp9dlIAcvKqEKg8nSQTQxW",
             issuer: `${useRuntimeConfig().public.keycloakUrl}/realms/${useRuntimeConfig().public.keycloakRealm}`,
         }),
     ],
