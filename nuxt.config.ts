@@ -32,14 +32,11 @@ export default defineNuxtConfig({
         },
     },
 
-    // nitro: {
-    //     devProxy: {
-    //         '/api': {
-    //             target: process.env.NUXT_PUBLIC_SISEB_API_BASE_URL,
-    //             changeOrigin: true,
-    //         },
-    //     },
-    // },
+    nitro: {
+        routeRules: {
+            '/local/auth/**': { cors: true }
+        }
+    },
 
     experimental: {
         payloadExtraction: false,
@@ -71,13 +68,14 @@ export default defineNuxtConfig({
         originEnvKey: "AUTH_ORIGIN",
         baseURL: `${process.env.NUXT_AUTH_ORIGIN}/local/auth`,
         sessionRefresh: {
-            enablePeriodically: false,
+            enablePeriodically: true,
             enableOnWindowFocus: true,
         },
         provider: {
             type: "authjs",
-            trustHost: true,
-            defaultProvider: "github",
+            trustHost: false,
+            defaultProvider: 'keycloak',
+            addDefaultCallbackUrl: true
         },
     },
 
