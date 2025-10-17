@@ -3,10 +3,13 @@ import KeycloakProvider from "next-auth/providers/keycloak";
 import { NuxtAuthHandler } from "#auth";
 
 export default NuxtAuthHandler({
-    // TODO: SET A STRONG SECRET, SEE https://sidebase.io/nuxt-auth/configuration/nuxt-auth-handler#secret
+
     secret: process.env.AUTH_SECRET || "f56a81d8-4110-4342-aa81-d84110b34246",
-    // TODO: ADD YOUR OWN AUTHENTICATION PROVIDER HERE, READ THE DOCS FOR MORE: https://sidebase.io/nuxt-auth
+
+    debug: true,
+
     providers: [
+
         // @ts-expect-error You need to use .default here for it to work during SSR. May be fixed via Vite at some point
         KeycloakProvider.default({
             name: "keycloak",
@@ -14,115 +17,49 @@ export default NuxtAuthHandler({
             clientSecret: process.env.KEYCLOAK_SECRET || "siseb-front",
             issuer: `${useRuntimeConfig().public.keycloakUrl}/realms/${useRuntimeConfig().public.keycloakRealm}`,
         }),
-
-        // @ts-expect-error You need to use .default here for it to work during SSR. May be fixed via Vite at some point
-        CredentialsProvider.default({
-
-            name: "Credentials",
-            credentials: {
-                username: {
-                    label: "Username",
-                    type: "text",
-                    placeholder: "(hint: jsmith)",
-                },
-                password: {
-                    label: "Username",
-                    type: "password",
-                    placeholder: "(hint: hunter2)",
-                },
-            },
-
-            async authorize(credentials: any) {
-
-                const url = `${useRuntimeConfig().public.sisebApiBaseUrl}/api/auth/login_in`;
-
-                try {
-                    const res = await fetch(url, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            email: credentials.email,
-                            password: credentials.password,
-                            auth_provider: "local",
-                        }),
-                    });
-
-                    console.log("FROM SERVER", res);
-
-                    // Read as text first to handle non-JSON responses gracefully
-                    const text = await res.text();
-                    let data: any = undefined;
-                    try {
-                        data = text ? JSON.parse(text) : undefined;
-                        console.log("FROM SERVER", data);
-                    } catch (_) {
-                        // Non-JSON body (HTML, plain text, etc.)
-                        console.error("[AUTH ERROR - CREDENTIALS] Réponse non-JSON reçue du serveur", {
-                            timestamp: new Date().toISOString(),
-                            email: credentials.email,
-                            status: res.status,
-                            responseText: text.substring(0, 200), // Log les premiers 200 caractères
-                        });
-                    }
-
-                    console.log("FROM SERVER", res);
-
-                    if (!res.ok) {
-                        const message =
-                            (data && (data.message || data.error || data.msg)) ||
-                            `Echec d'authentification (${res.status})`;
-
-                        // Log détaillé de l'erreur d'authentification en production
-                        console.error("[AUTH ERROR - CREDENTIALS] Échec d'authentification par identifiants", {
-                            timestamp: new Date().toISOString(),
-                            email: credentials.email,
-                            status: res.status,
-                            errorMessage: message,
-                            errorData: data,
-                            url: url,
-                        });
-
-                        console.log("FROM SERVER", message);
-                        throw new Error(message);
-                    }
-
-                    const user = data ?? {};
-
-                    // Log succès de l'authentification
-                    console.log("[AUTH SUCCESS - CREDENTIALS] Authentification réussie", {
-                        timestamp: new Date().toISOString(),
-                        email: credentials.email,
-                    });
-
-                    return user;
-                } catch (error: any) {
-                    // Log des erreurs réseau ou autres erreurs inattendues
-                    console.error("[AUTH ERROR - CREDENTIALS] Erreur lors de l'authentification", {
-                        timestamp: new Date().toISOString(),
-                        email: credentials.email,
-                        error: error.message,
-                        stack: error.stack,
-                        url: url,
-                    });
-                    throw error;
-                }
-            },
-        }),
     ],
 
     callbacks: {
-        /* on before signin */
-        async signIn({ user, account, profile, email, credentials }) {
+
+        async jwt({ token, account, user, trigger, session }) {
+            if (user && user?.auth_provider == "local" && trigger === "signIn") {
+                token.name = `${user.userToSend.user.nom} ${user.userToSend.user.prenoms}`;
+                token.email = user.userToSend.user.email;
+                token.access_token = user.token;
+                token.refresh_token = user.userToSend.refreshToken;
+                token.auth_provider = user.auth_provider;
+                return Promise.resolve(token);
+            }
+
+            if (
+                token &&
+                user &&
+                account &&
+                account.access_token &&
+                trigger === "signIn"
+            ) {
+                token.access_token = account.access_token;
+                token.refresh_token = account.refresh_token;
+                return Promise.resolve(token);
+            }
+
+            if (token && trigger === undefined) {
+                return Promise.resolve(token);
+            }
+
+            return Promise.resolve(token);
+        },
+
+        async signIn(payload) {
             return true;
         },
 
-        /* on redirect to another url */
         async redirect({ url, baseUrl }) {
             return `${baseUrl}/admin/project-module/dashboard`;
         },
 
-        /* on session retrival */
         async session({ session, user, token }) {
+
             console.log("FROM SERVER", token);
 
             try {
@@ -187,35 +124,7 @@ export default NuxtAuthHandler({
                 throw error;
             }
         },
-        /* on JWT token creation or mutation */
-        async jwt({ token, account, user, trigger, session }) {
-            if (user && user?.auth_provider == "local" && trigger === "signIn") {
-                token.name = `${user.userToSend.user.nom} ${user.userToSend.user.prenoms}`;
-                token.email = user.userToSend.user.email;
-                token.access_token = user.token;
-                token.refresh_token = user.userToSend.refreshToken;
-                token.auth_provider = user.auth_provider;
-                return Promise.resolve(token);
-            }
 
-            if (
-                token &&
-                user &&
-                account &&
-                account.access_token &&
-                trigger === "signIn"
-            ) {
-                token.access_token = account.access_token;
-                token.refresh_token = account.refresh_token;
-                return Promise.resolve(token);
-            }
-
-            if (token && trigger === undefined) {
-                return Promise.resolve(token);
-            }
-
-            return Promise.resolve(token);
-        },
     },
 
     pages: {

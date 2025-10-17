@@ -1,97 +1,14 @@
 <script lang="ts" setup>
+
 import { UIcon } from "#components";
 
 definePageMeta({
   layout: "login-layout",
 });
 
-const links = [{
-  label: 'Création d\'un nouveau projet',
-  icon: 'i-heroicons-user-circle'
-}]
 
-const router = useRouter();
-const runtimeConfig = useRuntimeConfig();
 const { signIn, data } = useAuth();
 
-const passwordVisible = ref(false);
-const loginPermisFormEl = ref(null);
-
-
-const loginPermisForm = ref({
-
-  scrollOnNext: true,
-
-  id: "suivre-demande",
-
-  addClass: "max-w-full",
-
-  displayErrors: true,
-
-  showRequired: ["label"],
-
-  endpoint: async (form: any, payload: any) => {
-    navigateTo({name: 'admin-project-module-dashboard'})
-  },
-
-  schema: {
-    email: {
-      type: "text",
-      inputType: "text",
-      label: "Email",
-      placeholder: "sisep.admin@projet.bj",
-      rules: "required|email",
-      columns: {
-        default: { container: 12, label: 12, wrapper: 12 },
-        sm: { container: 12, label: 12, wrapper: 12 },
-        md: { container: 12, label: 12, wrapper: 12 },
-        lg: { container: 12, label: 12, wrapper: 12 },
-      },
-    },
-    password: {
-      rules: "required",
-      inputType: "password",
-      type: "text",
-      label: "Mot de passe",
-      slots: {
-        "addon-after": () =>
-            h(UIcon, {
-              name: !passwordVisible.value
-                  ? "i-heroicons-eye"
-                  : "i-heroicons-eye-slash",
-              class: "text-permis-base cursor-pointer size-6",
-              onClick: () => {
-                passwordVisible.value = !passwordVisible.value;
-                if (passwordVisible.value == true) {
-                  loginPermisFormEl.value.schema.password.inputType = "text";
-                } else {
-                  loginPermisFormEl.value.schema.password.inputType = "password";
-                }
-              },
-            }),
-      },
-      columns: {
-        default: { container: 12, label: 12, wrapper: 12 },
-        sm: { container: 12, label: 12, wrapper: 12 },
-        md: { container: 12, label: 12, wrapper: 12 },
-        lg: { container: 12, label: 12, wrapper: 12 },
-      },
-    },
-
-    register: {
-      type: "button",
-      submits: true,
-      buttonLabel: "Se connecter",
-      full: true,
-      columns: {
-        default: { container: 12, label: 12, wrapper: 12 },
-        sm: { container: 12, label: 12, wrapper: 12 },
-        md: { container: 12, label: 12, wrapper: 12 },
-        lg: { container: 12, label: 12, wrapper: 12 },
-      },
-    },
-  },
-});
 </script>
 
 <template>
@@ -124,24 +41,9 @@ const loginPermisForm = ref({
 
             <div id="error"></div>
 
-            <h4 class="font-bold text-center pt-4 text-2xl">
+            <h4 class="font-bold text-center py-5 text-2xl">
               Plateforme d'administration SISEB
             </h4>
-
-            <div class="mt-8">
-              <ClientOnly>
-                <Vueform ref="loginPermisFormEl" v-bind="loginPermisForm" />
-              </ClientOnly>
-            </div>
-
-
-            <div class="flex  gap-3 items-center mt-4">
-              <hr class="border flex-1 border-gray-300 my-5" />
-
-              <span class="font-bold">OU</span>
-
-              <hr class="border flex-1 border-gray-300 my-5" />
-            </div>
 
             <div class=" space-y-3">
               <NuxtLink

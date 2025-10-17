@@ -1,0 +1,78 @@
+ CredentialsProvider.default({
+
+            async authorize(credentials: any) {
+
+                const url = `${useRuntimeConfig().public.sisebApiBaseUrl}/api/auth/login_in`;
+
+                try {
+                    const res = await fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            email: credentials.email,
+                            password: credentials.password,
+                            auth_provider: "local",
+                        }),
+                    });
+
+                    console.log("FROM SERVER", res);
+
+                    // Read as text first to handle non-JSON responses gracefully
+                    const text = await res.text();
+                    let data: any = undefined;
+                    try {
+                        data = text ? JSON.parse(text) : undefined;
+                        console.log("FROM SERVER", data);
+                    } catch (_) {
+                        // Non-JSON body (HTML, plain text, etc.)
+                        console.error("[AUTH ERROR - CREDENTIALS] Réponse non-JSON reçue du serveur", {
+                            timestamp: new Date().toISOString(),
+                            email: credentials.email,
+                            status: res.status,
+                            responseText: text.substring(0, 200), // Log les premiers 200 caractères
+                        });
+                    }
+
+                    console.log("FROM SERVER", res);
+
+                    if (!res.ok) {
+                        const message =
+                            (data && (data.message || data.error || data.msg)) ||
+                            `Echec d'authentification (${res.status})`;
+
+                        // Log détaillé de l'erreur d'authentification en production
+                        console.error("[AUTH ERROR - CREDENTIALS] Échec d'authentification par identifiants", {
+                            timestamp: new Date().toISOString(),
+                            email: credentials.email,
+                            status: res.status,
+                            errorMessage: message,
+                            errorData: data,
+                            url: url,
+                        });
+
+                        console.log("FROM SERVER", message);
+                        throw new Error(message);
+                    }
+
+                    const user = data ?? {};
+
+                    // Log succès de l'authentification
+                    console.log("[AUTH SUCCESS - CREDENTIALS] Authentification réussie", {
+                        timestamp: new Date().toISOString(),
+                        email: credentials.email,
+                    });
+
+                    return user;
+                } catch (error: any) {
+                    // Log des erreurs réseau ou autres erreurs inattendues
+                    console.error("[AUTH ERROR - CREDENTIALS] Erreur lors de l'authentification", {
+                        timestamp: new Date().toISOString(),
+                        email: credentials.email,
+                        error: error.message,
+                        stack: error.stack,
+                        url: url,
+                    });
+                    throw error;
+                }
+            },
+        }),
