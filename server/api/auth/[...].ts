@@ -219,8 +219,8 @@ export default NuxtAuthHandler({
     },
 
     pages: {
-        signIn: "/",
-        signOut: "/",
-        error: "/",
+        signIn: "/admin/login",
+        signOut: "/admin/login",
+        error: "/admin/login",
     },
 });
