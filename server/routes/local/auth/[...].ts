@@ -128,8 +128,8 @@ export default NuxtAuthHandler({
     },
 
     pages: {
-        signIn: "/admin/login",
-        signOut: "/admin/login",
-        error: "/admin/login",
+        signIn: "/",
+        signOut: "/",
+        error: "/",
     },
 });
