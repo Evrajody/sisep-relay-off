@@ -67,7 +67,7 @@ export default defineNuxtConfig({
         },
         provider: {
             type: "authjs",
-            trustHost: false,
+            trustHost: true,
             defaultProvider: 'keycloak',
             addDefaultCallbackUrl: true
         },
