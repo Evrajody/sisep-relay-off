@@ -69,7 +69,7 @@ export default defineNuxtConfig({
         globalAppMiddleware: false,
         isEnabled: true,
         originEnvKey: "AUTH_ORIGIN",
-        baseURL: `${process.env.NUXT_AUTH_ORIGIN}/api/auth`,
+        baseURL: `${process.env.NUXT_AUTH_ORIGIN}/local/auth`,
         sessionRefresh: {
             enablePeriodically: false,
             enableOnWindowFocus: true,
