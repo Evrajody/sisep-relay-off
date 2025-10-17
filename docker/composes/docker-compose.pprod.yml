@@ -7,6 +7,10 @@ services:
       context: ../..
       dockerfile: docker/dockerfiles/Dockerfile@pprod
       tags: ['siseb-frontend-pprod']
+    extra_hosts:
+      - "keycloack.emes.bj:173.249.45.104"
+    environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
     networks:
       - siseb
 
