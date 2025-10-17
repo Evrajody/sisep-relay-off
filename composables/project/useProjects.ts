@@ -54,7 +54,13 @@ export const useProjects = () => {
         method: "GET",
         key: "auth-projets-list",
         $fetch: $sisepApi,
-
+        query: computed(() => ({
+            page: page.value,
+            limit: pageCount.value,
+            search: search.value || undefined,
+            status: selectedStatus.value?.value !== 'all' ? selectedStatus.value?.value : undefined,
+        })),
+        watch: [page, pageCount, search, selectedStatus],
 
         onResponse: ({ response }) => {
             if (response.status != 200) {

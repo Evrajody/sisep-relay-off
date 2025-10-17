@@ -37,8 +37,15 @@ const previewFile = ref<any>(null);
 // Gestion de la suppression
 const { deleteProject: deleteProjectComposable } = useProjectDelete();
 
+// Callback appelé après succès d'affectation
+const onAffectSuccess = async () => {
+  assignFocalPointModal.value = false;
+  selectedStructure.value = null;
+  await fetchProject(projectId);
+};
+
 // Composable pour l'affectation de projet
-const { structuresList, structuresStatus, affectProject, affectProjectFormEl, affectProjectForm  } = useAffectProject(projectId);
+const { structuresList, structuresStatus, affectProject, affectProjectFormEl, affectProjectForm  } = useAffectProject(projectId, onAffectSuccess);
 
 // Actions du projet
 const deleteProject = async () => {
@@ -589,6 +596,38 @@ definePageMeta({
                 </UCard>
               </div>
 
+              <!-- Structure affectée -->
+              <UCard v-if="project?.structure" class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-800">
+                <div class="flex items-start gap-4">
+                  <div class="p-4 bg-blue-500 dark:bg-blue-600 rounded-xl">
+                    <UIcon name="i-heroicons-building-office-2" class="w-8 h-8 text-white" />
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                      <UBadge color="blue" variant="soft" size="sm">Structure affectée</UBadge>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                      {{ project.structure.name }}
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                      <UIcon name="i-heroicons-identification" class="w-4 h-4" />
+                      <span>Code: {{ project.structure.code }}</span>
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <UButton
+                      color="blue"
+                      variant="soft"
+                      size="sm"
+                      icon="i-heroicons-arrow-top-right-on-square"
+                      @click="navigateTo(`/admin/structures/${project.structure.id}`)"
+                    >
+                      Voir la structure
+                    </UButton>
+                  </div>
+                </div>
+              </UCard>
+
               <!-- Description -->
               <UCard>
                 <template #header>
@@ -758,19 +797,98 @@ definePageMeta({
                     </UButton>
                   </div>
                 </template>
-                <div v-if="project?.indicators?.length" class="space-y-4">
+                <div v-if="project?.indicators?.length" class="space-y-6">
                   <div
                     v-for="indicator in project.indicators"
                     :key="indicator.id"
-                    class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+                    class="p-6 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-md transition-shadow bg-white dark:bg-gray-800"
                   >
-                    <h4 class="font-semibold mb-2">{{ indicator.name }}</h4>
-                    <div class="space-y-2">
-                      <div class="flex justify-between text-sm">
-                        <span>Valeur actuelle: {{ indicator.value }}</span>
-                        <span>Cible: {{ indicator.target }}</span>
+                    <!-- En-tête de l'indicateur -->
+                    <div class="flex items-start justify-between mb-4">
+                      <div class="flex-1">
+                        <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                          {{ indicator.indicatorName || 'Sans nom' }}
+                        </h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                          ID: {{ indicator.indicatorId }}
+                        </p>
                       </div>
-                      <UProgress :value="(Number(indicator.value) / Number(indicator.target)) * 100" />
+                      <UBadge color="blue" variant="soft" size="sm">
+                        <UIcon name="i-heroicons-chart-bar" class="mr-1" />
+                        Indicateur
+                      </UBadge>
+                    </div>
+
+                    <!-- Données de l'indicateur -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      <!-- Valeur de base -->
+                      <div class="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Valeur de base</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                          {{ indicator.baselineValue || 'N/A' }}
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Année: {{ indicator.baselineYear ? new Date(indicator.baselineYear).getFullYear() : 'N/A' }}
+                        </p>
+                      </div>
+
+                      <!-- Valeur cible -->
+                      <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                        <p class="text-xs text-green-600 dark:text-green-400 mb-1">Valeur cible</p>
+                        <p class="text-2xl font-bold text-green-700 dark:text-green-300">
+                          {{ indicator.targetValue || 'N/A' }}
+                        </p>
+                        <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                          Année: {{ indicator.targetYear ? new Date(indicator.targetYear).getFullYear() : 'N/A' }}
+                        </p>
+                      </div>
+
+                      <!-- Valeur la plus récente -->
+                      <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <p class="text-xs text-blue-600 dark:text-blue-400 mb-1">Valeur actuelle</p>
+                        <p class="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                          {{ indicator.latestValue || 'N/A' }}
+                        </p>
+                        <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                          Année: {{ indicator.latestYear ? new Date(indicator.latestYear).getFullYear() : 'N/A' }}
+                        </p>
+                      </div>
+                    </div>
+
+                    <!-- Barre de progression -->
+                    <div class="space-y-2">
+                      <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                        <span>Progression vers la cible</span>
+                        <span class="font-semibold">
+                          {{
+                            indicator.baselineValue && indicator.targetValue && indicator.latestValue
+                              ? Math.round(((Number(indicator.latestValue) - Number(indicator.baselineValue)) / (Number(indicator.targetValue) - Number(indicator.baselineValue))) * 100)
+                              : 0
+                          }}%
+                        </span>
+                      </div>
+                      <UProgress
+                        :value="
+                          indicator.baselineValue && indicator.targetValue && indicator.latestValue
+                            ? Math.min(100, Math.max(0, ((Number(indicator.latestValue) - Number(indicator.baselineValue)) / (Number(indicator.targetValue) - Number(indicator.baselineValue))) * 100))
+                            : 0
+                        "
+                        color="blue"
+                        size="md"
+                      />
+                    </div>
+
+                    <!-- Méthodologie -->
+                    <div v-if="indicator.methodologyReference?.url" class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Méthodologie de référence</p>
+                      <a
+                        :href="indicator.methodologyReference.url"
+                        target="_blank"
+                        class="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                      >
+                        {{ indicator.methodologyReference.url }}
+                        <UIcon name="i-heroicons-arrow-top-right-on-square" class="w-3 h-3" />
+                      </a>
                     </div>
                   </div>
                 </div>

@@ -17,8 +17,6 @@ const links = [
 ];
 
 // Configuration du tableau
-const page = ref(1);
-const pageCount = ref(10);
 const selected = ref<Project[]>([]);
 const sort = ref({ column: 'createdAt', direction: 'desc' as const });
 
@@ -44,9 +42,13 @@ const { deleteProject, isDeleting } = useProjectDelete();
 const statuses = [
   { value: 'all', label: 'Tous les statuts' },
   { value: 'DRAFT', label: 'Brouillon' },
-  { value: 'PENDING', label: 'En attente' },
-  { value: 'PUBLISHED', label: 'Publié' },
+  { value: 'SUBMITTED', label: 'Soumis' },
+  { value: 'VALIDATED', label: 'Validé' },
+  { value: 'VALIDATED_BY_STRUCTURE', label: 'Validé par la structure' },
   { value: 'REJECTED', label: 'Rejeté' },
+  { value: 'REJECTED_BY_STRUCTURE', label: 'Rejeté par la structure' },
+  { value: 'PUBLISHED', label: 'Publié' },
+  { value: 'UNPUBLISHED', label: 'Non publié' },
 ];
 
 // Fonction de suppression d'un projet
@@ -80,17 +82,21 @@ const getActions = (row: Project) => [
 const getStatusBadge = (status: string) => {
   const statusMap: Record<string, { color: string, label: string }> = {
     'DRAFT': { color: 'gray', label: 'Brouillon' },
-    'PENDING': { color: 'yellow', label: 'En attente' },
-    'PUBLISHED': { color: 'green', label: 'Publié' },
+    'SUBMITTED': { color: 'blue', label: 'Soumis' },
+    'VALIDATED': { color: 'green', label: 'Validé' },
+    'VALIDATED_BY_STRUCTURE': { color: 'emerald', label: 'Validé par la structure' },
     'REJECTED': { color: 'red', label: 'Rejeté' },
+    'REJECTED_BY_STRUCTURE': { color: 'orange', label: 'Rejeté par la structure' },
+    'PUBLISHED': { color: 'green', label: 'Publié' },
+    'UNPUBLISHED': { color: 'gray', label: 'Non publié' },
+    'PENDING': { color: 'yellow', label: 'En attente' },
   };
   return statusMap[status] || { color: 'gray', label: 'Inconnu' };
 };
 
 // Gestion du changement de page
 const onPageChange = (newPage: number) => {
-  page.value = newPage;
-  refreshProjectList();
+  pagination.page.value = newPage;
 };
 
 // Gestion du tri
@@ -306,24 +312,33 @@ const getDaysRemaining = (endDate: string) => {
                 <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
                   {{ row.type?.name || 'Sans catégorie' }}
                 </p>
+                <div v-if="row.structure" class="flex items-center gap-1 mt-1">
+                  <UIcon name="i-heroicons-building-office-2" class="w-3 h-3 text-blue-500" />
+                  <p class="text-xs text-blue-600 dark:text-blue-400 truncate">
+                    {{ row.structure.name }}
+                  </p>
+                </div>
               </div>
             </div>
           </template>
 
           <!-- Colonne Statut -->
           <template #status-data="{ row }">
-            <UBadge 
-              :color="getStatusBadge(row.status).color" 
+            <UBadge
+              :color="getStatusBadge(row.status).color"
               variant="subtle"
               size="sm"
               class="capitalize"
-              :ui="{ 
-                color: { 
+              :ui="{
+                color: {
                   gray: 'dark:bg-gray-800/50 dark:text-gray-300',
+                  blue: 'dark:bg-blue-900/50 dark:text-blue-300',
                   yellow: 'dark:bg-yellow-900/50 dark:text-yellow-300',
                   green: 'dark:bg-green-900/50 dark:text-green-300',
+                  emerald: 'dark:bg-emerald-900/50 dark:text-emerald-300',
+                  orange: 'dark:bg-orange-900/50 dark:text-orange-300',
                   red: 'dark:bg-red-900/50 dark:text-red-300'
-                } 
+                }
               }"
             >
               {{ getStatusBadge(row.status).label }}
@@ -382,17 +397,17 @@ const getDaysRemaining = (endDate: string) => {
 
       <!-- Pied de tableau avec pagination -->
       <template #footer>
-        <div class="flex flex-col sm:flex-row items-center justify-between  border-gray-200 dark:border-gray-700">
+        <div class="flex flex-col sm:flex-row items-center justify-between border-gray-200 dark:border-gray-700">
           <div class="text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-0">
-            Affichage de <span class="font-medium">{{ pagination.pageFrom }}</span> à 
+            Affichage de <span class="font-medium">{{ pagination.pageFrom }}</span> à
             <span class="font-medium">{{ pagination.pageTo }}</span> sur
             <span class="font-medium">{{ pagination.totalItems }}</span> projets
           </div>
-          
+
           <UPagination
-            v-model="page"
-            :page-count="pageCount"
-            :total="projectList?.data?.length"
+            v-model="pagination.page.value"
+            :page-count="pagination.pageCount.value"
+            :total="pagination.totalItems.value"
             :ui="{
               wrapper: 'flex items-center gap-1',
               rounded: '!rounded-full min-w-[32px] justify-center',

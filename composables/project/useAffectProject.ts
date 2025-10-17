@@ -1,7 +1,7 @@
 import type { SisebResponseType, Structure } from "~/types"
 import {transformTmpPayload} from "~/utils/transformTmpPayload";
 
-export const useAffectProject = (projectId: string) => {
+export const useAffectProject = (projectId: string, onSuccess?: () => void) => {
 
     const { $sisepStatsApi, $sisepApi } = useNuxtApp()
 
@@ -57,6 +57,12 @@ export const useAffectProject = (projectId: string) => {
                             message: `Le projet a été affecté à la structure avec succès.`,
                         })
 
+                        // Appeler le callback de succès si fourni
+                        if (onSuccess) {
+                            onSuccess()
+                        }
+
+                        // Retourner true pour indiquer le succès
                         return true
                     }
 
@@ -69,7 +75,7 @@ export const useAffectProject = (projectId: string) => {
                             extraClass: "bg-red-500",
                         })
 
-                        return false
+                        throw new Error('Erreur d\'affectation')
                     }
 
                     if (response.status === 404) {
@@ -81,7 +87,7 @@ export const useAffectProject = (projectId: string) => {
                             extraClass: "bg-red-500",
                         })
 
-                        return false
+                        throw new Error('Ressource introuvable')
                     }
 
                     if (response.status === 500) {
@@ -93,10 +99,13 @@ export const useAffectProject = (projectId: string) => {
                             extraClass: "bg-red-500",
                         })
 
-                        return false
+                        throw new Error('Erreur serveur')
                     }
                 },
             })
+
+            // Retourner la réponse pour permettre la gestion dans la page
+            return response
 
         },
 
