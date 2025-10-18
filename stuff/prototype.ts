@@ -1,62 +1,24 @@
-import CredentialsProvider from "next-auth/providers/credentials";
 import KeycloakProvider from "next-auth/providers/keycloak";
 import { NuxtAuthHandler } from "#auth";
 
 export default NuxtAuthHandler({
 
-    debug: true,
-
     secret: process.env.AUTH_SECRET || "f56a81d8-4110-4342-aa81-d84110b34246",
 
-    jwt: {
-        maxAge: 60 * 60 * 24 * 30
-    },
-
-    pages: {
-
-    },
+    debug: true,
 
     providers: [
-        // @ts-expect-error
+
+        // @ts-expect-error You need to use .default here for it to work during SSR. May be fixed via Vite at some point
         KeycloakProvider.default({
-            idToken: true,
-            scheme: "oauth2",
             name: "keycloak",
-            issuer: process.env.KEYCLOAK_ISSUER,
-            clientId: process.env.KEYCLOAK_CLIENT_ID,
-            clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
-            token: {
-                property: "access_token",
-                type: "Bearer",
-                name: "Authorization",
-                maxAge: 60 * 60 * 24,
-            },
-            refreshToken: {
-                property: "refresh_token",
-                maxAge: 60 * 60 * 24 * 30,
-            },
-            responseType: "code",
-            grantType: "authorization_code",
-            scope: ["openid", "profile", "email"],
-            codeChallengeMethod: "S256",
-            endpoints: {
-                authorization: `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/auth`,
-                userInfo: `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/userinfo`,
-                token: `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/token`,
-                logout: `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/logout?redirect_uri=${encodeURIComponent(String(process.env.NUXT_AUTH_ORIGIN))}`,
-            },
+            clientId: useRuntimeConfig().public.keycloakClientId,
+            clientSecret: "u888uNvKz3Tp9dlIAcvKqEKg8nSQTQxW",
+            issuer: `${useRuntimeConfig().public.keycloakUrl}/realms/${useRuntimeConfig().public.keycloakRealm}`,
         }),
     ],
 
     callbacks: {
-
-        async signIn(payload) {
-            return true;
-        },
-
-        async redirect({ url, baseUrl }) {
-            return `${baseUrl}/admin/project-module/dashboard`;
-        },
 
         async jwt({ token, account, user, trigger, session }) {
 
@@ -86,6 +48,14 @@ export default NuxtAuthHandler({
             }
 
             return Promise.resolve(token);
+        },
+
+        async signIn(payload) {
+            return true;
+        },
+
+        async redirect({ url, baseUrl }) {
+            return `${baseUrl}/admin/project-module/dashboard`;
         },
 
         async session({ session, user, token }) {
@@ -157,6 +127,7 @@ export default NuxtAuthHandler({
             }
         },
 
-    }
+    },
 
 });
+
