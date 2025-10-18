@@ -191,8 +191,10 @@ const navMenuElements = reactive([
   {
     label: 'Espace',
     href: '/admin/login',
-    onClick: () => {
-      signIn('keycloak')
+    onClick: async () => {
+      await signIn('keycloak', {
+        redirect: "/admin/project-module/dashboard"
+      })
     }
   },
 ])

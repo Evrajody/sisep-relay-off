@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
 
-const { data: session, status } = useAuth();
+const { data: session, status, signOut } = useAuth();
 
 // Props pour permettre un affichage compact ou complet
 const props = defineProps({
@@ -77,12 +77,15 @@ const dropdownItems = computed(() => [
     label: 'Déconnexion',
     icon: 'i-heroicons-arrow-right-on-rectangle',
     click: async () => {
-      await signOut({ callbackUrl: '/admin/login' });
+      await signOut({
+        callbackUrl: '/',
+        redirect: true
+      })
     }
   }]
 ]);
 
-const { signOut } = useAuth();
+
 </script>
 
 <template>

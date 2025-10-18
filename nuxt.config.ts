@@ -61,9 +61,10 @@ export default defineNuxtConfig({
         isEnabled: true,
         originEnvKey: "AUTH_ORIGIN",
         baseURL: `${process.env.NUXT_AUTH_ORIGIN}/local/auth`,
+
         sessionRefresh: {
-            enablePeriodically: true,
-            enableOnWindowFocus: true,
+            enablePeriodically: false,
+            enableOnWindowFocus: false,
         },
         provider: {
             type: "authjs",
