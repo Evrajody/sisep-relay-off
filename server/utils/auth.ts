@@ -4,7 +4,7 @@ import { customSession } from "better-auth/plugins";
 
 const runtimeconfig = useRuntimeConfig()
 // Import du composable de déconnexion
-const { logout  } = useAuthLogout();
+// const { logout  } = useAuthLogout();
 /**
  * Récupère la configuration depuis les variables d'environnement
  * avec des valeurs par défaut et validation
@@ -125,7 +125,7 @@ export const auth = betterAuth({
                 if (!validTokens) {
                     console.error("[Custom Session] Impossible d'obtenir un token valide, refresh token expiré ou invalide");
                     // Le refresh token est expiré, l'utilisateur doit se reconnecter
-                    await logout()
+                    // await logout()
                     return { user, session, additional_info: null };
                 }
 
