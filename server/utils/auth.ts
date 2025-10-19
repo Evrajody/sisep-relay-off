@@ -3,30 +3,55 @@ import { sso } from "@better-auth/sso";
 import { customSession } from "better-auth/plugins";
 // import Database from "better-sqlite3";
 
-// Configuration Keycloak depuis les variables d'environnement
-const keycloakUrl = process.env.KEYCLOAK_URL!;
-const keycloakRealm = process.env.KEYCLOAK_REALM!;
-const keycloakClientId = process.env.KEYCLOAK_CLIENT_ID!;
-const keycloakClientSecret = process.env.KEYCLOAK_CLIENT_SECRET!;
 
-// Déterminer la baseURL en fonction de l'environnement
-const getBaseURL = () => {
-    // En production/Docker, utiliser l'URL publique si définie
-    if (process.env.NUXT_PUBLIC_BETTER_AUTH_URL) {
-        return process.env.NUXT_PUBLIC_BETTER_AUTH_URL;
+const runtimeconfig = useRuntimeConfig()
+
+/**
+ * Récupère la configuration depuis les variables d'environnement
+ * avec des valeurs par défaut et validation
+ */
+const getAuthConfig = () => {
+    // Runtime config n'est pas disponible au niveau module dans utils
+    // On utilise donc process.env avec validation et fallbacks
+    const config = {
+        baseURL: runtimeconfig.public.betterAuthUrl,
+
+        keycloak: {
+            url: runtimeconfig.public.keycloakUrl || "",
+            realm: runtimeconfig.public.keycloakRealm || "siseb",
+            clientId: runtimeconfig.public.keycloakClientId || "",
+            clientSecret: "0b6iwJYqszGDvSMDMGu1okUMI4UrJhMF",
+        },
+
+        api: {
+            baseUrl: runtimeconfig.public.sisebApiBaseUrl || "",
+        }
+    };
+
+    // Validation des variables critiques
+    if (!config.keycloak.url) {
+        console.warn("[Better Auth] KEYCLOAK_URL non définie, l'authentification Keycloak ne fonctionnera pas");
+    }
+    if (!config.keycloak.clientId || !config.keycloak.clientSecret) {
+        console.warn("[Better Auth] KEYCLOAK_CLIENT_ID ou KEYCLOAK_CLIENT_SECRET manquants");
     }
 
-    // Fallback : construire l'URL depuis BETTER_AUTH_URL ou utiliser une URL par défaut
-    const baseUrl = process.env.BETTER_AUTH_URL || "https://siseb-refonte.emes.bj/local/auth";
+    console.log("[Better Auth] Configuration chargée:", {
+        baseURL: config.baseURL,
+        keycloakUrl: config.keycloak.url,
+        keycloakRealm: config.keycloak.realm,
+        apiBaseUrl: config.api.baseUrl,
+    });
 
-    console.log("[Better Auth] Base URL configurée:", baseUrl);
-
-    return baseUrl;
+    return config;
 };
+
+// Charger la configuration
+const authConfig = getAuthConfig();
 
 export const auth = betterAuth({
     // Base URL pour l'authentification
-    baseURL: getBaseURL(),
+    baseURL: authConfig.baseURL,
 
     // Configuration de la base de données SQLite
     // database: new Database("./auth.db"),
@@ -56,17 +81,17 @@ export const auth = betterAuth({
             defaultSSO: [
                 {
                     providerId: "keycloak",
-                    domain: keycloakUrl,
+                    domain: authConfig.keycloak.url,
                     oidcConfig: {
                         pkce: true,
-                        clientSecret: keycloakClientSecret,
-                        clientId: keycloakClientId,
-                        issuer: `${keycloakUrl}/realms/${keycloakRealm}`,
-                        authorizationEndpoint: `${keycloakUrl}/realms/${keycloakRealm}/protocol/openid-connect/auth`,
-                        tokenEndpoint: `${keycloakUrl}/realms/${keycloakRealm}/protocol/openid-connect/token`,
-                        jwksEndpoint: `${keycloakUrl}/realms/${keycloakRealm}/protocol/openid-connect/certs`,
-                        userInfoEndpoint: `${keycloakUrl}/realms/${keycloakRealm}/protocol/openid-connect/userinfo`,
-                        discoveryEndpoint: `${keycloakUrl}/realms/${keycloakRealm}/.well-known/openid-configuration`,
+                        clientSecret: authConfig.keycloak.clientSecret,
+                        clientId: authConfig.keycloak.clientId,
+                        issuer: `${authConfig.keycloak.url}/realms/${authConfig.keycloak.realm}`,
+                        authorizationEndpoint: `${authConfig.keycloak.url}/realms/${authConfig.keycloak.realm}/protocol/openid-connect/auth`,
+                        tokenEndpoint: `${authConfig.keycloak.url}/realms/${authConfig.keycloak.realm}/protocol/openid-connect/token`,
+                        jwksEndpoint: `${authConfig.keycloak.url}/realms/${authConfig.keycloak.realm}/protocol/openid-connect/certs`,
+                        userInfoEndpoint: `${authConfig.keycloak.url}/realms/${authConfig.keycloak.realm}/protocol/openid-connect/userinfo`,
+                        discoveryEndpoint: `${authConfig.keycloak.url}/realms/${authConfig.keycloak.realm}/.well-known/openid-configuration`,
                         scopes: ["openid", "profile", "email"],
                         tokenEndpointAuthentication: "client_secret_basic",
                         overrideUserInfo: true,
@@ -116,7 +141,7 @@ export const auth = betterAuth({
                 // Appeler l'API backend avec l'access_token du provider (Keycloak JWT)
                 const realSession = await $fetch("auth/profile", {
                     method: "GET",
-                    baseURL: process.env.NUXT_PUBLIC_SISEB_API_BASE_URL,
+                    baseURL: authConfig.api.baseUrl,
                     headers: {
                         authorization: `Bearer ${accessToken}`,
                         "Content-Type": "application/json",
