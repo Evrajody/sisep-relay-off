@@ -26,7 +26,7 @@ const getKeycloakConfig = () => {
         realm: runtimeConfig.public.keycloakRealm || "siseb",
         clientId: runtimeConfig.public.keycloakClientId || "",
         // Le client secret doit être stocké côté serveur uniquement
-        clientSecret: process.env.KEYCLOAK_CLIENT_SECRET || "",
+        clientSecret: "0b6iwJYqszGDvSMDMGu1okUMI4UrJhMF",
     };
 };
 
