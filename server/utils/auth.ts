@@ -17,7 +17,7 @@ const getBaseURL = () => {
     }
 
     // Fallback : construire l'URL depuis BETTER_AUTH_URL ou utiliser une URL par défaut
-    const baseUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000";
+    const baseUrl = process.env.BETTER_AUTH_URL || "https://siseb-refonte.emes.bj/local/auth";
 
     console.log("[Better Auth] Base URL configurée:", baseUrl);
 
