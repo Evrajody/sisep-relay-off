@@ -7,6 +7,8 @@ export const useAuthLogout = () => {
 
     const { $authClient } = useNuxtApp();
 
+    const runtime = useRuntimeConfig()
+
     /**
      * Déconnexion complète : Better Auth + Keycloak
      */
@@ -14,8 +16,9 @@ export const useAuthLogout = () => {
 
         try {
             // Appeler l'endpoint de déconnexion
-            const response = await $fetch("local/api/logout-keycloak", {
+            const response = await $fetch("/local/api/logout-keycloak", {
                 method: "POST",
+                baseURL: `${runtime.public.baseSiseb}`,
             });
 
             if (response.success && response.keycloakLogoutUrl) {
