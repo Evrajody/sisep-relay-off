@@ -121,7 +121,7 @@ const changModuleForm = computed(() => ({
             ></UDashboardSidebarLinks>
 
             <template #footer>
-<!--              <UserDropdown />-->
+              <UserDropdown />
             </template>
 
           </UDashboardSidebar>
@@ -154,7 +154,7 @@ const changModuleForm = computed(() => ({
 
               <template #right>
                 <div class="flex items-center gap-4">
-<!--                  <UserDropdown :compact="false" variant="navbar" />-->
+                  <UserDropdown :compact="false" variant="navbar" />
                 </div>
               </template>
             </UDashboardNavbar>

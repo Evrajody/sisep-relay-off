@@ -138,7 +138,7 @@ services:
       - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
       - NUXT_PUBLIC_SISEB_API_BASE_URL=${NUXT_PUBLIC_SISEB_API_BASE_URL}
     env_file:
-      - .envs/.env.pprod
+      - ../.envs/.env.pprod
     restart: unless-stopped
     networks:
       - siseb-network
@@ -485,7 +485,7 @@ Si le problème persiste :
 1. Vérifier les logs : `docker logs siseb-frontend-pprod`
 2. Vérifier les variables : `docker inspect siseb-frontend-pprod`
 3. Tester Keycloak : `curl https://keycloack.emes.bj`
-4. Consulter la documentation : [KEYCLOAK_AUTH_COMPLETE_GUIDE.md](./KEYCLOAK_AUTH_COMPLETE_GUIDE.md)
+4. Consulter la documentation : [KEYCLOAK_AUTH_COMPLETE_GUIDE.md](KEYCLOAK_AUTH_COMPLETE_GUIDE.md)
 
 ---
 

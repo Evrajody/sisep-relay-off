@@ -465,7 +465,7 @@ useHead({
 
 definePageMeta({
   layout: "sisep-app-layout",
-  middleware: ["sidebase-auth"],
+  middleware: ["auth"],
 });
 
 </script>

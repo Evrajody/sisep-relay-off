@@ -6,7 +6,7 @@ import type { Project } from '~/types';
 
 definePageMeta({
   layout: "sisep-app-layout",
-  middleware: ["sidebase-auth"],
+  middleware: ["auth"],
 });
 
 const links = [

@@ -57,24 +57,6 @@ export default defineNuxtConfig({
         serverBundle: false,
     },
 
-    auth: {
-        globalAppMiddleware: false,
-        isEnabled: false,
-        originEnvKey: "AUTH_ORIGIN",
-        baseURL: `${process.env.NUXT_AUTH_ORIGIN}/local/auth`,
-
-        sessionRefresh: {
-            enablePeriodically: false,
-            enableOnWindowFocus: false,
-        },
-        provider: {
-            type: "authjs",
-            trustHost: true,
-            defaultProvider: 'keycloak',
-            addDefaultCallbackUrl: true
-        },
-    },
-
     colorMode: {
         preference: "light",
         fallback: "light",
@@ -100,7 +82,6 @@ export default defineNuxtConfig({
         "@nuxt/ui",
         "@element-plus/nuxt",
         "@nuxt/icon",
-        "@sidebase/nuxt-auth",
         "nuxt-authorization",
         'nuxt-keen-slider',
         '@nuxtjs/leaflet',

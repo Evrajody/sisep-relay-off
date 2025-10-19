@@ -6,6 +6,7 @@ import useProjectDetail from '~/composables/project/useProjectDetail';
 
 definePageMeta({
   layout: "sisep-app-layout",
+  middleware: ["auth"],
 });
 
 const route = useRoute();

@@ -119,7 +119,7 @@ const userRoles = session?.session?.additional_info?.userRoles;
 | **[DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)** | 📑 Index de tous les docs |
 | [ACCESS_TOKEN_EXPLAINED.md](./ACCESS_TOKEN_EXPLAINED.md) | 🔑 Origine de l'access_token |
 | [LOGOUT_GUIDE.md](./LOGOUT_GUIDE.md) | 🚪 Guide déconnexion |
-| [SESSION_ENRICHMENT_SUMMARY.md](./SESSION_ENRICHMENT_SUMMARY.md) | 🎨 Session enrichie |
+| [SESSION_ENRICHMENT_SUMMARY.md](SESSION_ENRICHMENT_SUMMARY.md) | 🎨 Session enrichie |
 
 ---
 

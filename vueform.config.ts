@@ -9,7 +9,6 @@ import {defineConfig} from "@vueform/vueform";
 // import FormStep_snow from "~/components/templates/FormStep_snow.vue";
 
 const runtimeConfig = useRuntimeConfig();
-// const { data, token } = useAuth();
 
 // LOCAL CUSTOMISATIONS
 

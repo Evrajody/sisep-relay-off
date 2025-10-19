@@ -313,9 +313,9 @@ Ajouter :
 
 Pour plus de détails, consultez :
 
-- **[DOCKER_DEPLOYMENT_GUIDE.md](./DOCKER_DEPLOYMENT_GUIDE.md)** : Guide complet de déploiement Docker
-- **[KEYCLOAK_AUTH_COMPLETE_GUIDE.md](./KEYCLOAK_AUTH_COMPLETE_GUIDE.md)** : Guide d'authentification Keycloak
-- **[DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)** : Index de toute la documentation
+- **[DOCKER_DEPLOYMENT_GUIDE.md](DOCKER_DEPLOYMENT_GUIDE.md)** : Guide complet de déploiement Docker
+- **[KEYCLOAK_AUTH_COMPLETE_GUIDE.md](KEYCLOAK_AUTH_COMPLETE_GUIDE.md)** : Guide d'authentification Keycloak
+- **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** : Index de toute la documentation
 
 ---
 

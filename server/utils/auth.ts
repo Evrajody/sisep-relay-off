@@ -1,8 +1,6 @@
 import { betterAuth } from "better-auth";
 import { sso } from "@better-auth/sso";
 import { customSession } from "better-auth/plugins";
-// import Database from "better-sqlite3";
-
 
 const runtimeconfig = useRuntimeConfig()
 
@@ -58,20 +56,17 @@ export const auth = betterAuth({
 
     // Mapping des champs de session
     session: {
+
         fields: {
             expiresAt: "expires",
             token: "sessionToken"
-        }
-    },
+        },
 
-    // Mapping des champs de compte
-    account: {
-        fields: {
-            accountId: "providerAccountId",
-            refreshToken: "refresh_token",
-            accessToken: "access_token",
-            accessTokenExpiresAt: "access_token_expires",
-            idToken: "id_token",
+        expiresIn: (60 * 60 * 24 * 2),
+
+        cookieCache: {
+            enabled: true,
+            maxAge: 5 * 60 // Cache duration in seconds
         }
     },
 
@@ -120,13 +115,30 @@ export const auth = betterAuth({
                 }
 
                 // Récupérer le premier compte (normalement Keycloak)
-                const account = accounts[0];
-                const accessToken = account.accessToken;
+                let account = accounts[0];
                 const providerId = account.providerId;
+
+                // ✅ NOUVEAU : Vérifier et rafraîchir le token si nécessaire
+                const validTokens = await ensureValidToken(account, ctx.context.adapter);
+
+                if (!validTokens) {
+                    console.error("[Custom Session] Impossible d'obtenir un token valide, refresh token expiré ou invalide");
+                    // Le refresh token est expiré, l'utilisateur doit se reconnecter
+                    return { user, session, additional_info: null };
+                }
+
+                // Utiliser le token rafraîchi (ou le token original s'il était encore valide)
+                const accessToken = validTokens.accessToken;
+                const idToken = validTokens.idToken;
+                const accessTokenExpiresAt = validTokens.expiresAts;
 
                 if (!accessToken) {
                     console.warn("[Custom Session] Access token manquant pour l'utilisateur:", user.id);
-                    return { user, session };
+                    return {
+                        user,
+                        session,
+                        additional_info: null,
+                    };
                 }
 
                 console.log("[Custom Session] Appel de l'API avec access token:", {
@@ -152,7 +164,7 @@ export const auth = betterAuth({
                     userId: user.id,
                     email: user.email,
                     providerId: providerId,
-                    idToken: account.idToken,
+                    idToken: idToken,
                     authorization: `Bearer ${accessToken}`,
                     hasData: !!realSession?.data,
                 });
@@ -164,8 +176,9 @@ export const auth = betterAuth({
                         ...session,
                         auth_provider: providerId,
                         access_token: accessToken,
-                        idToken: account.idToken,
+                        idToken: idToken,
                         additional_info: {
+                            accessTokenExpiresAt,
                             ...realSession?.data,
                         },
                     },
@@ -191,6 +204,8 @@ export const auth = betterAuth({
                     },
                 };
             }
+        }, {  }, {
+            // shouldMutateListDeviceSessionsEndpoint: true,
         }),
     ],
 });

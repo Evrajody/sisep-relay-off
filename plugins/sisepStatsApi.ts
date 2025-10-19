@@ -1,14 +1,16 @@
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(async (nuxtApp) => {
 
-    const { public: secret  } = useRuntimeConfig()
+    const {$authClient} = useNuxtApp();
+    const {public: secret} = useRuntimeConfig()
+    const {data: authUser} = await $authClient.getSession();
 
-   // const { data: authUser } = useAuth();
+    let token_call: string = `Bearer ${authUser?.session?.access_token}`
 
     const sisepStatsApi = $fetch.create({
         baseURL: secret.sisebApiStatsUrl,
         headers: {
-            'Content-Type': 'application/json',
-           // 'authorization': `Bearer ${authUser.value?.access_token}`
+            ContentType: 'application/json',
+            authorization: token_call || '',
         },
     })
 

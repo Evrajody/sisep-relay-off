@@ -1,6 +1,6 @@
 import { createAuthClient } from "better-auth/client"
 import { ssoClient } from "@better-auth/sso/client"
-import { inferAdditionalFields } from "better-auth/client/plugins"
+import { inferAdditionalFields, customSessionClient } from "better-auth/client/plugins"
 import type { auth } from "~/server/utils/auth"
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -11,7 +11,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         baseURL: `${config.public.betterAuthUrl}`,
         plugins: [
             ssoClient(),
-            inferAdditionalFields<typeof auth>()
+            inferAdditionalFields<typeof auth>(),
+            customSessionClient<typeof auth>()
         ]
     })
 

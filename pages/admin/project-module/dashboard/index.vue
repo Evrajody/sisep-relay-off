@@ -3,34 +3,19 @@ import { ref, computed, onMounted } from 'vue';
 
 definePageMeta({
   layout: "sisep-app-layout",
-  // middleware: ["sidebase-auth"],
-  // requiredPermissions: ["menu_list_roles", "menu_list_permissions"],
+  middleware: ["auth"],
 });
 
 useHead({
   title: "Tableau de bord - Projets",
 });
 
-const {$authClient} = useNuxtApp();
 
 // Import du composable de déconnexion
-const { logout, simpleLogout } = useAuthLogout();
-
+const {$authClient} = useNuxtApp();
 const { data: session, error  } = await $authClient.getSession()
 
-const signoutsso = async () => {
-   await $authClient.signOut({
-     fetchOptions: {
-       onSuccess: () => {
-         navigateTo('/admin/login'); // redirect to login page
-       },
-     },
-   })
-}
 
-// const { data: authUser } = useAuth();
-
-// Données des indicateurs clés (à remplacer par les vraies données de l'API)
 const stats = ref([
   {
     id: 1,
@@ -146,15 +131,6 @@ const topPartners = ref([
   { name: 'OMS', projects: 8, amount: '340K FCFA' },
 ]);
 
-// Statistiques mensuelles (à remplacer par les vraies données)
-const monthlyStats = ref([
-  { month: 'Jan', projects: 12, budget: 2.5 },
-  { month: 'Fév', projects: 15, budget: 3.1 },
-  { month: 'Mar', projects: 18, budget: 3.8 },
-  { month: 'Avr', projects: 22, budget: 4.2 },
-  { month: 'Mai', projects: 24, budget: 4.5 },
-  { month: 'Juin', projects: 28, budget: 5.1 },
-]);
 
 // Configuration des badges de statut
 const getStatusBadge = (status: string) => {
@@ -233,17 +209,6 @@ onMounted(() => {
       </template>
     </UDashboardToolbar>
 
-    <pre>
-      {{session}}
-    </pre>
-
-
-
-    <div>
-      <button  @click="logout">
-        Sign out
-      </button>
-    </div>
 
     <div class="max-w-[95vw] mx-auto px-4 py-6 space-y-6">
       <!-- En-tête du dashboard -->
