@@ -13,9 +13,11 @@
     "started": "npx serve .output/public",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "clean": "rm -rf .nuxt node_modules/.cache"
+    "clean": "rm -rf .nuxt node_modules/.cache",
+    "db:init": "node scripts/init-db.js"
   },
   "dependencies": {
+    "@better-auth/sso": "^1.3.27",
     "@fullcalendar/core": "^6.1.17",
     "@fullcalendar/daygrid": "^6.1.17",
     "@fullcalendar/interaction": "^6.1.17",
@@ -42,6 +44,8 @@
     "@vueform/plugin-mask": "^1.0.7",
     "@vueform/vueform": "^1.13.3",
     "@vueuse/nuxt": "^12.7.0",
+    "better-auth": "^1.3.27",
+    "better-sqlite3": "^12.4.1",
     "date-fns": "^4.1.0",
     "eslint": "^9.24.0",
     "flatpickr": "^4.6.13",

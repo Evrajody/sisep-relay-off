@@ -7,7 +7,16 @@ definePageMeta({
 });
 
 
-const { signIn, data } = useAuth();
+const { $authClient } = useNuxtApp()
+
+const login = async () => {
+  await $authClient.signIn.sso({
+    providerId: "keycloak",
+    callbackURL: "/admin/project-module/dashboard",
+  });
+}
+
+
 
 </script>
 
@@ -45,11 +54,11 @@ const { signIn, data } = useAuth();
               Plateforme d'administration SISEB
             </h4>
 
+
             <div class=" space-y-3">
               <NuxtLink
                   class="relative inline-flex cursor-pointer items-center bg-blue-400 justify-center w-full px-4 py-4 text-base font-semibold  transition-all duration-200 text-white shadow rounded-md hover:bg-blue-100 focus:bg-blue-100 hover:text-black focus:text-black focus:outline-none"
-                  @click.prevent="
-                  signIn('keycloak')">
+                  @click.prevent="async () => await login()">
                 <div class="absolute inset-y-0 left-0 p-4">
                   <svg
                       class="w-6 h-6 text-blue-500"

@@ -3,16 +3,32 @@ import { ref, computed, onMounted } from 'vue';
 
 definePageMeta({
   layout: "sisep-app-layout",
-  middleware: ["sidebase-auth"],
-  requiredPermissions: ["menu_list_roles", "menu_list_permissions"],
+  // middleware: ["sidebase-auth"],
+  // requiredPermissions: ["menu_list_roles", "menu_list_permissions"],
 });
 
 useHead({
   title: "Tableau de bord - Projets",
 });
 
+const {$authClient} = useNuxtApp();
 
-const { data: authUser } = useAuth();
+// Import du composable de déconnexion
+const { logout, simpleLogout } = useAuthLogout();
+
+const { data: session, error  } = await $authClient.getSession()
+
+const signoutsso = async () => {
+   await $authClient.signOut({
+     fetchOptions: {
+       onSuccess: () => {
+         navigateTo('/admin/login'); // redirect to login page
+       },
+     },
+   })
+}
+
+// const { data: authUser } = useAuth();
 
 // Données des indicateurs clés (à remplacer par les vraies données de l'API)
 const stats = ref([
@@ -217,9 +233,17 @@ onMounted(() => {
       </template>
     </UDashboardToolbar>
 
-<!--    <pre>-->
-<!--      {{authUser}}-->
-<!--    </pre>-->
+    <pre>
+      {{session}}
+    </pre>
+
+
+
+    <div>
+      <button  @click="logout">
+        Sign out
+      </button>
+    </div>
 
     <div class="max-w-[95vw] mx-auto px-4 py-6 space-y-6">
       <!-- En-tête du dashboard -->

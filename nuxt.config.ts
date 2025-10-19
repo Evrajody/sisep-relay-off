@@ -8,7 +8,7 @@ export default defineNuxtConfig({
             keycloakRealm: "siseb",
             keycloakClientId: "siseb-front",
             keycloakUrl: "https://keycloack.emes.bj",
-            // keycloakUrl: "https://keycloack.emes.bj/realms/siseb/account",
+            betterAuthUrl: `${process.env.NUXT_PUBLIC_BETTER_AUTH_URL}`,
         }
     },
     css: ['~/assets/css/main-siseb.css'],
@@ -58,7 +58,7 @@ export default defineNuxtConfig({
 
     auth: {
         globalAppMiddleware: false,
-        isEnabled: true,
+        isEnabled: false,
         originEnvKey: "AUTH_ORIGIN",
         baseURL: `${process.env.NUXT_AUTH_ORIGIN}/local/auth`,
 

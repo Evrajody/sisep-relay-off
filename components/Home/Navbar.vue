@@ -99,7 +99,7 @@ const openIndex = ref<number | null>(null)
 const isMobileMenuOpen = ref(false)
 const isMobile = ref(false)
 
-const { signIn, data } = useAuth();
+// const { signIn, data } = useAuth();
 
 // Vérifier la taille de l'écran au chargement
 const checkScreenSize = () => {
@@ -191,11 +191,11 @@ const navMenuElements = reactive([
   {
     label: 'Espace',
     href: '/admin/login',
-    onClick: async () => {
-      await signIn('keycloak', {
-        redirect: "/admin/project-module/dashboard"
-      })
-    }
+    // onClick: async () => {
+    //   await signIn('keycloak', {
+    //     redirect: "/admin/project-module/dashboard"
+    //   })
+    // }
   },
 ])
 </script>
