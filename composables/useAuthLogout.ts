@@ -3,15 +3,18 @@
  * (Better Auth + Keycloak SSO)
  */
 export const useAuthLogout = () => {
+
+
     const { $authClient } = useNuxtApp();
 
     /**
      * Déconnexion complète : Better Auth + Keycloak
      */
     const logout = async () => {
+
         try {
             // Appeler l'endpoint de déconnexion
-            const response = await $fetch("/api/logout-keycloak", {
+            const response = await $fetch("local/api/logout-keycloak", {
                 method: "POST",
             });
 

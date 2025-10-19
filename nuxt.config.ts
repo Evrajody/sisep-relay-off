@@ -5,9 +5,10 @@ export default defineNuxtConfig({
         public: {
             sisebApiBaseUrl: process.env.NUXT_PUBLIC_SISEB_API_BASE_URL,
             sisebApiStatsUrl: process.env.NUXT_PUBLIC_SISEB_API_STATS_BASE_URL,
-            keycloakRealm: "siseb",
-            keycloakClientId: "siseb-front",
-            keycloakUrl: "https://keycloack.emes.bj",
+            keycloakRealm: process.env.KEYCLOAK_REALM,
+            keycloakClientId: process.env.KEYCLOAK_CLIENT_ID,
+            keycloakUrl: process.env.KEYCLOAK_URL,
+            baseSiseb: process.env.BETTER_AUTH_URL,
             betterAuthUrl: process.env.NUXT_PUBLIC_BETTER_AUTH_URL || process.env.BETTER_AUTH_URL || "http://localhost:3000",
         }
     },

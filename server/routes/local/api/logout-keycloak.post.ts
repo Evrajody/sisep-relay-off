@@ -36,11 +36,14 @@ export default defineEventHandler(async (event) => {
             headers: event.headers,
         });
 
+        const runtimeconfig = useRuntimeConfig()
+
         // 4. Construire l'URL de déconnexion Keycloak
-        const keycloakUrl = process.env.KEYCLOAK_URL;
-        const keycloakRealm = process.env.KEYCLOAK_REALM;
-        const keycloakClientId = process.env.KEYCLOAK_CLIENT_ID;
-        const appUrl = process.env.BETTER_AUTH_URL || process.env.NUXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:3000";
+        const keycloakUrl = runtimeconfig.public.keycloakUrl || "";
+        const keycloakRealm = runtimeconfig.public.keycloakRealm || "siseb";
+        const keycloakClientId = runtimeconfig.public.keycloakClientId || "";
+        const appUrl = runtimeconfig.public.baseSiseb || "";
+
 
         if (!keycloakUrl || !keycloakRealm) {
             console.error("[Logout] Keycloak configuration missing");
