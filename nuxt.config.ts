@@ -8,7 +8,7 @@ export default defineNuxtConfig({
             keycloakRealm: "siseb",
             keycloakClientId: "siseb-front",
             keycloakUrl: "https://keycloack.emes.bj",
-            betterAuthUrl: `${process.env.NUXT_PUBLIC_BETTER_AUTH_URL}`,
+            betterAuthUrl: process.env.NUXT_PUBLIC_BETTER_AUTH_URL || process.env.BETTER_AUTH_URL || "http://localhost:3000",
         }
     },
     css: ['~/assets/css/main-siseb.css'],

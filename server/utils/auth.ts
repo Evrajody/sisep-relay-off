@@ -9,9 +9,24 @@ const keycloakRealm = process.env.KEYCLOAK_REALM!;
 const keycloakClientId = process.env.KEYCLOAK_CLIENT_ID!;
 const keycloakClientSecret = process.env.KEYCLOAK_CLIENT_SECRET!;
 
+// Déterminer la baseURL en fonction de l'environnement
+const getBaseURL = () => {
+    // En production/Docker, utiliser l'URL publique si définie
+    if (process.env.NUXT_PUBLIC_BETTER_AUTH_URL) {
+        return process.env.NUXT_PUBLIC_BETTER_AUTH_URL;
+    }
+
+    // Fallback : construire l'URL depuis BETTER_AUTH_URL ou utiliser une URL par défaut
+    const baseUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000";
+
+    console.log("[Better Auth] Base URL configurée:", baseUrl);
+
+    return baseUrl;
+};
+
 export const auth = betterAuth({
     // Base URL pour l'authentification
-    baseURL: `${process.env.NUXT_PUBLIC_BETTER_AUTH_URL}`,
+    baseURL: getBaseURL(),
 
     // Configuration de la base de données SQLite
     // database: new Database("./auth.db"),
