@@ -1,27 +1,82 @@
 <script lang="ts" setup>
 
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 definePageMeta({
   layout: "sisep-app-layout",
+  middleware: ["auth"],
 });
 
 useHead({
   title: "Mon profil",
 });
 
-// Données utilisateur (à remplacer par les vraies données)
+// Récupérer la session de l'utilisateur connecté
+const {$authClient} = useNuxtApp();
+const { data: session, error } = await $authClient.getSession();
+
+// Computed properties pour extraire les informations de la session
+const userFullName = computed(() => {
+  return session?.session?.additional_info?.tokenDetails?.userFullName || session?.user?.name || '';
+});
+
+const userName = computed(() => {
+  return session?.session?.additional_info?.tokenDetails?.username || '';
+});
+
+const userEmail = computed(() => {
+  return session?.session?.additional_info?.tokenDetails?.userEmail || session?.user?.email || '';
+});
+
+const userModules = computed(() => {
+  return session?.session?.additional_info?.tokenDetails?.liste_modules || [];
+});
+
+const userStructures = computed(() => {
+  return session?.session?.additional_info?.tokenDetails?.structures_modules || [];
+});
+
+const userResources = computed(() => {
+  return session?.session?.additional_info?.tokenDetails?.userResources || {};
+});
+
+const allUserRoles = computed(() => {
+  const resources = userResources.value;
+  const allRoles: string[] = [];
+  Object.values(resources).forEach((module: any) => {
+    if (module.roles) {
+      allRoles.push(...module.roles);
+    }
+  });
+  return [...new Set(allRoles)]; // Remove duplicates
+});
+
+const primaryRole = computed(() => {
+
+  const roles = allUserRoles.value;
+  if (roles.length === 0) return 'Utilisateur';
+
+  // Prioriser certains rôles
+  if (roles.includes('ADMIN')) return 'Administrateur';
+  if (roles.includes('POINT_FOCAL')) return 'Point Focal';
+  if (roles.includes('VALIDATEUR')) return 'Validateur';
+
+  // Sinon retourner le premier rôle formaté
+  return roles[0].replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+});
+
+// Données utilisateur
 const user = ref({
-  nom: 'DOSSAVI',
-  prenoms: 'Hubert',
-  email: 'hubert.dossavi@gmail.com',
-  tel: '+229 97 00 00 00',
-  role: 'Administrateur',
+  nom: userFullName.value.split(' ').pop() || '',
+  prenoms: userFullName.value.split(' ').slice(0, -1).join(' ') || userFullName.value,
+  email: userEmail.value,
+  tel: '',
+  role: primaryRole.value,
   avatar: null,
-  dateCreation: '2024-01-15',
-  derniereConnexion: '2025-03-02 14:30',
-  structure: 'Ministère du Cadre de Vie',
-  fonction: 'Directeur Technique',
+  dateCreation: session?.user?.createdAt || new Date().toISOString(),
+  derniereConnexion: new Date().toLocaleString('fr-FR'),
+  structure: userStructures.value[0] || '',
+  fonction: '',
 });
 
 // Onglet actif
@@ -93,6 +148,56 @@ const notificationSettings = ref({
   mentions: true,
   weeklyReport: false,
   monthlyReport: true,
+});
+
+// Compte à rebours pour l'expiration du token
+const countdown = ref({
+  days: 0,
+  hours: 0,
+  minutes: 0,
+  seconds: 0,
+  expired: false,
+});
+
+const updateCountdown = () => {
+  const expiresAt = session?.session?.additional_info?.accessTokenExpiresAt;
+  if (!expiresAt) {
+    countdown.value.expired = true;
+    return;
+  }
+
+  const now = new Date().getTime();
+  const expiry = new Date(expiresAt).getTime();
+  const distance = expiry - now;
+
+  if (distance < 0) {
+    countdown.value.expired = true;
+    countdown.value.days = 0;
+    countdown.value.hours = 0;
+    countdown.value.minutes = 0;
+    countdown.value.seconds = 0;
+    return;
+  }
+
+  countdown.value.expired = false;
+  countdown.value.days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  countdown.value.hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  countdown.value.minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  countdown.value.seconds = Math.floor((distance % (1000 * 60)) / 1000);
+};
+
+// Mettre à jour le compte à rebours toutes les secondes
+let countdownInterval: NodeJS.Timeout | null = null;
+
+onMounted(() => {
+  updateCountdown();
+  countdownInterval = setInterval(updateCountdown, 1000);
+});
+
+onUnmounted(() => {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+  }
 });
 
 // Actions
@@ -245,9 +350,29 @@ const links = [{
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ user.prenoms }} {{ user.nom }}
             </h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {{ user.email }}
-            </p>
+            <div class="flex items-center gap-2 mt-1">
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ user.email }}
+              </p>
+              <UBadge
+                v-if="session?.user?.emailVerified"
+                color="green"
+                variant="subtle"
+                size="xs"
+              >
+                <UIcon name="i-heroicons-check-circle" class="w-3 h-3" />
+                Vérifié
+              </UBadge>
+              <UBadge
+                v-else
+                color="yellow"
+                variant="subtle"
+                size="xs"
+              >
+                <UIcon name="i-heroicons-exclamation-circle" class="w-3 h-3" />
+                Non vérifié
+              </UBadge>
+            </div>
             <div class="flex flex-wrap items-center gap-3 mt-3">
               <UBadge color="blue" variant="subtle">
                 {{ user.role }}
@@ -430,21 +555,95 @@ const links = [{
 
                 <div class="space-y-4">
                   <div class="flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div class="flex items-start gap-3">
-                      <UIcon name="i-heroicons-computer-desktop" class="w-5 h-5 text-green-600 mt-1" />
-                      <div>
+                    <div class="flex items-start gap-3 flex-1 min-w-0">
+                      <UIcon name="i-heroicons-computer-desktop" class="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
+                      <div class="flex-1 min-w-0">
                         <p class="font-medium text-gray-900 dark:text-white">Session actuelle</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">
-                          Windows • Chrome • Cotonou, Bénin
+                        <p class="text-sm text-gray-600 dark:text-gray-400 truncate">
+                          {{ session?.userAgent }}
                         </p>
                         <p class="text-xs text-gray-500 mt-1">
-                          Dernière activité: {{ user.derniereConnexion }}
+                          IP: {{ session?.ipAddress }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                          Créée le: {{ new Date(session?.createdAt || new Date()).toLocaleString('fr-FR') }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                          Expire le: {{ new Date(session?.expiresAt || new Date()).toLocaleString('fr-FR') }}
                         </p>
                       </div>
                     </div>
-                    <UBadge color="green" variant="subtle" size="xs">
+                    <UBadge color="green" variant="subtle" size="xs" class="flex-shrink-0">
                       Actif
                     </UBadge>
+                  </div>
+
+                  <!-- Compte à rebours du token -->
+                  <div v-if="session?.session.additional_info?.accessTokenExpiresAt" class="p-4 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div class="flex items-center justify-between mb-3">
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-clock" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">Temps restant du token</p>
+                      </div>
+                    </div>
+
+                    <!-- Expiration message -->
+                    <div v-if="countdown.expired" class="text-center py-2">
+                      <UBadge color="red" variant="solid" size="lg">
+                        <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
+                        Token expiré
+                      </UBadge>
+                      <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                        Veuillez vous reconnecter
+                      </p>
+                    </div>
+
+                    <!-- Countdown display -->
+                    <div v-else class="grid grid-cols-4 gap-2">
+                      <!-- Jours -->
+                      <div class="flex flex-col items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                        <span class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          {{ countdown.days }}
+                        </span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          jour{{ countdown.days > 1 ? 's' : '' }}
+                        </span>
+                      </div>
+
+                      <!-- Heures -->
+                      <div class="flex flex-col items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                        <span class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                          {{ countdown.hours }}
+                        </span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          heure{{ countdown.hours > 1 ? 's' : '' }}
+                        </span>
+                      </div>
+
+                      <!-- Minutes -->
+                      <div class="flex flex-col items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                        <span class="text-2xl font-bold text-green-600 dark:text-green-400">
+                          {{ countdown.minutes }}
+                        </span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          min
+                        </span>
+                      </div>
+
+                      <!-- Secondes -->
+                      <div class="flex flex-col items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                        <span class="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                          {{ countdown.seconds }}
+                        </span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          sec
+                        </span>
+                      </div>
+                    </div>
+
+                    <p class="text-xs text-center text-gray-600 dark:text-gray-400 mt-3">
+                      Expiration: {{ new Date(session?.session?.additional_info?.accessTokenExpiresAt).toLocaleString('fr-FR') }}
+                    </p>
                   </div>
                 </div>
               </UCard>
@@ -641,43 +840,102 @@ const links = [{
 
         <!-- Sidebar - Informations complémentaires -->
         <div class="space-y-6">
-          <!-- Statistiques -->
+          <!-- Modules et Accès -->
           <UCard>
             <template #header>
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                Mes statistiques
+                Modules et Accès
+              </h3>
+            </template>
+
+            <!-- Empty state si aucune information disponible -->
+            <div
+              v-if="!userName && userModules.length === 0 && userStructures.length === 0"
+              class="flex flex-col items-center justify-center py-8 text-center"
+            >
+              <div class="p-3 bg-gray-100 dark:bg-gray-800 rounded-full mb-3">
+                <UIcon name="i-heroicons-inbox" class="w-8 h-8 text-gray-400" />
+              </div>
+              <p class="text-sm font-medium text-gray-900 dark:text-white">Aucune information disponible</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Les informations d'accès ne sont pas configurées
+              </p>
+            </div>
+
+            <!-- Contenu normal -->
+            <div v-else class="space-y-4">
+              <!-- Nom d'utilisateur -->
+              <div v-if="userName" class="space-y-1">
+                <p class="text-xs text-gray-500 dark:text-gray-400">Nom d'utilisateur</p>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ userName }}</p>
+              </div>
+
+              <UDivider v-if="userName && (userModules.length > 0 || userStructures.length > 0)" />
+
+              <!-- Modules accessibles -->
+              <div v-if="userModules.length > 0" class="space-y-2">
+                <p class="text-xs text-gray-500 dark:text-gray-400">Modules accessibles</p>
+                <div class="flex flex-wrap gap-2">
+                  <UBadge
+                    v-for="module in userModules"
+                    :key="module"
+                    color="blue"
+                    variant="subtle"
+                    size="sm"
+                  >
+                    {{ module }}
+                  </UBadge>
+                </div>
+              </div>
+
+              <UDivider v-if="userModules.length > 0 && userStructures.length > 0" />
+
+              <!-- Structures -->
+              <div v-if="userStructures.length > 0" class="space-y-2">
+                <p class="text-xs text-gray-500 dark:text-gray-400">Structures</p>
+                <div class="space-y-1">
+                  <div
+                    v-for="(structure, index) in userStructures"
+                    :key="index"
+                    class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
+                  >
+                    <UIcon name="i-heroicons-building-office-2" class="w-4 h-4 text-blue-600" />
+                    <span>{{ structure }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </UCard>
+
+          <!-- Rôles et Permissions -->
+          <UCard v-if="Object.keys(userResources).length > 0">
+            <template #header>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Rôles et Permissions
               </h3>
             </template>
 
             <div class="space-y-4">
-              <div class="flex items-center justify-between">
+              <div
+                v-for="(resource, moduleName) in userResources"
+                :key="moduleName"
+                class="space-y-2"
+              >
                 <div class="flex items-center gap-2">
-                  <div class="p-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                    <UIcon name="i-heroicons-folder" class="w-4 h-4 text-blue-600" />
-                  </div>
-                  <span class="text-sm text-gray-600 dark:text-gray-400">Projets créés</span>
+                  <UIcon name="i-heroicons-shield-check" class="w-4 h-4 text-purple-600" />
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ moduleName }}</p>
                 </div>
-                <span class="font-semibold text-gray-900 dark:text-white">24</span>
-              </div>
-
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <div class="p-2 bg-green-50 dark:bg-green-950/30 rounded-lg">
-                    <UIcon name="i-heroicons-check-circle" class="w-4 h-4 text-green-600" />
-                  </div>
-                  <span class="text-sm text-gray-600 dark:text-gray-400">Projets terminés</span>
+                <div class="flex flex-wrap gap-1.5 ml-6">
+                  <UBadge
+                    v-for="role in resource.roles"
+                    :key="role"
+                    color="purple"
+                    variant="soft"
+                    size="xs"
+                  >
+                    {{ role.replace(/_/g, ' ') }}
+                  </UBadge>
                 </div>
-                <span class="font-semibold text-gray-900 dark:text-white">18</span>
-              </div>
-
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <div class="p-2 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                    <UIcon name="i-heroicons-document" class="w-4 h-4 text-purple-600" />
-                  </div>
-                  <span class="text-sm text-gray-600 dark:text-gray-400">Documents</span>
-                </div>
-                <span class="font-semibold text-gray-900 dark:text-white">156</span>
               </div>
             </div>
           </UCard>
@@ -720,18 +978,38 @@ const links = [{
             </template>
 
             <div class="space-y-3 text-sm">
+              <div class="space-y-1">
+                <span class="text-xs text-gray-500 dark:text-gray-400">ID Utilisateur</span>
+                <p class="font-mono text-xs text-gray-900 dark:text-white break-all">
+                  {{ session?.user?.id }}
+                </p>
+              </div>
+
+              <UDivider />
+
               <div class="flex items-center justify-between">
                 <span class="text-gray-600 dark:text-gray-400">Membre depuis</span>
                 <span class="font-medium text-gray-900 dark:text-white">
-                  {{ new Date(user.dateCreation).toLocaleDateString('fr-FR') }}
+                  {{ new Date(session?.user?.createdAt || new Date()).toLocaleDateString('fr-FR') }}
                 </span>
               </div>
 
               <div class="flex items-center justify-between">
-                <span class="text-gray-600 dark:text-gray-400">Dernière connexion</span>
+                <span class="text-gray-600 dark:text-gray-400">Dernière mise à jour</span>
                 <span class="font-medium text-gray-900 dark:text-white">
-                  {{ user.derniereConnexion }}
+                  {{ new Date(session?.user?.updatedAt || new Date()).toLocaleDateString('fr-FR') }}
                 </span>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <span class="text-gray-600 dark:text-gray-400">Fournisseur d'auth</span>
+                <UBadge
+                  :color="session?.auth_provider === 'keycloak' ? 'blue' : 'gray'"
+                  variant="subtle"
+                  size="xs"
+                >
+                  {{ session?.auth_provider || 'N/A' }}
+                </UBadge>
               </div>
 
               <UDivider />

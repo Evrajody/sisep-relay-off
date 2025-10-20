@@ -27,7 +27,7 @@ export default {
             },
 
             animation: {
-                "slide": "slide 10s linear infinite",
+                "slide": "slide 100s linear infinite",
             },
 
             backgroundImage: {

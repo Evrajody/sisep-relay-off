@@ -5,33 +5,72 @@ import FooterSiseb from "~/components/Home/FooterSiseb.vue";
 import Navbar from "~/components/Home/Navbar.vue";
 import ProjectCard from "~/components/Home/ProjectCard.vue";
 import ConventionCard from "~/components/Home/ConventionCard.vue";
+import type { Project } from "~/types";
+import {usePublishedProjects} from "~/composables/project/usePublishedProjects";
 
 // Définir le layout spécifique pour la page d'accueil
 definePageMeta({
   layout: "home",
 });
 
-// Hero carousel state
-const slides = reactive([
+// Récupérer les projets publiés
+const { publishedProjects, publishedProjectsStatus } = usePublishedProjects();
+
+// Utiliser le composable pour afficher les fichiers
+const { getFileDisplayUrl } = useFileDisplay();
+
+// Slides statiques par défaut
+const defaultSlides = [
   {
     title: "Données clés sur le cadre de vies",
     subtitle: "Faits et informations pour orienter l'action publique",
     image: "cadre_world.webp",
-    cta: { label: "Explorer les données", href: "/" }
+    cta: { label: "Explorer les données", href: "/" },
+    type: 'default' as const
   },
   {
     title: "Projets structurants",
     subtitle: "Suivez l'avancée des grands chantiers",
     image: "media_travaux.jpeg",
-    cta: { label: "Voir les projets", href: "/project" }
+    cta: { label: "Voir les projets", href: "/project" },
+    type: 'default' as const
   },
   {
     title: "Conventions et engagements",
     subtitle: "Découvrez les accords majeurs pour l'environnement",
     image: "img-odds.png",
-    cta: { label: "Parcourir", href: "/conventions" }
+    cta: { label: "Parcourir", href: "/conventions" },
+    type: 'default' as const
   }
-])
+];
+
+// Hero carousel state - Mélanger les slides statiques avec les projets publiés
+const slides = computed(() => {
+  const projectSlides = publishedProjects.value.slice(0, 5).map((project: Project) => ({
+    title: project.title,
+    subtitle: '', // Pas de description pour les projets
+    image: project.coverImageId ? getFileDisplayUrl(project.coverImageId) : "media_travaux.jpeg",
+    cta: { label: "Voir le projet", href: `/project/${project.id}` },
+    type: 'project' as const,
+    projectId: project.id
+  }));
+
+  // Mélanger les slides: alterner entre projets et slides statiques
+  const mixed = [];
+  const maxLength = Math.max(projectSlides.length, defaultSlides.length);
+
+  for (let i = 0; i < maxLength; i++) {
+    if (i < projectSlides.length) {
+      mixed.push(projectSlides[i]);
+    }
+    if (i < defaultSlides.length) {
+      mixed.push(defaultSlides[i]);
+    }
+  }
+
+  // Retourner les slides mélangés ou les slides par défaut si aucun projet
+  return mixed.length > 0 ? mixed : defaultSlides;
+})
 
 const currentSlide = ref(0)
 const progress = ref(0) // 0..100
@@ -39,6 +78,16 @@ const isPlaying = ref(true)
 const SLIDE_DURATION = 7000 // ms
 let rafId: number | null = null
 let startTs = 0
+
+// Fonction pour obtenir l'URL complète de l'image
+const getImageUrl = (slide: any) => {
+  // Si c'est une URL complète (commence par http:// ou https://)
+  if (slide.image && (slide.image.startsWith('http://') || slide.image.startsWith('https://'))) {
+    return slide.image;
+  }
+  // Sinon, c'est une image locale
+  return `/images/${slide.image}`;
+};
 
 function step(ts: number) {
   if (!isPlaying.value) return
@@ -54,10 +103,10 @@ function step(ts: number) {
 }
 
 function nextSlide() {
-  currentSlide.value = (currentSlide.value + 1) % slides.length
+  currentSlide.value = (currentSlide.value + 1) % slides.value.length
 }
 function prevSlide() {
-  currentSlide.value = (currentSlide.value - 1 + slides.length) % slides.length
+  currentSlide.value = (currentSlide.value - 1 + slides.value.length) % slides.value.length
 }
 function goToSlide(i: number) {
   currentSlide.value = i
@@ -93,32 +142,32 @@ const cadresSearchElements = reactive([
     label: "Terres",
     href: "#",
   },
-  {
-    label: "Ressources en eau",
-    href: "#",
-  },
-
-  {
-    label: "Ressources biologiques",
-    href: "#",
-  },
-
-  {
-    label: "Établissements humains",
-    href: "#",
-  },
-  {
-    label: "Libération de substances chimiques",
-    href: "#",
-  },
-  {
-    label: "Émissions dans l'air",
-    href: "#",
-  },
-  {
-    label: "Établissements humains",
-    href: "#",
-  },
+  // {
+  //   label: "Ressources en eau",
+  //   href: "#",
+  // },
+  //
+  // {
+  //   label: "Ressources biologiques",
+  //   href: "#",
+  // },
+  //
+  // {
+  //   label: "Établissements humains",
+  //   href: "#",
+  // },
+  // {
+  //   label: "Libération de substances chimiques",
+  //   href: "#",
+  // },
+  // {
+  //   label: "Émissions dans l'air",
+  //   href: "#",
+  // },
+  // {
+  //   label: "Établissements humains",
+  //   href: "#",
+  // },
   {
     label: "Santé environnementale",
     href: "#",
@@ -134,29 +183,112 @@ const cadresSearchElements = reactive([
 const partenairesImg = reactive([
 
   {
-    label: "1",
+    label: "2SCALE",
     href: "#",
-    src: "logo_cadre_vie.png"
+    src: "2scale.png"
   },
 
   {
-    label: "2",
+    label: "ACEDAFRICA",
     href: "#",
-    src: "gdiz_logo.png"
+    src: "acedafrica.png"
   },
 
   {
-    label: "2",
+    label: "AFD",
     href: "#",
-    src: "sbpe_log.png"
+    src: "afd.png"
   },
 
   {
-    label: "2",
+    label: "AFDB",
     href: "#",
-    src: "sobrebra.png"
-  }
+    src: "afdb.png"
+  },
 
+  {
+    label: "BEEONG",
+    href: "#",
+    src: "beeong.png"
+  },
+
+  {
+    label: "BOAD",
+    href: "#",
+    src: "boad.png"
+  },
+
+  {
+    label: "ECOBENIN",
+    href: "#",
+    src: "ecobenin.png"
+  },
+
+  {
+    label: "ENABEL",
+    href: "#",
+    src: "enabel.png"
+  },
+
+  {
+    label: "FAO",
+    href: "#",
+    src: "fao.png"
+  },
+
+  {
+    label: "FEM",
+    href: "#",
+    src: "fem.png"
+  },
+
+  {
+    label: "GIZ",
+    href: "#",
+    src: "giz.png"
+  },
+
+  {
+    label: "HELVETAS",
+    href: "#",
+    src: "helvetas.png"
+  },
+
+  {
+    label: "IDID ONG",
+    href: "#",
+    src: "ididong.png"
+  },
+
+  {
+    label: "ONG JEVEV",
+    href: "#",
+    src: "ongjevev.png"
+  },
+
+  {
+    label: "PNUE",
+    href: "#",
+    src: "pnue.png"
+  },
+
+  {
+    label: "SOLIDARITES ENTREPRISES",
+    href: "#",
+    src: "solidarites-entreprises.png"
+  },
+
+  {
+    label: "UNDP",
+    href: "#",
+    src: "undp.png"
+  },
+
+  {
+    label: "WORLD BANK",
+    href: "#",
+    src: "worldbank.png"
+  },
 
 ])
 
@@ -202,7 +334,7 @@ const statsImg = reactive([
     <!-- SECTION BANNIÈRE PRINCIPALE: CAROUSEL -->
     <header class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       <!-- Top nav bar with brand + navbar overlay - Enhanced glassmorphism -->
-      <div class="h-fit mx-auto absolute top-2 md:top-4 lg:top-7 rounded-2xl shadow-2xl left-0 right-0 z-20 max-w-[95vw] md:max-w-[90vw] bg-white/10 backdrop-blur-xl border border-white/20 transition-all duration-300 hover:shadow-3xl motion-preset-fade">
+      <div class="h-fit mx-auto absolute top-2 md:top-4 lg:top-7 rounded-2xl shadow-2xl left-0 right-0 z-20 max-w-[95vw] bg-white/10 backdrop-blur-xl border border-white/20 transition-all duration-300 hover:shadow-3xl motion-preset-fade">
         <div class="flex flex-col md:flex-row gap-2 md:gap-6 justify-between md:justify-start items-center p-2 md:pr-6">
           <div class="img-box flex rounded-xl md:rounded-l-xl bg-gradient-to-br from-white to-gray-50 w-full md:w-fit shadow-inner transform transition-transform duration-300 hover:scale-[1.02]">
             <div class="w-full md:w-[250px] lg:w-[300px] p-3 md:p-2">
@@ -219,11 +351,10 @@ const statsImg = reactive([
           <transition name="fade-scale" mode="out-in">
             <div :key="currentSlide" class="absolute inset-0">
               <img
-                :src="`/images/${slides[currentSlide].image}`"
+                :src="getImageUrl(slides[currentSlide])"
                 :alt="slides[currentSlide].title"
                 class="w-full h-full object-cover scale-110 animate-ken-burns"
                 loading="lazy"
-                :srcset="`/images/${slides[currentSlide].image} 1x, /images/${slides[currentSlide].image} 2x`"
               />
             </div>
           </transition>
@@ -235,8 +366,8 @@ const statsImg = reactive([
         <!-- Content with enhanced animations -->
         <div class="relative z-10 h-full container mx-auto px-3 sm:px-4 md:px-6 flex items-center">
           <div class="w-full md:max-w-2xl lg:max-w-3xl space-y-3 sm:space-y-4 md:space-y-6 pt-16 md:pt-20">
-            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white font-bold leading-tight motion-preset-slide-up motion-delay-100 drop-shadow-2xl">{{ slides[currentSlide].title }}</h1>
-            <p class="text-white/95 text-base sm:text-lg md:text-xl lg:text-2xl motion-preset-slide-up motion-delay-200 drop-shadow-lg font-light">{{ slides[currentSlide].subtitle }}</p>
+            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl/snug text-white font-bold leading-tight motion-preset-slide-up motion-delay-100 line-clamp-3 drop-shadow-2xl">{{ slides[currentSlide].title }}</h1>
+            <p v-if="slides[currentSlide].subtitle" class="text-white/95 text-base sm:text-lg md:text-xl motion-preset-slide-up motion-delay-200 drop-shadow-lg font-light">{{ slides[currentSlide].subtitle }}</p>
             
             <!-- Boutons d'action améliorés -->
             <div class="flex flex-wrap gap-2 sm:gap-3 md:gap-4 motion-preset-slide-up motion-delay-300">
@@ -298,9 +429,9 @@ const statsImg = reactive([
           <div class="ml-auto hidden lg:block motion-preset-slide-left motion-delay-600">
             <div class="relative w-52 xl:w-64 h-36 xl:h-40 rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-3xl group cursor-pointer border-2 border-white/20 hover:border-white/40">
               <img
-                :src="`/images/${slides[(currentSlide+1)%slides.length].image}`"
+                :src="getImageUrl(slides[(currentSlide+1) % slides.length])"
                 class="w-full h-full object-cover blur-[2px] group-hover:blur-none scale-105 transition-all duration-500 group-hover:scale-110"
-                :alt="`Aperçu: ${slides[(currentSlide+1)%slides.length].title}`"
+                :alt="`Aperçu: ${slides[(currentSlide+1) % slides.length].title}`"
                 loading="lazy"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent group-hover:from-black/40"></div>
@@ -309,7 +440,7 @@ const statsImg = reactive([
                   <UIcon name="i-heroicons-clock" class="w-3.5 h-3.5" />
                   <span class="font-light">À suivre</span>
                 </div>
-                <p class="text-white text-sm xl:text-base font-semibold line-clamp-2">{{ slides[(currentSlide+1)%slides.length].title }}</p>
+                <p class="text-white text-sm xl:text-base font-semibold line-clamp-2">{{ slides[(currentSlide+1) % slides.length].title }}</p>
               </div>
             </div>
           </div>
@@ -351,7 +482,7 @@ const statsImg = reactive([
           <div class="mt-3 sm:mt-4 flex justify-center gap-2 sm:gap-2.5">
             <button
               v-for="(s, i) in slides"
-              :key="i"
+              :key="`slide-btn-${i}-${s.type}`"
               @click="goToSlide(i)"
               class="h-1.5 sm:h-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-md hover:shadow-lg"
               :class="i===currentSlide ? 'w-8 sm:w-10 bg-white' : 'w-4 sm:w-5 bg-white/30 hover:bg-white/50'"
@@ -672,7 +803,7 @@ const statsImg = reactive([
       </section>
 
 
-      <!--SECTION DERNIERS PROJETS - Redesignée avec bento layout -->
+      <!--SECTION DERNIERS PROJETS - Redesignée avec bento layout dynamique -->
 
       <section class="py-20 md:py-24 lg:py-28 h-full relative overflow-hidden">
         <div class="bg-gradient-to-b from-gray-50 to-white absolute inset-0"></div>
@@ -684,7 +815,7 @@ const statsImg = reactive([
           <div class="flex flex-col gap-10 md:gap-12">
 
           <!-- Header with CTA amélioré -->
-          <div class="w-full flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 motion-preset-slide-up">
+          <div class="w-full flex flex-col sm:flex-row sm:items-end sm:items-end sm:justify-between gap-4 motion-preset-slide-up">
             <div class="space-y-3">
               <div class="inline-block px-4 py-1.5 bg-sisep-hit/10 rounded-full">
                 <span class="text-sisep-hit font-semibold text-sm uppercase tracking-wider">Projets en cours</span>
@@ -700,22 +831,76 @@ const statsImg = reactive([
             </NuxtLink>
           </div>
 
-          <!-- Row 1: Featured + two medium cards -->
-          <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 w-full">
-            <div class="lg:col-span-2">
-              <ProjectCard :project="{ title: 'Rénovation urbaine', image: 'https://images.unsplash.com/photo-1486304873000-235643847519?w=1200', status: 'En cours', category: 'Urbanisme' }"/>
-            </div>
-            <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <ProjectCard :project="{ title: 'Assainissement', image: 'https://images.unsplash.com/photo-1563447310550-3081749fb321?w=800', status: 'Planifié', category: 'Hydraulique' }"/>
-              <ProjectCard :project="{ title: 'Éclairage public', image: 'https://images.unsplash.com/photo-1509395176047-4a66953fd231?w=800', status: 'Planifié', category: 'Infrastructures' }"/>
-            </div>
-          </div>
+          <!-- Bento Grid dynamique avec projets réels -->
+          <template v-if="publishedProjects.length > 0">
+            <!-- Row 1: Featured + two medium cards -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 w-full">
+              <!-- Premier projet en grand -->
+              <div v-if="publishedProjects[0]" class="lg:col-span-2">
+                <ProjectCard
+                  :project="{
+                    id: publishedProjects[0].id,
+                    title: publishedProjects[0].title,
+                    image: publishedProjects[0].coverImageId ? getFileDisplayUrl(publishedProjects[0].coverImageId) : 'https://images.unsplash.com/photo-1486304873000-235643847519?w=1200',
+                    status: publishedProjects[0].status,
+                    category: publishedProjects[0].type?.name || 'Projet',
+                    description: publishedProjects[0].description
+                  }"
+                  @click="navigateTo(`/project/${publishedProjects[0].id}`)"
+                />
+              </div>
 
-          <!-- Row 2: Responsive grid of more projects -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
-            <div v-for="i in 4" :key="'grid-'+i">
-              <ProjectCard :project="{ title: 'Projet '+ i, image: i%2 ? 'https://images.unsplash.com/photo-1556767576-cfba1efe4fd0?w=800' : 'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?w=800', status: i%2 ? 'En cours' : 'Planifié', category: i%2 ? 'Voirie' : 'Aménagement' }"/>
+              <!-- Projets 2 et 3 -->
+              <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <ProjectCard
+                  v-if="publishedProjects[1]"
+                  :project="{
+                    id: publishedProjects[1].id,
+                    title: publishedProjects[1].title,
+                    image: publishedProjects[1].coverImageId ? getFileDisplayUrl(publishedProjects[1].coverImageId) : 'https://images.unsplash.com/photo-1563447310550-3081749fb321?w=800',
+                    status: publishedProjects[1].status,
+                    category: publishedProjects[1].type?.name || 'Projet'
+                  }"
+                  @click="navigateTo(`/project/${publishedProjects[1].id}`)"
+                />
+                <ProjectCard
+                  v-if="publishedProjects[2]"
+                  :project="{
+                    id: publishedProjects[2].id,
+                    title: publishedProjects[2].title,
+                    image: publishedProjects[2].coverImageId ? getFileDisplayUrl(publishedProjects[2].coverImageId) : 'https://images.unsplash.com/photo-1509395176047-4a66953fd231?w=800',
+                    status: publishedProjects[2].status,
+                    category: publishedProjects[2].type?.name || 'Projet'
+                  }"
+                  @click="navigateTo(`/project/${publishedProjects[2].id}`)"
+                />
+              </div>
             </div>
+
+            <!-- Row 2: Responsive grid of more projects (4 to 7) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
+              <ProjectCard
+                v-for="(project, index) in publishedProjects.slice(3, 7)"
+                :key="project.id"
+                :project="{
+                  id: project.id,
+                  title: project.title,
+                  image: project.coverImageId ? getFileDisplayUrl(project.coverImageId) : 'https://images.unsplash.com/photo-1556767576-cfba1efe4fd0?w=800',
+                  status: project.status,
+                  category: project.type?.name || 'Projet'
+                }"
+                @click="navigateTo(`/project/${project.id}`)"
+              />
+            </div>
+          </template>
+
+          <!-- Fallback si pas de projets -->
+          <div v-else class="flex flex-col items-center justify-center py-16 text-center">
+            <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+              <UIcon name="i-heroicons-inbox" class="w-12 h-12 text-gray-400" />
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Aucun projet disponible</h3>
+            <p class="text-gray-600 dark:text-gray-400">Les projets seront bientôt publiés</p>
           </div>
 
           </div>
@@ -843,12 +1028,12 @@ const statsImg = reactive([
 
 
       <!--    SECTIONS DES PARTENAIRES-->
-      <section class="py-16 h-full relative">
+      <section class="py-16 h-full bg-white relative">
         <div class=" max-w-7xl mx-auto overflow-x-clip">
           <div  class="grid grid-flow-col gap-10 items-center [grid-auto-columns:min-content] justify-center min-w-fit animate-slide">
 
             <div v-for="item in [...partenairesImg, ...partenairesImg]" class="el w-[300px]">
-              <img :src="`/images/${item.src}`" class="w-full motion-blur">
+              <img :src="`/images/${item.src}`" class="w-full imgss motion-blur">
             </div>
 
           </div>
@@ -911,6 +1096,10 @@ const statsImg = reactive([
 }
 .animate-ken-burns {
   animation: ken-burns 10s ease-out infinite alternate;
+}
+
+.imgss {
+  mix-blend-mode: multiply;
 }
 
 /* Slow pulse animation */

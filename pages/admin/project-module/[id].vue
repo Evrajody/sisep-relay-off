@@ -363,12 +363,12 @@ const projectActions = computed(() => {
     ],
     // Groupe 2: Actions de workflow
     [
-      // {
-      //   label: 'Enregistrer comme brouillon',
-      //   icon: 'i-heroicons-document',
-      //   click: saveDraft,
-      //   // disabled: currentStatus === 'DRAFT'
-      // },
+      {
+        label: 'Brouillon',
+        icon: 'i-heroicons-document',
+        click: saveDraft,
+        // disabled: currentStatus === 'DRAFT'
+      },
       {
         label: 'Soumettre',
         icon: 'i-heroicons-paper-airplane',

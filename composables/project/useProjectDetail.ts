@@ -1,16 +1,41 @@
 import { useNuxtApp } from '#app';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import type { Project } from '~/types';
 
-export const useProjectDetail = () => {
+export const useProjectDetail = (projectId?: string) => {
   const { $sisepApi } = useNuxtApp();
+
+  // Si un projectId est fourni, utiliser useFetch
+  if (projectId) {
+    const {
+      data: projectData,
+      status: projectDetailStatus,
+      error: projectDetailError,
+      refresh: refreshProjectDetail,
+    } = useFetch<Project>(`projects/${projectId}`, {
+      method: 'GET',
+      key: `project-detail-${projectId}`,
+      $fetch: $sisepApi,
+    });
+
+    const projectDetail = computed(() => projectData.value);
+
+    return {
+      projectDetail,
+      projectDetailStatus,
+      projectDetailError,
+      refreshProjectDetail,
+    };
+  }
+
+  // Sinon, utiliser l'ancienne méthode avec ref
   const project = ref<Project | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
   // Récupérer les détails d'un projet par son ID
-  const fetchProject = async (projectId: string) => {
-    if (!projectId) {
+  const fetchProject = async (id: string) => {
+    if (!id) {
       error.value = 'ID du projet manquant';
       return null;
     }
@@ -19,7 +44,7 @@ export const useProjectDetail = () => {
     error.value = null;
 
     try {
-      const response = await $sisepApi(`/projects/${projectId}`, {
+      const response = await $sisepApi(`/projects/${id}`, {
         method: 'GET'
       });
 
