@@ -28,7 +28,7 @@ export const usePublishedProjects = () => {
         refresh: refreshPublishedProjects,
         status: publishedProjectsStatus,
         error: publishedProjectsError,
-    } = useFetch(`projects`, {
+    } = useFetch(`published-projects`, {
         method: "GET",
         key: "published-projects-list",
         $fetch: $sisepApi,
