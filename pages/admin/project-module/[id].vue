@@ -6,6 +6,7 @@ import { useProjectDelete } from '~/composables/project/useProjectDelete';
 import { useLoading } from '~/composables/useLoading';
 import { useFileDisplay } from '~/composables/useFileDisplay';
 import { useAffectProject } from '~/composables/project/useAffectProject';
+import { useProjectActionAvailability } from '~/composables/project/useProjectActionAvailability';
 
 const route = useRoute();
 const projectId = route.params.id as string;
@@ -20,6 +21,9 @@ const {
   formatDate,
   getStatusBadge,
 } = useProjectDetail();
+
+// Composable pour vérifier la disponibilité des actions
+const { isActionAvailable } = useProjectActionAvailability();
 
 const activeTab = ref(0);
 const showActionModal = ref(false);
@@ -367,37 +371,37 @@ const projectActions = computed(() => {
         label: 'Brouillon',
         icon: 'i-heroicons-document',
         click: saveDraft,
-        // disabled: currentStatus === 'DRAFT'
+        disabled: !isActionAvailable(currentStatus, 'SAVE_DRAFT')
       },
       {
         label: 'Soumettre',
         icon: 'i-heroicons-paper-airplane',
         click: submitForValidation,
-        // disabled: currentStatus === 'SUBMITTED' || currentStatus === 'VALIDATED' || currentStatus === 'VALIDATED_BY_STRUCTURE' || currentStatus === 'PUBLISHED'
+        disabled: !isActionAvailable(currentStatus, 'SUBMIT')
       },
       {
         label: 'Valider',
         icon: 'i-heroicons-check-circle',
         click: validateProject,
-        // disabled: currentStatus === 'VALIDATED' || currentStatus === 'VALIDATED_BY_STRUCTURE' || currentStatus === 'PUBLISHED'
+        disabled: !isActionAvailable(currentStatus, 'VALIDATE')
       },
       {
         label: 'Valider (Structure)',
         icon: 'i-heroicons-building-office-2',
         click: validateByStructure,
-        // disabled: currentStatus === 'VALIDATED_BY_STRUCTURE' || currentStatus === 'PUBLISHED'
+        disabled: !isActionAvailable(currentStatus, 'VALIDATE_BY_STRUCTURE')
       },
       {
         label: 'Rejeter',
         icon: 'i-heroicons-x-circle',
         click: rejectProject,
-        // disabled: currentStatus === 'REJECTED' || currentStatus === 'DRAFT'
+        disabled: !isActionAvailable(currentStatus, 'REJECT')
       },
       {
         label: 'Rejeter (Structure)',
         icon: 'i-heroicons-building-office',
         click: rejectByStructure,
-        // disabled: currentStatus === 'REJECTED_BY_STRUCTURE' || currentStatus === 'DRAFT'
+        disabled: !isActionAvailable(currentStatus, 'REJECT_BY_STRUCTURE')
       }
     ],
     // Groupe 3: Actions de publication
@@ -406,13 +410,13 @@ const projectActions = computed(() => {
         label: 'Publier',
         icon: 'i-heroicons-globe-alt',
         click: publishProject,
-        // disabled: currentStatus === 'PUBLISHED' || currentStatus === 'DRAFT' || currentStatus === 'SUBMITTED'
+        disabled: !isActionAvailable(currentStatus, 'PUBLISH')
       },
       {
         label: 'Dépublier',
         icon: 'i-heroicons-eye-slash',
         click: unpublishProject,
-        // disabled: currentStatus !== 'PUBLISHED'
+        disabled: !isActionAvailable(currentStatus, 'UNPUBLISH')
       }
     ],
     // Groupe 4: Actions dangereuses
@@ -483,10 +487,6 @@ definePageMeta({
           class="w-full h-full object-cover"
         >
       </div>
-
-<!--      <pre>-->
-<!--        {{ project }}-->
-<!--      </pre>-->
 
 
       <!-- Informations principales superposées -->

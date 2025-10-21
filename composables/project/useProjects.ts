@@ -63,10 +63,10 @@ export const useProjects = () => {
         watch: [page, pageCount, search, selectedStatus],
 
         onResponse: ({ response }) => {
-            if (response.status != 200) {
+            if (![200, 201].includes(response.status)) {
                 makeAlert({
                     title: "Oups Erreur !",
-                    message: `${response._data.message}`,
+                    message: `${response._data.error}`,
                     type: "error",
                 });
             } else {

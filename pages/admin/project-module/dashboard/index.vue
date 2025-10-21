@@ -208,6 +208,10 @@ onMounted(() => {
         </div>
       </template>
     </UDashboardToolbar>
+
+    <pre>
+      {{session}}
+    </pre>
     
 
     <div class="max-w-[95vw] mx-auto px-4 py-6 space-y-6">

@@ -3,8 +3,7 @@ import { sso } from "@better-auth/sso";
 import { customSession } from "better-auth/plugins";
 
 const runtimeconfig = useRuntimeConfig()
-// Import du composable de déconnexion
-// const { logout  } = useAuthLogout();
+
 /**
  * Récupère la configuration depuis les variables d'environnement
  * avec des valeurs par défaut et validation

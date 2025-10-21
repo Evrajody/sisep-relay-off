@@ -77,14 +77,26 @@ export const useProjectDetail = (projectId?: string) => {
 
     try {
       const response = await $sisepApi(`/projects/${projectId}/update-status`, {
+
         method: 'PUT',
-        body: { status }
+        body: { status },
+
+        onResponse: ({response}) => {
+            if (![200, 201].includes(response.status)) {
+                makeAlert({
+                    title: "Oups Erreur !",
+                    message: `${response._data.message}`,
+                    type: "error",
+                });
+            }
+        }
       });
 
       if (response && project.value) {
         project.value.status = status;
         return true;
       }
+
       return false;
     } catch (err) {
       console.error('Erreur lors de la mise à jour du statut:', err);
@@ -106,6 +118,7 @@ export const useProjectDetail = (projectId?: string) => {
     error.value = null;
 
     try {
+
       const response = await $sisepApi(`/projects/${projectId}/submit`, {
         method: 'POST'
       });
