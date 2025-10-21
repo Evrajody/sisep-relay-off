@@ -1,13 +1,13 @@
-import { transformProjectToPayload, transformPayloadToAPI, cleanPayload } from '~/utils/transformProjectToPayload';
-import { transformTmpPayload } from '~/utils/transformTmpPayload';
+import {transformPayloadToAPI, transformProjectToPayload} from '~/utils/transformProjectToPayload';
+import {transformTmpPayload} from '~/utils/transformTmpPayload';
 
 export const useUpdateProject = (projectRef: any) => {
 
-    const { $sisepApi } = useNuxtApp();
+    const {$sisepApi} = useNuxtApp();
     const router = useRouter();
 
 
-    const { loadIndicators,    loadVilles,  loadDepartements, } = useSisebHelper()
+    const {loadIndicators, loadVilles, loadDepartements,} = useSisebHelper()
 
     /**
      * Met à jour un projet existant
@@ -25,11 +25,12 @@ export const useUpdateProject = (projectRef: any) => {
                 method: 'PUT',
                 body: data,
 
-                onResponse: ({ response }) => {
+                onResponse: ({response}) => {
 
-                    console.log('Update response:', response);
+                    // console.log('Update response:', response);
 
                     if (response.status === 200 || response.status === 201) {
+
                         makeAlert({
                             type: "success",
                             title: "Projet mis à jour !",
@@ -54,6 +55,15 @@ export const useUpdateProject = (projectRef: any) => {
                             type: "error",
                             title: "Projet introuvable !",
                             message: `Le projet que vous essayez de modifier n'existe pas`,
+                            extraClass: "bg-red-500",
+                        });
+                    }
+
+                    if (response.status === 401) {
+                        makeAlert({
+                            type: "error",
+                            title: "Erreur !",
+                            message: `${response._data.error}`,
                             extraClass: "bg-red-500",
                         });
                     }
@@ -124,7 +134,7 @@ export const useUpdateProject = (projectRef: any) => {
                     location: (formData.location?.location?.latitude && formData.location?.location?.longitude) ? {
                         type: 'point',
                         coordinates: [[formData.location.location.latitude, formData.location.location.longitude]]
-                    } : { },
+                    } : {},
                 }
             };
 
@@ -712,7 +722,8 @@ export const useUpdateProject = (projectRef: any) => {
                         instrumentType: {
                             type: 'text',
                             rules: ['required'],
-                            default: '', label: 'Type d\'instrument', placeholder: "Ex: Subvention, Prêt, Don"},
+                            default: '', label: 'Type d\'instrument', placeholder: "Ex: Subvention, Prêt, Don"
+                        },
                         amountCommitedCfa: {
                             type: 'text',
                             default: '',
@@ -757,8 +768,20 @@ export const useUpdateProject = (projectRef: any) => {
                                 lg: {container: 12, label: 12, wrapper: 12},
                             },
                             schema: {
-                                donor: {type: 'text', default: '',  rules: ['required'], label: 'Donateur', placeholder: "Ex: Banque Mondiale, UE, AFD"},
-                                program: {type: 'text', default: '',  rules: ['required'], label: 'Programme', placeholder: "Ex: Programme de développement rural"},
+                                donor: {
+                                    type: 'text',
+                                    default: '',
+                                    rules: ['required'],
+                                    label: 'Donateur',
+                                    placeholder: "Ex: Banque Mondiale, UE, AFD"
+                                },
+                                program: {
+                                    type: 'text',
+                                    default: '',
+                                    rules: ['required'],
+                                    label: 'Programme',
+                                    placeholder: "Ex: Programme de développement rural"
+                                },
                             },
                         }
                     }
