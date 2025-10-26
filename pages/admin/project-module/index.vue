@@ -2,6 +2,8 @@
 import { useProjects } from "~/composables/project/useProjects";
 import { useProjectDelete } from "~/composables/project/useProjectDelete";
 import type { Project } from '~/types';
+import {canCreateProject, canModifyProject, canDeleteProject} from "#shared/utils/abilities";
+
 
 
 definePageMeta({
@@ -64,19 +66,32 @@ const getActions = (row: Project) => [
   {
     label: 'Voir les détails',
     icon: 'i-heroicons-eye',
-    click: () => navigateTo(`/admin/project-module/${row.id}`)
+    click: () => navigateTo(`/admin/project-module/${row.id}`),
+    isAuthorized: true,
   },
   {
     label: 'Modifier',
     icon: 'i-heroicons-pencil-square',
-    click: () => navigateTo(`/admin/project-module/edit-project/${row.id}`)
+    click: () => navigateTo(`/admin/project-module/edit-project/${row.id}`),
+    isAuthorized: () => allows(canModifyProject, row),
   },
   {
     label: 'Supprimer',
     icon: 'i-heroicons-trash',
-    click: () => handleDeleteProject(row)
+    click: () => handleDeleteProject(row),
+    isAuthorized: async () => await allows(canDeleteProject, row),
   }
 ];
+
+// Filtrer les actions autorisées
+const getAuthorizedActions = (row: Project) => {
+  return getActions(row).filter(action => {
+    if (typeof action.isAuthorized === 'function') {
+      return action.isAuthorized();
+    }
+    return action.isAuthorized;
+  });
+};
 
 // Configuration des badges de statut
 const getStatusBadge = (status: string) => {
@@ -256,14 +271,17 @@ const getDaysRemaining = (endDate: string) => {
               </template>
             </USelectMenu>
 
-            <UButton
-              to="/admin/project-module/create-project"
-              color="primary"
-              icon="i-heroicons-plus"
-              label="Nouveau projet"
-              size="lg"
-              class="w-full lg:w-auto"
-            />
+            <Can :ability="canCreateProject">
+              <UButton
+                to="/admin/project-module/create-project"
+                color="primary"
+                icon="i-heroicons-plus"
+                label="Nouveau projet"
+                size="lg"
+                class="w-full lg:w-auto"
+              />
+            </Can>
+
           </div>
         </div>
       </template>
@@ -289,7 +307,7 @@ const getDaysRemaining = (endDate: string) => {
           }"
           class="w-full"
           :ui="{
-            td: { base: 'whitespace-nowrap' },
+            td: { base: 'whitespace-normal' },
             th: { base: 'whitespace-nowrap' }
           }"
           v-model:sort="sort"
@@ -297,7 +315,7 @@ const getDaysRemaining = (endDate: string) => {
         >
           <!-- Colonne Titre avec image -->
           <template #title-data="{ row }">
-            <div class="flex items-center gap-3 min-w-[200px]">
+            <div class="flex gap-3 w-[750px]">
               <UAvatar
                 :src="row.coverImage?.url || `https://ui-avatars.com/api/?name=${encodeURIComponent(row.title || '')}&background=3b82f6&color=fff`"
                 :alt="row.title"
@@ -305,16 +323,16 @@ const getDaysRemaining = (endDate: string) => {
                 class="flex-shrink-0"
                 :ui="{ size: { 'md': 'h-10 w-10 text-sm' } }"
               />
-              <div class="min-w-0">
-                <p class="font-medium text-gray-900 dark:text-white truncate">
+              <div class="flex-1">
+                <p class="font-medium text-gray-900 dark:text-white break-words">
                   {{ row.title || 'Sans titre' }}
                 </p>
-                <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
+                <p class="text-sm text-gray-500 dark:text-gray-400 break-words">
                   {{ row.type?.name || 'Sans catégorie' }}
                 </p>
                 <div v-if="row.structure" class="flex items-center gap-1 mt-1">
                   <UIcon name="i-heroicons-building-office-2" class="w-3 h-3 text-blue-500" />
-                  <p class="text-xs text-blue-600 dark:text-blue-400 truncate">
+                  <p class="text-xs text-blue-600 dark:text-blue-400 break-words">
                     {{ row.structure.name }}
                   </p>
                 </div>
@@ -376,16 +394,15 @@ const getDaysRemaining = (endDate: string) => {
 
           <!-- Colonne Actions -->
           <template #actions-data="{ row }">
-            <UDropdown :items="[getActions(row)]" :popper="{ placement: 'bottom-start' }">
+            <UDropdown :items="[getAuthorizedActions(row)]" :popper="{ placement: 'bottom-start' }">
               <UButton 
                 color="gray" 
                 variant="ghost" 
                 icon="i-heroicons-ellipsis-vertical"
                 :loading="projectListStatus === 'pending'"
               />
-              
               <template #item="{ item: actionItem }">
-                <div class="flex items-center gap-2" @click="actionItem.click">
+                <div  class="flex items-center gap-2" @click="actionItem.click">
                   <UIcon :name="actionItem.icon" class="h-4 w-4" />
                   <span>{{ actionItem.label }}</span>
                 </div>

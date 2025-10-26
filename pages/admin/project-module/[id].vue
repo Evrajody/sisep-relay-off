@@ -596,6 +596,10 @@ definePageMeta({
                 </UCard>
               </div>
 
+              <pre>
+                {{project}}
+              </pre>
+
               <!-- Structure affectée -->
               <UCard v-if="project?.structure" class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-800">
                 <div class="flex items-start gap-4">

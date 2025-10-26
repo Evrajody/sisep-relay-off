@@ -1,300 +1,164 @@
-import type { ProjectRole, UserSession } from "~/types/auth";
-import { getUserRolesForModule, hasRole, hasAnyRole } from "~/types/auth";
 
-/**
- * Actions disponibles dans le système
- */
-export enum Action {
-  // Actions sur les projets
-  LIST = "list",
-  READ = "read",
-  CREATE = "create",
-  UPDATE = "update",
-  DELETE = "delete",
-  ASSIGN = "assign",
+import type {Project, UserType} from "~/types";
 
-  // Actions de validation
-  VALIDATE = "validate",
-  REJECT = "reject",
-  REQUEST_MODIFICATION = "request_modification",
+// === -------------------------------------------------------------- === //
+// TODO: PERMISSIONS DU PROJET
 
-  // Actions de publication
-  PUBLISH = "publish",
-  UNPUBLISH = "unpublish",
+// => LISTER LES PROJETS PERSONNELS
+export const canListOwnProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_LIST_OWN_PROJECT || false;
+});
 
-  // Actions d'administration
-  MANAGE_USERS = "manage_users",
-  MANAGE_ROLES = "manage_roles",
-}
+// => METTRE A JOUR TOUS LES INDICATEURS
+export const canUpdateAllIndicator = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_UPDATE_ALL_INDICATOR || false;
+});
 
-/**
- * Sujets (ressources) disponibles dans le système
- */
-export enum Subject {
-  PROJECT = "project",
-  USER = "user",
-  ROLE = "role",
-  MODULE = "module",
-  ALL = "all",
-}
+// => PUBLIER UN PROJET
+export const canPublishProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_PUBLISH_PROJECT || false;
+});
 
-/**
- * Type pour une ability (permission)
- */
-export interface Ability {
-  action: Action;
-  subject: Subject;
-  conditions?: Record<string, any>;
-}
+// => LISTER LES INDICATEURS PERSONNELS
+export const canListOwnIndicator = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_LIST_OWN_INDICATOR || false;
+});
 
-/**
- * Mapping des rôles Keycloak vers les abilities
- * Définit quelles actions un rôle peut effectuer sur quels sujets
- */
-const ROLE_ABILITIES_MAP: Record<ProjectRole, Ability[]> = {
-  // Rôle: Liste les projets
-  LIST_PROJECT: [
-    { action: Action.LIST, subject: Subject.PROJECT },
-    { action: Action.READ, subject: Subject.PROJECT },
-  ],
+// => SUPER VALIDATEUR
+export const canSuperValidateur = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_SUPER_VALIDATEUR || false;
+});
 
-  // Rôle: Créer un projet
-  CREATE_PROJECT: [
-    { action: Action.CREATE, subject: Subject.PROJECT },
-  ],
+// => DEMANDER UNE MISE A JOUR
+export const canAskForUpdate = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_ASK_FOR_UPDATE || false;
+});
 
-  // Rôle: Modifier un projet
-  UPDATE_PROJECT: [
-    { action: Action.UPDATE, subject: Subject.PROJECT },
-  ],
+// => METTRE A JOUR UN PROJET
+export const canUpdateProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_UPDATE_PROJECT || false;
+});
 
-  // Rôle: Supprimer un projet
-  DELETE_PROJECT: [
-    { action: Action.DELETE, subject: Subject.PROJECT },
-  ],
+// => LISTER TOUS LES PROJETS
+export const canListAllProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_LIST_ALL_PROJECT || false;
+});
 
-  // Rôle: Affecter un projet
-  ASSIGN_PROJECT: [
-    { action: Action.ASSIGN, subject: Subject.PROJECT },
-  ],
+// => ASSIGNER UN PROJET
+export const canAssignProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_ASSIGN_PROJECT || false;
+});
 
-  // Rôle: Valider un projet
-  VALIDATE_PROJECT: [
-    { action: Action.VALIDATE, subject: Subject.PROJECT },
-  ],
+// => CREER UN PROJET
+export const canCreateProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_CREATE_PROJECT || false;
+});
 
-  // Rôle: Rejeter un projet
-  REJECT_PROJECT: [
-    { action: Action.REJECT, subject: Subject.PROJECT },
-  ],
+// => ADMINISTRATEUR
+export const canAdmin = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_ADMIN || false;
+});
 
-  // Rôle: Demander une modification
-  REQUEST_MODIFICATION: [
-    { action: Action.REQUEST_MODIFICATION, subject: Subject.PROJECT },
-  ],
+// => METTRE A JOUR TOUS LES PROJETS
+export const canUpdateAllProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_UPDATE_ALL_PROJECT || false;
+});
 
-  // Rôle: Publier un projet
-  PUBLISH_PROJECT: [
-    { action: Action.PUBLISH, subject: Subject.PROJECT },
-  ],
+// => POINT FOCAL
+export const canPointFocal = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_POINT_FOCAL || false;
+});
 
-  // Rôle: Dépublier un projet
-  UNPUBLISH_PROJECT: [
-    { action: Action.UNPUBLISH, subject: Subject.PROJECT },
-  ],
+// => METTRE A JOUR SES PROPRES PROJETS
+export const canUpdateOwnProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_UPDATE_OWN_PROJECT || false;
+});
 
-  // Rôle: Validateur (rôle composite avec plusieurs permissions)
-  VALIDATEUR: [
-    { action: Action.LIST, subject: Subject.PROJECT },
-    { action: Action.READ, subject: Subject.PROJECT },
-    { action: Action.VALIDATE, subject: Subject.PROJECT },
-    { action: Action.REJECT, subject: Subject.PROJECT },
-    { action: Action.REQUEST_MODIFICATION, subject: Subject.PROJECT },
-  ],
-};
+// => MODIFIER UN PROJET
+export const canModifyProject = defineAbility((user: UserType, args : Project) => {
+    // console.log("HERRREEESSSSS", (user?.additional_info?.persmissions?.CAN_MODIFY_PROJECT === true && user?.additional_info.persmissions?.CAN_ADMIN === true && args.structure === null))
+    // return (user?.additional_info?.persmissions?.CAN_MODIFY_PROJECT === true && user?.additional_info.persmissions?.CAN_ADMIN === true && args.structure === null) || (user?.additional_info.persmissions?.CAN_MODIFY_PROJECT === true && user?.additional_info.persmissions?.CAN_POINT_FOCAL === true);
+    return false
+});
 
-/**
- * Classe pour gérer les abilities (permissions) de l'utilisateur
- */
-export class AbilityManager {
-  private abilities: Ability[] = [];
-  private session: UserSession | null = null;
 
-  constructor(session: UserSession | null) {
-    this.session = session;
-    this.abilities = this.computeAbilities();
-  }
+// => VALIDATEUR
+export const canValidateur = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_VALIDATEUR || false;
+});
 
-  /**
-   * Calcule toutes les abilities de l'utilisateur en fonction de ses rôles
-   */
-  private computeAbilities(): Ability[] {
-    if (!this.session) {
-      return [];
-    }
+// => SOUMETTRE UN PROJET POUR VALIDATION
+export const canSubmitProjectForValidation = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_SUBMIT_PROJECT_FOR_VALIDATION || false;
+});
 
-    const userRoles = getUserRolesForModule(this.session);
-    const abilities: Ability[] = [];
+// => PROTECTION UMA
+export const canUmaProtection = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_uma_protection || false;
+});
 
-    // Pour chaque rôle de l'utilisateur, ajouter les abilities correspondantes
-    userRoles.forEach((role) => {
-      const roleAbilities = ROLE_ABILITIES_MAP[role];
-      if (roleAbilities) {
-        abilities.push(...roleAbilities);
-      }
-    });
+// => REJETER UN PROJET
+export const canRejectProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_REJECT_PROJECT || false;
+});
 
-    // Supprimer les doublons
-    return this.deduplicateAbilities(abilities);
-  }
+// => METTRE A JOUR SES PROPRES INDICATEURS
+export const canUpdateOwnIndicator = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_UPDATE_OWN_INDICATOR || false;
+});
 
-  /**
-   * Supprime les abilities en double
-   */
-  private deduplicateAbilities(abilities: Ability[]): Ability[] {
-    const seen = new Set<string>();
-    return abilities.filter((ability) => {
-      const key = `${ability.action}:${ability.subject}`;
-      if (seen.has(key)) {
-        return false;
-      }
-      seen.add(key);
-      return true;
-    });
-  }
+// => VALIDER UN PROJET
+export const canValidateProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_VALIDATE_PROJECT || false;
+});
 
-  /**
-   * Vérifie si l'utilisateur peut effectuer une action sur un sujet
-   */
-  can(action: Action, subject: Subject): boolean {
-    return this.abilities.some(
-      (ability) =>
-        ability.action === action &&
-        (ability.subject === subject || ability.subject === Subject.ALL)
-    );
-  }
+// => DEPUBLIER UN PROJET
+export const canUnpublishProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_UNPUBLISH_PROJECT || false;
+});
 
-  /**
-   * Vérifie si l'utilisateur ne peut pas effectuer une action sur un sujet
-   */
-  cannot(action: Action, subject: Subject): boolean {
-    return !this.can(action, subject);
-  }
+// => CREER UN INDICATEUR
+export const canCreateIndicator = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_CREATE_INDICATOR || false;
+});
 
-  /**
-   * Vérifie si l'utilisateur peut effectuer l'une des actions sur un sujet
-   */
-  canAny(actions: Action[], subject: Subject): boolean {
-    return actions.some((action) => this.can(action, subject));
-  }
+// => LISTER TOUS LES INDICATEURS
+export const canListAllIndicator = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_LIST_ALL_INDICATOR || false;
+});
 
-  /**
-   * Vérifie si l'utilisateur peut effectuer toutes les actions sur un sujet
-   */
-  canAll(actions: Action[], subject: Subject): boolean {
-    return actions.every((action) => this.can(action, subject));
-  }
+// => SUPPRIMER UN PROJET
+export const canDeleteProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_DELETE_PROJECT || false;
+});
 
-  /**
-   * Retourne toutes les abilities de l'utilisateur
-   */
-  getAbilities(): Ability[] {
-    return [...this.abilities];
-  }
+// => SUPPRIMER UN INDICATEUR
+export const canDeleteIndicator = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_DELETE_INDICATOR || false;
+});
 
-  /**
-   * Retourne les actions disponibles pour un sujet donné
-   */
-  getActionsForSubject(subject: Subject): Action[] {
-    return this.abilities
-      .filter((ability) => ability.subject === subject || ability.subject === Subject.ALL)
-      .map((ability) => ability.action);
-  }
+// => SOUMETTRE POUR VALIDATION UN PROJET
+export const canSubmitValidationProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_SUBMIT_VALIDATION_PROJECT || false;
+});
 
-  /**
-   * Vérifie si l'utilisateur a un rôle spécifique
-   */
-  hasRole(role: ProjectRole): boolean {
-    return hasRole(this.session, role);
-  }
+// => DEMANDER UNE MISE A JOUR DU PROJET
+export const canAskUpdateProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_ASK_UPDATE_PROJECT || false;
+});
 
-  /**
-   * Vérifie si l'utilisateur a l'un des rôles spécifiés
-   */
-  hasAnyRole(roles: ProjectRole[]): boolean {
-    return hasAnyRole(this.session, roles);
-  }
-}
+// => LISTER LES PROJETS
+export const canListProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_LIST_PROJECT || false;
+});
 
-/**
- * Helpers pour les vérifications d'abilities courantes
- */
+// => LIER UN INDICATEUR A UN PROJET
+export const canLinkIndicatorToProject = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_LINK_INDICATOR_TO_PROJECT || false;
+});
 
-// L'UTILISATEUR A ACCES AU MODULE PROJET
-export function canAccessProjectModule(session: UserSession | null): boolean {
-  const manager = new AbilityManager(session);
-  return manager.canAny(
-    [Action.LIST, Action.READ, Action.CREATE],
-    Subject.PROJECT
-  );
-}
+// => DGEC
+export const canDgec = defineAbility((user: UserType, args) => {
+    return user?.additional_info.persmissions?.CAN_DGEC || false;
+});
 
-// L'UTILISATEUR PEUT CONSULTER LA LISTE DES PROJETS
-export function canListProjects(session: UserSession | null): boolean {
-  const manager = new AbilityManager(session);
-  return manager.can(Action.LIST, Subject.PROJECT);
-}
-
-// L'UTILISATEUR PEUT CREER UN PROJET
-export function canCreateProject(session: UserSession | null): boolean {
-  const manager = new AbilityManager(session);
-  return manager.can(Action.CREATE, Subject.PROJECT);
-}
-
-// L'UTILISATEUR PEUT SUPPRIMER UN PROJET
-export function canDeleteProject(session: UserSession | null): boolean {
-  const manager = new AbilityManager(session);
-  return manager.can(Action.DELETE, Subject.PROJECT);
-}
-
-// L'UTILISATEUR PEUT AFFECTER UN PROJET
-export function canAssignProject(session: UserSession | null): boolean {
-  const manager = new AbilityManager(session);
-  return manager.can(Action.ASSIGN, Subject.PROJECT);
-}
-
-// L'UTILISATEUR PEUT MODIFIER UN PROJET
-export function canUpdateProject(session: UserSession | null): boolean {
-  const manager = new AbilityManager(session);
-  return manager.can(Action.UPDATE, Subject.PROJECT);
-}
-
-// L'UTILISATEUR PEUT VALIDER UN PROJET
-export function canValidateProject(session: UserSession | null): boolean {
-  const manager = new AbilityManager(session);
-  return manager.can(Action.VALIDATE, Subject.PROJECT);
-}
-
-// L'UTILISATEUR PEUT REJETER UN PROJET
-export function canRejectProject(session: UserSession | null): boolean {
-  const manager = new AbilityManager(session);
-  return manager.can(Action.REJECT, Subject.PROJECT);
-}
-
-// L'UTILISATEUR PEUT DEMANDER UNE MODIFICATION
-export function canRequestModification(session: UserSession | null): boolean {
-  const manager = new AbilityManager(session);
-  return manager.can(Action.REQUEST_MODIFICATION, Subject.PROJECT);
-}
-
-// L'UTILISATEUR PEUT PUBLIER UN PROJET
-export function canPublishProject(session: UserSession | null): boolean {
-  const manager = new AbilityManager(session);
-  return manager.can(Action.PUBLISH, Subject.PROJECT);
-}
-
-// L'UTILISATEUR PEUT DEPUBLIER UN PROJET
-export function canUnpublishProject(session: UserSession | null): boolean {
-  const manager = new AbilityManager(session);
-  return manager.can(Action.UNPUBLISH, Subject.PROJECT);
-}

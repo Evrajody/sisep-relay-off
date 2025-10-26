@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import {canCreateProject} from "#shared/utils/abilities";
 
 definePageMeta({
   layout: "sisep-app-layout",
@@ -12,7 +13,7 @@ useHead({
 
 
 // Import du composable de déconnexion
-const {$authClient} = useNuxtApp();
+const { $authClient } = useNuxtApp();
 const { data: session, error  } = await $authClient.getSession()
 
 
@@ -179,6 +180,7 @@ const formatNumber = (num: number | string) => {
 onMounted(() => {
   // Charger les vraies données ici
 });
+
 </script>
 
 <template>
@@ -220,15 +222,21 @@ onMounted(() => {
             Vue d'ensemble de vos projets et statistiques
           </p>
         </div>
-        <UButton
-          to="/admin/project-module/create-project"
-          color="primary"
-          icon="i-heroicons-plus"
-          size="lg"
-        >
-          Nouveau projet
-        </UButton>
+        <Can :ability="canCreateProject">
+          <UButton
+            to="/admin/project-module/create-project"
+            color="primary"
+            icon="i-heroicons-plus"
+            size="lg"
+          >
+            Nouveau projet
+          </UButton>
+        </Can>
       </div>
+
+      <pre>
+        {{session}}
+      </pre>
 
       <!-- Indicateurs clés -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

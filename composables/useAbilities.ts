@@ -1,18 +1,12 @@
 import { computed } from "vue";
 import type { UserSession } from "~/types/auth";
 import {
-  AbilityManager,
-  Action,
-  Subject,
-  canAccessProjectModule,
-  canListProjects,
   canCreateProject,
   canDeleteProject,
   canAssignProject,
   canUpdateProject,
   canValidateProject,
   canRejectProject,
-  canRequestModification,
   canPublishProject,
   canUnpublishProject,
 } from "~/shared/utils/abilities";

@@ -4,6 +4,7 @@ export default defineNuxtPlugin({
     async setup() {
 
         const {$authClient} = useNuxtApp();
+
         const {data: authUser} = await $authClient.getSession();
 
         return {
