@@ -35,37 +35,44 @@ const userEmail = computed(() => {
   return session?.additional_info?.tokenDetails?.userEmail || session?.user?.email || '';
 });
 
-const userRoles = computed(() => {
-  const resources = session?.additional_info?.tokenDetails?.userResources;
-  if (!resources) return [];
-
-  // Récupérer tous les rôles de tous les modules
-  const allRoles: string[] = [];
-  Object.values(resources).forEach((module: any) => {
-    if (module.roles) {
-      allRoles.push(...module.roles);
-    }
-  });
-
-  return allRoles;
+// Récupérer les permissions de l'utilisateur
+const userPermissions = computed(() => {
+  return session?.additional_info?.persmissions || {};
 });
 
+// Déterminer le rôle actuel basé sur les permissions
 const primaryRole = computed(() => {
-  const roles = userRoles.value;
-  if (roles.length === 0) return 'Utilisateur';
+  const permissions = userPermissions.value;
 
-  // Prioriser certains rôles
-  if (roles.includes('POINT_FOCAL')) return 'Point Focal';
-  if (roles.includes('ADMIN')) return 'Administrateur';
+  // Prioriser certains rôles en fonction des permissions
+  if (permissions.CAN_ADMIN) return 'Administrateur';
+  if (permissions.CAN_POINT_FOCAL) return 'Point Focal';
+  if (permissions.CAN_VALIDATEUR) return 'Validateur';
+  if (permissions.CAN_SUPER_VALIDATEUR) return 'Super Validateur';
+  if (permissions.CAN_PUBLISH_PROJECT) return 'Éditeur de projet';
 
-  // Sinon retourner le premier rôle formaté
-  return roles[0].replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+  return 'Utilisateur';
 });
+
+// Récupérer les structures d'affectation
+const userStructures = computed(() => {
+  return session?.session?.additional_info?.structures || [];
+});
+
+// Formater le nom d'une structure
+const getStructureName = (structure: any) => {
+  return structure?.artefact?.nameJson?.fr || structure?.artefact?.name || 'Structure sans nom';
+};
+
+// Récupérer l'identifiant d'une structure
+const getStructureIdentifier = (structure: any) => {
+  return structure?.artefact?.identifier || '';
+};
 
 const dropdownItems = computed(() => [
   [{
-    label: userEmail.value,
-    slot: 'account',
+    label: 'Profil & Structures',
+    slot: 'userInfo',
     disabled: true
   }],
   [{
@@ -145,12 +152,51 @@ const dropdownItems = computed(() => [
       </button>
     </template>
 
-    <!-- Custom account slot pour afficher l'email -->
-    <template #account>
-      <div class="text-left px-2 py-1.5">
-        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-          {{ userEmail }}
-        </p>
+    <!-- Custom userInfo slot pour afficher les infos et structures -->
+    <template #userInfo>
+      <div class="text-left w-full border-b border-gray-200 dark:border-gray-700 space-y-3">
+        <!-- Email et rôle -->
+        <div>
+          <p class="text-xs truncate">
+            {{ userEmail }}
+          </p>
+          <div class="flex items-center gap-2 mt-1.5">
+            <div class="flex items-center gap-1.5">
+              <div class="w-2 h-2 rounded-full bg-green-500"></div>
+              <span class="text-xs font-semibold text-gray-900 dark:text-white">{{ primaryRole }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Structures d'affectation -->
+        <div v-if="userStructures.length > 0" class="space-y-2">
+          <p class="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">Structures</p>
+          <div class="space-y-1.5">
+            <div
+              v-for="structure in userStructures"
+              :key="structure.id"
+              class="p-2 rounded-lg bg-red-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700"
+            >
+              <div class="flex items-start gap-2">
+                <UIcon name="i-heroicons-building-office-2" class="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-gray-900 dark:text-white truncate">
+                    {{ getStructureName(structure) }}
+                  </p>
+                  <p v-if="getStructureIdentifier(structure)" class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ getStructureIdentifier(structure) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Badge Point Focal si applicable -->
+        <div v-if="userPermissions.CAN_POINT_FOCAL" class="flex items-center gap-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+          <UIcon name="i-heroicons-star" class="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <span class="text-xs font-semibold text-blue-900 dark:text-blue-200">Point Focal</span>
+        </div>
       </div>
     </template>
   </UDropdown>

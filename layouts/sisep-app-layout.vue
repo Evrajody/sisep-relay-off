@@ -6,6 +6,10 @@ const {sidebarAuthorized} = useAuthSidebar();
 
 const {loadAccessibleModules} = useSisebHelper()
 
+const {$authClient} = useNuxtApp();
+const { data: session, error  } = await $authClient.getSession()
+
+
 const changModuleFormEl = ref(null);
 
 const changModuleForm = computed(() => ({
@@ -146,8 +150,16 @@ const changModuleForm = computed(() => ({
               <template #title>
                 <div class="flex flex-col w-full">
                   <h3 class="font-bold  "> Espace d'administration de SISEB BENIN </h3>
-                  <div class="bg-green-800 w-fit text-lg text-white font-extrabold">
-                    <span>-- Module de gestion des projets -- </span>
+
+                  <div class="flex">
+                    <div class="bg-green-800 w-fit text-lg text-white font-extrabold">
+                      <span>-- Gestion des projets -- </span>
+                    </div>
+
+<!--                    <div class="bg-indigo-800 w-fit text-lg text-white font-extrabold">-->
+<!--                      <span> {{session.session.}} </span>-->
+<!--                    </div>-->
+
                   </div>
                 </div>
               </template>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue';
+import {computed, onMounted, ref, watchEffect} from 'vue';
 import {useRoute} from 'vue-router';
 import useProjectDetail from '~/composables/project/useProjectDetail';
 import { useProjectDelete } from '~/composables/project/useProjectDelete';
@@ -7,6 +7,12 @@ import { useLoading } from '~/composables/useLoading';
 import { useFileDisplay } from '~/composables/useFileDisplay';
 import { useAffectProject } from '~/composables/project/useAffectProject';
 import { useProjectActionAvailability } from '~/composables/project/useProjectActionAvailability';
+import {
+  canModifyProject,
+  canDeleteProject,
+  canSubmitProjectForValidation,
+  canAssignProject, canRejectProject, canUnpublishProject, canValidateProject
+} from "#shared/utils/abilities";
 
 const route = useRoute();
 const projectId = route.params.id as string;
@@ -50,6 +56,14 @@ const onAffectSuccess = async () => {
 
 // Composable pour l'affectation de projet
 const { structuresList, structuresStatus, affectProject, affectProjectFormEl, affectProjectForm  } = useAffectProject(projectId, onAffectSuccess);
+
+// État pour les actions autorisées par ligne
+const authorizedActionsMap = ref<Record<string, any[]>>({});
+
+// Fonction utilitaire pour obtenir les actions d'une ligne
+const getAuthorizedActions = () => {
+  return authorizedActionsMap.value['project'] || [];
+};
 
 // Actions du projet
 const deleteProject = async () => {
@@ -346,9 +360,8 @@ const unpublishProject = async () => {
   }
 };
 
-// Actions disponibles avec logique conditionnelle basée sur le statut
-
-const projectActions = computed(() => {
+// Fonction pour construire les actions avec les vérifications de permissions
+const getActions = () => {
   const currentStatus = project.value?.status;
 
   return [
@@ -357,12 +370,14 @@ const projectActions = computed(() => {
       {
         label: 'Modifier',
         icon: 'i-heroicons-pencil-square',
-        click: () => navigateTo(`/admin/project-module/edit-project/${projectId}`)
+        click: () => navigateTo(`/admin/project-module/edit-project/${projectId}`),
+        isAuthorized: () => allows(canModifyProject, project!.value),
       },
       {
         label: 'Affecter',
         icon: 'i-heroicons-user-plus',
-        click: () => assignFocalPointModal.value = true
+        click: () => assignFocalPointModal.value = true,
+        isAuthorized: () => allows(canAssignProject, project!.value),
       }
     ],
     // Groupe 2: Actions de workflow
@@ -371,36 +386,42 @@ const projectActions = computed(() => {
         label: 'Brouillon',
         icon: 'i-heroicons-document',
         click: saveDraft,
+        isAuthorized: isActionAvailable(currentStatus, 'SAVE_DRAFT'),
         disabled: !isActionAvailable(currentStatus, 'SAVE_DRAFT')
       },
       {
         label: 'Soumettre',
         icon: 'i-heroicons-paper-airplane',
         click: submitForValidation,
+        isAuthorized: () =>  allows(canSubmitProjectForValidation, project!.value),
         disabled: !isActionAvailable(currentStatus, 'SUBMIT')
       },
       {
         label: 'Valider',
         icon: 'i-heroicons-check-circle',
         click: validateProject,
+        isAuthorized: () => allows(canValidateProject, project!.value),
         disabled: !isActionAvailable(currentStatus, 'VALIDATE')
       },
       {
         label: 'Valider (Structure)',
         icon: 'i-heroicons-building-office-2',
         click: validateByStructure,
+        isAuthorized: () => allows(canValidateProject, project!.value),
         disabled: !isActionAvailable(currentStatus, 'VALIDATE_BY_STRUCTURE')
       },
       {
         label: 'Rejeter',
         icon: 'i-heroicons-x-circle',
         click: rejectProject,
+        isAuthorized: () => allows(canRejectProject, project!.value),
         disabled: !isActionAvailable(currentStatus, 'REJECT')
       },
       {
         label: 'Rejeter (Structure)',
         icon: 'i-heroicons-building-office',
         click: rejectByStructure,
+        isAuthorized: () => allows(canRejectProject, project!.value),
         disabled: !isActionAvailable(currentStatus, 'REJECT_BY_STRUCTURE')
       }
     ],
@@ -410,12 +431,14 @@ const projectActions = computed(() => {
         label: 'Publier',
         icon: 'i-heroicons-globe-alt',
         click: publishProject,
+        isAuthorized: isActionAvailable(currentStatus, 'PUBLISH'),
         disabled: !isActionAvailable(currentStatus, 'PUBLISH')
       },
       {
         label: 'Dépublier',
         icon: 'i-heroicons-eye-slash',
         click: unpublishProject,
+        isAuthorized: () => allows(canUnpublishProject, project!.value),
         disabled: !isActionAvailable(currentStatus, 'UNPUBLISH')
       }
     ],
@@ -425,10 +448,48 @@ const projectActions = computed(() => {
         label: 'Supprimer',
         icon: 'i-heroicons-trash',
         click: deleteProject,
+        isAuthorized: () => allows(canDeleteProject, project.value),
         class: 'text-red-600'
       }
     ]
   ];
+};
+
+// Charger les actions autorisées pour le projet
+const loadAuthorizedActions = async () => {
+  const actions = getActions();
+  const authorizedActions: any[] = [];
+
+  for (const group of actions) {
+    const authorizedGroup: any[] = [];
+
+    for (const action of group) {
+      if (typeof action.isAuthorized === 'function') {
+        // Gérer les fonctions asynchrones et synchrones
+        const isAuth = await Promise.resolve(action.isAuthorized());
+        console.log(isAuth)
+        if (isAuth) {
+          authorizedGroup.push(action);
+        }
+      } else if (action.isAuthorized) {
+        // Booléens statiques
+        authorizedGroup.push(action);
+      }
+    }
+
+    if (authorizedGroup.length > 0) {
+      authorizedActions.push(authorizedGroup);
+    }
+  }
+
+  authorizedActionsMap.value['project'] = authorizedActions;
+};
+
+// Watcher pour recharger les actions quand le statut du projet change
+watchEffect(() => {
+  if (project.value) {
+    loadAuthorizedActions();
+  }
 });
 
 // Onglets
@@ -522,13 +583,32 @@ definePageMeta({
               >
                 Modifier
               </UButton>
-              <UDropdown :items="projectActions" :popper="{ placement: 'bottom-end' }">
+              <UDropdown :items="getAuthorizedActions()" :popper="{ placement: 'bottom-end' }">
                 <UButton
                   color="white"
                   variant="solid"
                   trailing-icon="i-heroicons-ellipsis-vertical"
                   square
                 />
+                <template #item="{ item: actionItem }">
+                  <div v-if="Array.isArray(actionItem)" class="py-1">
+                    <template v-for="(action, index) in actionItem" :key="index">
+                      <div
+                        :class="{ 'text-red-600': action.class === 'text-red-600' }"
+                        :disabled="action.disabled"
+                        class="flex items-center gap-2"
+                        @click="action.click"
+                      >
+                        <UIcon :name="action.icon" class="h-4 w-4" />
+                        <span>{{ action.label }}</span>
+                      </div>
+                    </template>
+                  </div>
+                  <div v-else class="flex items-center gap-2" @click="actionItem.click">
+                    <UIcon :name="actionItem.icon" class="h-4 w-4" />
+                    <span>{{ actionItem.label }}</span>
+                  </div>
+                </template>
               </UDropdown>
             </div>
           </div>
@@ -596,9 +676,9 @@ definePageMeta({
                 </UCard>
               </div>
 
-              <pre>
-                {{project}}
-              </pre>
+<!--              <pre>-->
+<!--                {{project}}-->
+<!--              </pre>-->
 
               <!-- Structure affectée -->
               <UCard v-if="project?.structure" class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-800">

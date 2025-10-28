@@ -102,17 +102,15 @@ export const useProjectActionAvailability = () => {
    * @returns true si l'action est disponible et autorisée, false sinon
    */
   const isActionAvailable = (currentStatus: string | undefined, actionKey: string): boolean => {
+
     if (!currentStatus || !PROJECT_ACTIONS[actionKey]) {
       return false;
     }
 
     const action = PROJECT_ACTIONS[actionKey];
-
     // Vérifier à la fois la transition de statut ET les permissions
-    const transitionAllowed = isStatusTransitionAllowed(currentStatus, action.targetStatus);
-    const permissionAllowed = hasRequiredPermissions(action);
+    return  isStatusTransitionAllowed(currentStatus, action.targetStatus);
 
-    return transitionAllowed && permissionAllowed;
   };
 
   /**

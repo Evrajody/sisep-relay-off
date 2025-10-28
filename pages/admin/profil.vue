@@ -51,6 +51,52 @@ const allUserRoles = computed(() => {
   return [...new Set(allRoles)]; // Remove duplicates
 });
 
+// Récupérer les structures d'affectation depuis les nouvelles données
+const userAffectationStructures = computed(() => {
+  return session?.session?.additional_info?.structures || [];
+});
+
+// Récupérer les permissions de l'utilisateur
+const userPermissions = computed(() => {
+  return session?.session?.additional_info?.persmissions || {};
+});
+
+// Déterminer le rôle basé sur les permissions
+const rolePrincipal = computed(() => {
+  const permissions = userPermissions.value;
+
+  if (permissions.CAN_ADMIN) return 'Administrateur';
+  if (permissions.CAN_SUPER_VALIDATEUR) return 'Super Validateur';
+  if (permissions.CAN_VALIDATEUR) return 'Validateur';
+  if (permissions.CAN_POINT_FOCAL) return 'Point Focal';
+  if (permissions.CAN_PUBLISH_PROJECT) return 'Éditeur de projet';
+
+  return 'Utilisateur';
+});
+
+// Formater le nom d'une structure
+const getStructureName = (structure: any) => {
+  return structure?.artefact?.nameJson?.fr || structure?.artefact?.name || 'Structure sans nom';
+};
+
+// Récupérer l'identifiant d'une structure
+const getStructureIdentifier = (structure: any) => {
+  return structure?.artefact?.identifier || '';
+};
+
+// Obtenir la description d'une structure
+const getStructureDescription = (structure: any) => {
+  return structure?.artefact?.descriptionJson?.fr || structure?.artefact?.description || '';
+};
+
+// Obtenir les permissions actives (où la valeur est true)
+const activePermissions = computed(() => {
+  const permissions = userPermissions.value;
+  return Object.entries(permissions)
+    .filter(([_, value]) => value === true)
+    .map(([key, _]) => key);
+});
+
 const primaryRole = computed(() => {
 
   const roles = allUserRoles.value;
@@ -95,6 +141,12 @@ const tabs = [
     label: 'Sécurité',
     icon: 'i-heroicons-lock-closed',
     slot: 'security'
+  },
+  {
+    key: 'permissions',
+    label: 'Permissions',
+    icon: 'i-heroicons-shield-check',
+    slot: 'permissions'
   },
   {
     key: 'preferences',
@@ -649,6 +701,104 @@ const links = [{
               </UCard>
             </template>
 
+            <!-- Permissions -->
+            <template #permissions>
+              <UCard class="mt-6">
+                <template #header>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Permissions et Rôle
+                  </h3>
+                </template>
+
+                <!-- Rôle principal -->
+                <div class="space-y-6">
+                  <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div class="flex items-center gap-3 mb-2">
+                      <UIcon name="i-heroicons-star" class="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                      <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ rolePrincipal }}</h4>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Votre rôle principal basé sur vos permissions actuelles</p>
+                  </div>
+
+                  <!-- Permissions actives -->
+                  <div class="space-y-3">
+                    <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Permissions actives</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div
+                        v-for="permission in activePermissions"
+                        :key="permission"
+                        class="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800"
+                      >
+                        <UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {{ permission.replace(/CAN_/g, '').replace(/_/g, ' ') }}
+                          </p>
+                          <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                            {{ permission }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Informations supplémentaires -->
+                  <UDivider />
+
+                  <div class="space-y-3">
+                    <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Statut des permissions</h4>
+                    <div class="space-y-2">
+                      <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-shield-check" class="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                          <span class="text-sm font-medium text-gray-900 dark:text-white">Total des permissions</span>
+                        </div>
+                        <UBadge color="purple" variant="subtle">
+                          {{ activePermissions.length }} / {{ Object.keys(userPermissions).length }}
+                        </UBadge>
+                      </div>
+
+                      <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div class="flex items-center gap-2">
+                          <UIcon :name="userPermissions.CAN_POINT_FOCAL ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
+                                 :class="userPermissions.CAN_POINT_FOCAL ? 'text-green-600 dark:text-green-400' : 'text-gray-400'"
+                                 class="w-5 h-5" />
+                          <span class="text-sm font-medium text-gray-900 dark:text-white">Point Focal</span>
+                        </div>
+                        <UBadge :color="userPermissions.CAN_POINT_FOCAL ? 'green' : 'gray'" variant="subtle" size="sm">
+                          {{ userPermissions.CAN_POINT_FOCAL ? 'Actif' : 'Inactif' }}
+                        </UBadge>
+                      </div>
+
+                      <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div class="flex items-center gap-2">
+                          <UIcon :name="userPermissions.CAN_ADMIN ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
+                                 :class="userPermissions.CAN_ADMIN ? 'text-red-600 dark:text-red-400' : 'text-gray-400'"
+                                 class="w-5 h-5" />
+                          <span class="text-sm font-medium text-gray-900 dark:text-white">Administrateur</span>
+                        </div>
+                        <UBadge :color="userPermissions.CAN_ADMIN ? 'red' : 'gray'" variant="subtle" size="sm">
+                          {{ userPermissions.CAN_ADMIN ? 'Actif' : 'Inactif' }}
+                        </UBadge>
+                      </div>
+
+                      <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div class="flex items-center gap-2">
+                          <UIcon :name="userPermissions.CAN_VALIDATEUR ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
+                                 :class="userPermissions.CAN_VALIDATEUR ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'"
+                                 class="w-5 h-5" />
+                          <span class="text-sm font-medium text-gray-900 dark:text-white">Validateur</span>
+                        </div>
+                        <UBadge :color="userPermissions.CAN_VALIDATEUR ? 'blue' : 'gray'" variant="subtle" size="sm">
+                          {{ userPermissions.CAN_VALIDATEUR ? 'Actif' : 'Inactif' }}
+                        </UBadge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </UCard>
+            </template>
+
             <!-- Préférences -->
             <template #preferences>
               <UCard class="mt-6">
@@ -840,6 +990,40 @@ const links = [{
 
         <!-- Sidebar - Informations complémentaires -->
         <div class="space-y-6">
+          <!-- Structures d'affectation -->
+          <UCard v-if="userAffectationStructures.length > 0">
+            <template #header>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <UIcon name="i-heroicons-building-office-2" class="w-5 h-5 text-blue-600" />
+                Structures d'affectation
+              </h3>
+            </template>
+
+            <div class="space-y-3">
+              <div
+                v-for="structure in userAffectationStructures"
+                :key="structure.id"
+                class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition-shadow"
+              >
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex-1 min-w-0">
+                    <h4 class="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                      {{ getStructureName(structure) }}
+                    </h4>
+                    <div class="flex items-center gap-2 mt-1">
+                      <UBadge color="blue" variant="soft" size="xs">
+                        {{ getStructureIdentifier(structure) }}
+                      </UBadge>
+                    </div>
+                    <p v-if="getStructureDescription(structure)" class="text-xs text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
+                      {{ getStructureDescription(structure) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </UCard>
+
           <!-- Modules et Accès -->
           <UCard>
             <template #header>

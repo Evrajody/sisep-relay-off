@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { ref, watchEffect } from 'vue';
 import { useProjects } from "~/composables/project/useProjects";
 import { useProjectDelete } from "~/composables/project/useProjectDelete";
 import type { Project } from '~/types';
@@ -40,6 +41,9 @@ const {
 // Gestion de la suppression
 const { deleteProject, isDeleting } = useProjectDelete();
 
+// État pour les actions autorisées par ligne
+const authorizedActionsMap = ref<Record<string, any[]>>({});
+
 // Options de statut pour le filtre
 const statuses = [
   { value: 'all', label: 'Tous les statuts' },
@@ -73,7 +77,7 @@ const getActions = (row: Project) => [
     label: 'Modifier',
     icon: 'i-heroicons-pencil-square',
     click: () => navigateTo(`/admin/project-module/edit-project/${row.id}`),
-    isAuthorized: () => allows(canModifyProject, row),
+    isAuthorized: () =>  allows(canModifyProject, row),
   },
   {
     label: 'Supprimer',
@@ -83,14 +87,43 @@ const getActions = (row: Project) => [
   }
 ];
 
-// Filtrer les actions autorisées
-const getAuthorizedActions = (row: Project) => {
-  return getActions(row).filter(action => {
-    if (typeof action.isAuthorized === 'function') {
-      return action.isAuthorized();
+// Charger les actions autorisées pour chaque projet
+const loadAuthorizedActions = async () => {
+  const newMap: Record<string, any[]> = {};
+
+  for (const project of projectList.value?.data || []) {
+    const actions = getActions(project);
+    const authorizedActions: any[] = [];
+
+    for (const action of actions) {
+      if (typeof action.isAuthorized === 'function') {
+        // Gérer les fonctions asynchrones et synchrones
+        const isAuth = await Promise.resolve(action.isAuthorized());
+        if (isAuth) {
+          authorizedActions.push(action);
+        }
+      } else if (action.isAuthorized) {
+        // Booléens statiques
+        authorizedActions.push(action);
+      }
     }
-    return action.isAuthorized;
-  });
+
+    newMap[project.id] = authorizedActions;
+  }
+
+  authorizedActionsMap.value = newMap;
+};
+
+// Watcher pour recharger les actions quand la liste des projets change
+watchEffect(() => {
+  if (projectList.value?.data) {
+    loadAuthorizedActions();
+  }
+});
+
+// Fonction utilitaire pour obtenir les actions d'une ligne
+const getAuthorizedActions = (row: Project) => {
+  return authorizedActionsMap.value[row.id] || [];
 };
 
 // Configuration des badges de statut

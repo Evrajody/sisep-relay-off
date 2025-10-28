@@ -46,7 +46,7 @@ export const canListAllProject = defineAbility((user: UserType, args) => {
 
 // => ASSIGNER UN PROJET
 export const canAssignProject = defineAbility((user: UserType, args) => {
-    return user?.additional_info.persmissions?.CAN_ASSIGN_PROJECT || false;
+    return user?.additional_info.persmissions?.CAN_ASSIGN_PROJECT;
 });
 
 // => CREER UN PROJET
@@ -76,9 +76,10 @@ export const canUpdateOwnProject = defineAbility((user: UserType, args) => {
 
 // => MODIFIER UN PROJET
 export const canModifyProject = defineAbility((user: UserType, args : Project) => {
+    // TODO: CETTE REGLE DEVRAIT ETRE SYNCHRONISE AVEC LE BACKEND
     // console.log("HERRREEESSSSS", (user?.additional_info?.persmissions?.CAN_MODIFY_PROJECT === true && user?.additional_info.persmissions?.CAN_ADMIN === true && args.structure === null))
-    // return (user?.additional_info?.persmissions?.CAN_MODIFY_PROJECT === true && user?.additional_info.persmissions?.CAN_ADMIN === true && args.structure === null) || (user?.additional_info.persmissions?.CAN_MODIFY_PROJECT === true && user?.additional_info.persmissions?.CAN_POINT_FOCAL === true);
-    return false
+    // return (user?.additional_info?.persmissions?.CAN_MODIFY_PROJECT && user?.additional_info.persmissions?.CAN_ADMIN  && args.structure == null) || (user?.additional_info.persmissions?.CAN_MODIFY_PROJECT  && user?.additional_info.persmissions?.CAN_POINT_FOCAL);
+    return (user?.additional_info.persmissions?.CAN_ADMIN && args.structure == null) || (user?.additional_info?.persmissions.CAN_UPDATE_PROJECT)
 });
 
 
@@ -89,12 +90,7 @@ export const canValidateur = defineAbility((user: UserType, args) => {
 
 // => SOUMETTRE UN PROJET POUR VALIDATION
 export const canSubmitProjectForValidation = defineAbility((user: UserType, args) => {
-    return user?.additional_info.persmissions?.CAN_SUBMIT_PROJECT_FOR_VALIDATION || false;
-});
-
-// => PROTECTION UMA
-export const canUmaProtection = defineAbility((user: UserType, args) => {
-    return user?.additional_info.persmissions?.CAN_uma_protection || false;
+    return user?.additional_info.persmissions.CAN_SUBMIT_PROJECT_FOR_VALIDATION;
 });
 
 // => REJETER UN PROJET
@@ -129,7 +125,9 @@ export const canListAllIndicator = defineAbility((user: UserType, args) => {
 
 // => SUPPRIMER UN PROJET
 export const canDeleteProject = defineAbility((user: UserType, args) => {
-    return user?.additional_info.persmissions?.CAN_DELETE_PROJECT || false;
+    // TODO: CETTE REGLE DEVRAIT ETRE SYNCHRONISE AVEC LE BACKEND
+    // return (user?.additional_info.persmissions?.CAN_ADMIN && args.structure == null && user?.additional_info.persmissions?.CAN_DELETE_PROJECT);
+    return (user?.additional_info.persmissions?.CAN_ADMIN && user?.additional_info.persmissions?.CAN_DELETE_PROJECT);
 });
 
 // => SUPPRIMER UN INDICATEUR
