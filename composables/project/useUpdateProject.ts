@@ -67,6 +67,15 @@ export const useUpdateProject = (projectRef: any) => {
                             extraClass: "bg-red-500",
                         });
                     }
+
+                    if (response.status === 409) {
+                        makeAlert({
+                            type: "error",
+                            title: "Erreur !",
+                            message: `${response._data.message}`,
+                            extraClass: "bg-red-500",
+                        });
+                    }
                 },
             });
 
