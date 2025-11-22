@@ -2,7 +2,7 @@
 
 const isOpen = ref(true);
 
-const {sidebarAuthorized} = useAuthSidebar();
+const {sidebarAuthorized, setActiveModule} = useAuthSidebar();
 
 const {loadAccessibleModules} = useSisebHelper()
 
@@ -11,6 +11,11 @@ const { data: session, error  } = await $authClient.getSession()
 
 
 const changModuleFormEl = ref(null);
+
+// Log des modules au montage
+onMounted(async () => {
+  const modules = await loadAccessibleModules('');
+});
 
 const changModuleForm = computed(() => ({
 
@@ -48,7 +53,8 @@ const changModuleForm = computed(() => ({
       },
 
       items: async (query: string) => {
-        return await loadAccessibleModules(query);
+        const modules = await loadAccessibleModules(query);
+        return modules;
       },
       labelProp: "name",
       valueProp: "id",
@@ -56,6 +62,10 @@ const changModuleForm = computed(() => ({
       native: true,
       inputType: "search",
       autocomplete: "off",
+
+      onChange: (newValue: any) => {
+        setActiveModule(newValue)
+      },
     }
 
   }
