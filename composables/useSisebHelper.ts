@@ -1,6 +1,6 @@
 export const useSisebHelper = () => {
 
-    const { $sisepApi, $sisepStatsApi } = useNuxtApp()
+    const { $sisepApi, $sisepStatsApi, $sisepActiviteApi } = useNuxtApp()
 
     const loadAccessibleModules = async (query: string) => {
         const modulesRequestData = await $sisepApi("modules", {
@@ -38,6 +38,24 @@ export const useSisebHelper = () => {
         return departementsData?.locations;
     };
 
+    const loadfunctionalGroup = async (query: string) => {
+        const conventionsData = await $sisepActiviteApi("functional-groups", {
+            method: "GET",
+        });
+        return conventionsData?.data;
+    };
+
+    const loadConventions = async (query: string) => {
+        const conventionsData = await $sisepActiviteApi("conventions", {
+            method: "GET",
+            query: {
+                search: query,
+                paginateData: false
+            },
+        });
+        return conventionsData?.data;
+    }
+
     const loadVilles = async (query: string) => {
         const villesData = await $sisepStatsApi("locations", {
             method: "GET",
@@ -48,6 +66,17 @@ export const useSisebHelper = () => {
         });
         return villesData?.locations;
     };
+
+    const loadStructures = async (query: string) => {
+        const structuresData = await $sisepApi("structures", {
+            method: "GET",
+            query: {
+                search: query,
+                paginateData: false
+            },
+        });
+        return structuresData?.data;
+    }
 
     /* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
     /**
@@ -79,5 +108,8 @@ export const useSisebHelper = () => {
         loadIndicators,
         loadVilles,
         loadDepartements,
+        loadfunctionalGroup,
+        loadConventions,
+        loadStructures
     }
 }

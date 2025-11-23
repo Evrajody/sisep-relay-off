@@ -1,23 +1,21 @@
-export const useCreateConvention = (refreshConventions: () => void) => {
+export const useUpdateConvention = (refreshConventions: () => void) => {
 
     const { $sisepActiviteApi } = useNuxtApp()
 
-    const { loadfunctionalGroup } = useSisebHelper()
-
-    const createConvention = async (data: any) => {
-        const response = await $sisepActiviteApi('conventions', {
-            method: 'POST',
+    const updateConvention = async (conventionId: string, data: any) => {
+        const response = await $sisepActiviteApi(`conventions/${conventionId}`, {
+            method: 'PUT',
             body: data,
             onResponse: ({ response }) => {
                 console.log(response);
 
-                if (response.status === 201 || response.status === 200) {
+                if (response.status === 200) {
                     makeAlert({
                         type: "success",
-                        title: "Nouvelle convention créée !",
-                        message: `La convention ${response._data.title} a été créée avec succès`,
+                        title: "Convention mise à jour !",
+                        message: `La convention ${response._data.title} a été mise à jour avec succès`,
                     })
-                    toggleModalCreateConvention()
+                    toggleModalUpdateConvention()
                     refreshConventions()
                 }
 
@@ -33,16 +31,20 @@ export const useCreateConvention = (refreshConventions: () => void) => {
         })
     }
 
-    const createConventionFormEl = ref(null)
-    const createConventionForm = computed(() => ({
+    const updateConventionFormEl = ref(null)
+    const currentConvention = ref<any>(null)
+
+    const updateConventionForm = computed(() => ({
         scrollOnNext: true,
-        id: "createConventionForm",
+        id: "updateConventionForm",
         addClass: "max-w-full",
         displayErrors: true,
         showRequired: ["title", "functionalGroupId"],
 
         endpoint: async (form: any, payload: any) => {
-            await createConvention(payload.requestData)
+            if (currentConvention.value?.id) {
+                await updateConvention(currentConvention.value.id, payload.requestData)
+            }
         },
 
         schema: {
@@ -52,6 +54,7 @@ export const useCreateConvention = (refreshConventions: () => void) => {
                 description: "Titre complet de la convention",
                 placeholder: "Ex: Convention de Rio sur la biodiversité",
                 rules: ['required'],
+                default: currentConvention.value?.title || '',
                 columns: {
                     default: { container: 12, label: 12, wrapper: 12 },
                     sm: { container: 12, label: 12, wrapper: 12 },
@@ -65,7 +68,7 @@ export const useCreateConvention = (refreshConventions: () => void) => {
                 label: "Groupe fonctionnel",
                 description: "Sélectionnez le groupe fonctionnel associé",
                 rules: ['required'],
-                items: () => loadfunctionalGroup(''),
+                items: "functional-groups",
                 dataKey: "data",
                 labelProp: "name",
                 valueProp: "id",
@@ -73,6 +76,7 @@ export const useCreateConvention = (refreshConventions: () => void) => {
                 native: true,
                 inputType: "search",
                 autocomplete: "off",
+                default: currentConvention.value?.functionalGroupId || currentConvention.value?.functionalGroup?.id || '',
                 columns: {
                     default: { container: 12, label: 12, wrapper: 12 },
                     sm: { container: 12, label: 12, wrapper: 12 },
@@ -85,6 +89,7 @@ export const useCreateConvention = (refreshConventions: () => void) => {
                 type: 'date',
                 label: "Date d'adoption",
                 description: "Date à laquelle la convention a été adoptée",
+                default: currentConvention.value?.adoptionDate || '',
                 columns: {
                     default: { container: 12, label: 12, wrapper: 12 },
                     sm: { container: 12, label: 12, wrapper: 12 },
@@ -97,6 +102,7 @@ export const useCreateConvention = (refreshConventions: () => void) => {
                 type: 'date',
                 label: "Date de ratification",
                 description: "Date de ratification de la convention",
+                default: currentConvention.value?.ratificationDate || '',
                 columns: {
                     default: { container: 12, label: 12, wrapper: 12 },
                     sm: { container: 12, label: 12, wrapper: 12 },
@@ -109,6 +115,7 @@ export const useCreateConvention = (refreshConventions: () => void) => {
                 type: 'date',
                 label: "Date d'entrée en vigueur",
                 description: "Date d'entrée en vigueur de la convention",
+                default: currentConvention.value?.effectiveDate || '',
                 columns: {
                     default: { container: 12, label: 12, wrapper: 12 },
                     sm: { container: 12, label: 12, wrapper: 12 },
@@ -123,6 +130,7 @@ export const useCreateConvention = (refreshConventions: () => void) => {
                 description: "Objectifs de la convention",
                 placeholder: "Décrivez les objectifs principaux de la convention...",
                 rows: 4,
+                default: currentConvention.value?.objectives || '',
                 columns: {
                     default: { container: 12, label: 12, wrapper: 12 },
                     sm: { container: 12, label: 12, wrapper: 12 },
@@ -137,6 +145,7 @@ export const useCreateConvention = (refreshConventions: () => void) => {
                 description: "Principes fondamentaux de la convention",
                 placeholder: "Décrivez les principes de la convention...",
                 rows: 4,
+                default: currentConvention.value?.principles || '',
                 columns: {
                     default: { container: 12, label: 12, wrapper: 12 },
                     sm: { container: 12, label: 12, wrapper: 12 },
@@ -151,6 +160,7 @@ export const useCreateConvention = (refreshConventions: () => void) => {
                 description: "Obligations globales définies par la convention",
                 placeholder: "Décrivez les obligations globales...",
                 rows: 4,
+                default: currentConvention.value?.globalObligations || '',
                 columns: {
                     default: { container: 12, label: 12, wrapper: 12 },
                     sm: { container: 12, label: 12, wrapper: 12 },
@@ -165,6 +175,7 @@ export const useCreateConvention = (refreshConventions: () => void) => {
                 description: "Obligations spécifiques définies par la convention",
                 placeholder: "Décrivez les obligations spécifiques...",
                 rows: 4,
+                default: currentConvention.value?.specificObligations || '',
                 columns: {
                     default: { container: 12, label: 12, wrapper: 12 },
                     sm: { container: 12, label: 12, wrapper: 12 },
@@ -175,16 +186,23 @@ export const useCreateConvention = (refreshConventions: () => void) => {
         }
     }))
 
-    const isModalCreateConventionOpen = ref(false)
-    const toggleModalCreateConvention = () => {
-        isModalCreateConventionOpen.value = !isModalCreateConventionOpen.value
+    const isModalUpdateConventionOpen = ref(false)
+    const toggleModalUpdateConvention = () => {
+        isModalUpdateConventionOpen.value = !isModalUpdateConventionOpen.value
+    }
+
+    const openUpdateModal = (convention: any) => {
+        currentConvention.value = convention
+        isModalUpdateConventionOpen.value = true
     }
 
     return {
-        createConvention,
-        createConventionFormEl,
-        createConventionForm,
-        isModalCreateConventionOpen,
-        toggleModalCreateConvention
+        updateConvention,
+        updateConventionFormEl,
+        updateConventionForm,
+        isModalUpdateConventionOpen,
+        toggleModalUpdateConvention,
+        openUpdateModal,
+        currentConvention
     }
 }

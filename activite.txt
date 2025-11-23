@@ -1,0 +1,171 @@
+On a besoin d'un CRUD pour activité aussi
+
+    - POST /activities Créer une activité : {
+
+        Request body : {
+        "conventionId": "b0c8d0b3-3e4b-4b9a-8f5a-3a0b8d0b3e4b",
+        "nature": "Conférence",
+        "description": "Une conférence sur les technologies émergentes",
+        "youtubeUrl": "https://www.youtube.com/watch?v=abcd1234",
+        "coverImageId": "c8a9a510-9f77-4c1f-91ab-123456789abc",
+        "structureId": "d9b8c7a6-5e4d-3c2b-1a0f-9e8d7c6b5a4f",
+        "structure": {
+            "name": "Structure Name",
+            "type": "Organization",
+            "location": "City"
+        },
+        "files": [
+            {
+            "id": "b0c8d0b3-3e4b-4b9a-8f5a-3a0b8d0b3e4b",
+            "fileTypeId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            }
+        ]
+        }
+
+        Response : {
+        "id": "2f4e8c93-aaaa-4e5b-9d7a-22f2f8a7b045",
+        "title": "Convention de Paris sur le climat",
+        "functionalGroupId": "0d4e8c93-1234-4e5b-9d7a-11f2f8a7b012",
+        "adoptionDate": "1992-06-14",
+        "ratificationDate": "1993-01-10",
+        "effectiveDate": "1994-03-29",
+        "objectives": "Lutter contre le réchauffement climatique.",
+        "principles": "Précaution, responsabilité commune mais différenciée.",
+        "globalObligations": "Rapporter les émissions de gaz à effet de serre.",
+        "specificObligations": "Réduire les émissions de CO2 de 40% d’ici 2030.",
+        "createdAt": "2025-08-23T12:34:56.000Z",
+        "updatedAt": "2025-08-23T12:34:56.000Z"
+        }
+    }
+
+    - GET /activities Récupérer la liste des activités {
+        Cette route permet de récupérer la liste des activités.
+        Il est possible de filtrer par statut, par convention, ou par créateur.
+        La pagination est également disponible.
+
+        Parameters
+        Try it out
+        Name	Description
+        conventionId
+        string($uuid)
+        (query)
+        Filtrer les activités par convention
+
+        conventionId
+        createdBy
+        string($uuid)
+        (query)
+        Filtrer les activités par créateur
+
+        createdBy
+        search
+        string
+        (query)
+        Recherche textuelle dans nature et description
+
+        search
+        sortOrder
+        string
+        (query)
+        Ordre de tri par date de création (asc = croissant, desc = décroissant)
+
+        Available values : asc, desc
+
+        Default value : desc
+
+
+        desc
+        page
+        integer
+        (query)
+        Numéro de la page (pagination)
+
+        page
+        limit
+        integer
+        (query)
+        Nombre d'éléments par page
+
+        limit
+        Responses
+        Code	Description	Links
+        200	
+        Liste des activités récupérée avec succès
+
+        Media type
+
+        application/json
+        Controls Accept header.
+        Example Value
+        Schema
+        {
+        "data": [
+            {
+            "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "conventionId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "nature": "string",
+            "description": "string",
+            "youtubeUrl": "string",
+            "status": "DRAFT",
+            "coverImageId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "structureId": "string",
+            "structure": {
+                "additionalProp1": {}
+            },
+            "coverImage": {
+                "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "storageName": "string",
+                "storageBucket": "string",
+                "extension": "string",
+                "size": 0,
+                "createdAt": "2025-11-22T23:09:59.963Z",
+                "deletedAt": "2025-11-22T23:09:59.963Z"
+            },
+            "convention": {
+                "id": "2f4e8c93-aaaa-4e5b-9d7a-22f2f8a7b045",
+                "title": "Convention de Paris sur le climat",
+                "functionalGroupId": "0d4e8c93-1234-4e5b-9d7a-11f2f8a7b012",
+                "adoptionDate": "1992-06-14",
+                "ratificationDate": "1993-01-10",
+                "effectiveDate": "1994-03-29",
+                "objectives": "Lutter contre le réchauffement climatique.",
+                "principles": "Précaution, responsabilité commune mais différenciée.",
+                "globalObligations": "Rapporter les émissions de gaz à effet de serre.",
+                "specificObligations": "Réduire les émissions de CO2 de 40% d’ici 2030.",
+                "createdAt": "2025-08-23T12:34:56.000Z",
+                "updatedAt": "2025-08-23T12:34:56.000Z"
+            },
+            "files": [
+                {
+                "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "fileId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "fileTypeId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "type": "string",
+                "file": {
+                    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "storageName": "string",
+                    "storageBucket": "string",
+                    "extension": "string",
+                    "size": 0,
+                    "createdAt": "2025-11-22T23:09:59.963Z",
+                    "deletedAt": "2025-11-22T23:09:59.963Z"
+                },
+                "fileType": {
+                    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                    "name": "Rapport d'activité",
+                    "code": "ACTIVITY_REPORT",
+                    "description": "Document décrivant les activités réalisées",
+                    "createdAt": "2025-08-23T12:34:56.000Z",
+                    "updatedAt": "2025-08-23T12:34:56.000Z"
+                }
+                }
+            ],
+            "createdBy": "string",
+            "createdAt": "2025-11-22T23:09:59.963Z",
+            "updatedAt": "2025-11-22T23:09:59.963Z"
+            }
+        ]
+        }
+    }
+
+    - 

@@ -90,14 +90,8 @@ export const useAuthSidebar = () => {
                 {
                     id: "liste-organisations",
                     label: "Liste des organisations",
-                    // to: { name: "admin-statistique-module-organisations" },
+                    to: { name: "admin-statistique-module-organisations" },
                     tooltip: { text: "Liste des organisations" },
-                },
-                {
-                    id: "new-organisation",
-                    label: "Nouvelle organisation",
-                    // to: { name: "admin-statistique-module-organisations-create" },
-                    tooltip: { text: "Créer une nouvelle organisation" },
                 },
             ],
         },
@@ -138,28 +132,28 @@ export const useAuthSidebar = () => {
     const activiteElements = [
         dashboardElement,
         {
-            id: "categories",
-            label: "Catégories",
-            icon: "i-heroicons-square-3-stack-3d",
-            to: { name: "admin-project-module-categories" },
+            id: "functional-groups",
+            label: "Groupes fonctionnels",
+            icon: "i-heroicons-rectangle-group",
+            to: { name: "admin-activite-module-functional-groups" },
         },
         {
-            id: "subcategories",
-            label: "Sous-catégories",
-            icon: "i-heroicons-queue-list",
-            to: { name: "admin-project-module-subcategories" },
-        },
-        {
-            id: "agents",
-            label: "Agents",
-            icon: "i-heroicons-users",
-            to: { name: "admin-project-module-agents" },
+            id: "sdgs",
+            label: "SDG",
+            icon: "i-heroicons-globe-alt",
+            to: { name: "admin-activite-module-sdgs" },
         },
         {
             id: "conventions",
             label: "Conventions",
             icon: "i-heroicons-document-text",
-            to: { name: "admin-project-module-conventions" },
+            to: { name: "admin-activite-module-conventions" },
+        },
+        {
+            id: "activities",
+            label: "Activités",
+            icon: "i-heroicons-calendar-days",
+            to: { name: "admin-activite-module-activities" },
         },
     ];
 

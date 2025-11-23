@@ -10,6 +10,7 @@ export default defineNuxtConfig({
             keycloakUrl: process.env.KEYCLOAK_URL,
             baseSiseb: process.env.BETTER_AUTH_URL,
             betterAuthUrl: process.env.NUXT_PUBLIC_BETTER_AUTH_URL || process.env.BETTER_AUTH_URL || "http://localhost:3000",
+            sisebApiActiviteUrl: process.env.NUXT_PUBLIC_SISEB_API_ACTIVITE_BASE_URL
         }
     },
     css: ['~/assets/css/main-siseb.css'],

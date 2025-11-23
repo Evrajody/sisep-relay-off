@@ -144,3 +144,27 @@ export type UserType = {
     }
 }
 
+export type Convention = {
+  id: string
+  title: string
+  functionalGroupId: FunctionalGroup['id']
+  adoptionDate: string
+  ratificationDate: string
+  effectiveDate: string
+  objectives: string
+  principles: string
+  globalObligations: string
+  specificObligations: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type FunctionalGroup = {
+  id: string
+  name: string
+  description: string
+  createdAt: string
+  updatedAt: string
+}
+
+
